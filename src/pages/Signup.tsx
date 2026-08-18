@@ -7,6 +7,7 @@ import { SEOHead } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
 import { GoogleOneTap } from '@/components/google-one-tap';
 import { FloatingField, type FieldStatus } from '@/components/floating-field';
+import { CutFrame } from '@/components/cut-frame';
 import { GradientCheckbox } from '@/components/gradient-checkbox';
 import { GoogleButton } from '@/components/google-button';
 
@@ -129,12 +130,7 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
   const validation = touched && value.length > 0 ? validatePhone(value) : { valid: false };
   const isError = touched && value.length > 0 && !validation.valid && !!validation.error;
   const isValid = validation.valid;
-
-  const borderColor = isValid
-    ? '#22c55e'
-    : isError
-    ? '#ef4444'
-    : 'oklch(0.91 0.015 250)';
+  const statusCls = isValid ? 'is-valid' : isError ? 'is-error' : '';
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value.replace(/\D/g, '').slice(0, 10);
@@ -149,81 +145,74 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
   }
 
   return (
-    <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium text-gray-500 pl-1">Phone Number</label>
-      <div
-        className="flex items-center overflow-hidden rounded-2xl transition-all duration-200"
-        style={{
-          border: `1.5px solid ${borderColor}`,
-          background: '#fff',
-          boxShadow: isValid
-            ? '0 0 0 3px rgba(34,197,94,0.10)'
-            : isError
-            ? '0 0 0 3px rgba(239,68,68,0.10)'
-            : 'none',
-        }}
-        onClick={() => inputRef.current?.focus()}
-      >
-        {/* +880 badge */}
-        <div
-          className="flex shrink-0 items-center gap-1.5 border-r px-3 py-3.5 select-none"
-          style={{
-            borderColor,
-            background: 'linear-gradient(135deg, oklch(0.26 0.10 335 / 0.07), oklch(0.42 0.16 350 / 0.07))',
-          }}
-        >
-          <svg width="20" height="14" viewBox="0 0 30 20">
-            <rect width="30" height="20" rx="2" fill="#006A4E" />
-            <circle cx="13" cy="10" r="6" fill="#F42A41" />
-          </svg>
-          <span className="text-[13px] font-bold text-gray-700">+880</span>
-        </div>
+    <div className="flex flex-col gap-1.5 pt-1.5">
+      <div className={`pv-cut-field relative flex h-14 items-stretch ${statusCls}`} onClick={() => inputRef.current?.focus()}>
+        <div className="pv-cut-bg" />
+        <CutFrame />
 
-        {/* Input */}
-        <input
-          ref={inputRef}
-          type="tel"
-          inputMode="numeric"
-          placeholder="1XXXX-XXXXX"
-          value={formatPhone(value)}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          maxLength={11} /* 10 digits + 1 hyphen */
-          className="flex-1 bg-transparent px-3 py-3.5 text-sm text-gray-900 placeholder-gray-400 outline-none"
-          aria-label="Phone number"
-          autoComplete="tel-national"
-        />
+        <span className="pv-cut-label">Phone Number</span>
 
-        {/* Status icon */}
-        <div className="flex items-center pr-3.5">
-          {isValid ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
+        <div className="relative z-20 flex min-w-0 flex-1 items-center">
+          {/* +880 badge */}
+          <div
+            className="flex shrink-0 items-center gap-1.5 border-r border-border/70 px-3 py-2 select-none"
+            style={{
+              background: 'linear-gradient(135deg, oklch(0.26 0.10 335 / 0.07), oklch(0.42 0.16 350 / 0.07))',
+            }}
+          >
+            <svg width="20" height="14" viewBox="0 0 30 20" aria-hidden="true">
+              <rect width="30" height="20" rx="2" fill="#006A4E" />
+              <circle cx="13" cy="10" r="6" fill="#F42A41" />
             </svg>
-          ) : isError ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="5" y="2" width="14" height="20" rx="2" />
-              <line x1="12" y1="18" x2="12.01" y2="18" strokeWidth="2.5" />
-            </svg>
-          )}
+            <span className="text-[13px] font-bold text-secondary-foreground">+880</span>
+          </div>
+
+          {/* Input */}
+          <input
+            ref={inputRef}
+            type="tel"
+            inputMode="numeric"
+            placeholder="1XXXX-XXXXX"
+            value={formatPhone(value)}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            maxLength={11} /* 10 digits + 1 hyphen */
+            className="flex-1 bg-transparent px-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 outline-none"
+            aria-label="Phone number"
+            autoComplete="tel-national"
+          />
+
+          {/* Status icon */}
+          <div className="flex items-center pr-3.5">
+            {isValid ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="oklch(0.60 0.15 152)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            ) : isError ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-destructive" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-muted-foreground/50" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2" />
+                <line x1="12" y1="18" x2="12.01" y2="18" strokeWidth="2.5" />
+              </svg>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Hint */}
       <div className="min-h-[18px] pl-1">
         {isError && validation.error ? (
-          <p className="text-[11px] text-red-500">{validation.error}</p>
+          <p className="text-[11px] text-destructive">{validation.error}</p>
         ) : isValid ? (
-          <p className="text-[11px] text-emerald-600 flex items-center gap-1">
+          <p className="flex items-center gap-1 text-[11px] text-emerald-600">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
             Valid Bangladesh number
           </p>
         ) : (
-          <p className="text-[11px] text-gray-400">10-digit number after +880 (e.g. 1712345678)</p>
+          <p className="text-[11px] text-muted-foreground">10-digit number after +880 (e.g. 1712345678)</p>
         )}
       </div>
     </div>

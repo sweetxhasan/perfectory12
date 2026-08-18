@@ -154,6 +154,104 @@
   border-color: color-mix(in oklch, var(--destructive) 28%, transparent);
 }
 
+/* ── Premium cut-corner input frame (Login / Signup) ──────────── */
+.pv-cut-field {
+  position: relative;
+  isolation: isolate;
+}
+
+.pv-cut-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  clip-path: polygon(4.1% 0.9%, 92.4% 0.9%, 94.7% 10.7%, 98.2% 10.7%, 99.9% 23.2%, 99.9% 76.8%, 95.9% 99.1%, 7.6% 99.1%, 5.6% 89.3%, 2.1% 89.3%, 0.1% 76.8%, 0.1% 23.2%);
+  background: color-mix(in oklch, var(--card) 94%, transparent);
+  backdrop-filter: blur(6px);
+  transition: background 0.25s ease;
+}
+
+.pv-cut-frame-svg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.pv-cut-frame {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+.pv-cut-frame-inner {
+  fill: none;
+  stroke: color-mix(in oklch, var(--foreground) 6%, transparent);
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 0.25s ease;
+}
+
+.pv-cut-field:hover .pv-cut-frame {
+  stroke: color-mix(in oklch, var(--brand-2) 45%, var(--border));
+}
+.pv-cut-field:hover .pv-cut-frame-inner {
+  stroke: color-mix(in oklch, var(--brand-2) 14%, transparent);
+}
+
+.pv-cut-field:focus-within .pv-cut-frame {
+  stroke: var(--brand-2);
+  stroke-width: 1.6;
+}
+.pv-cut-field:focus-within .pv-cut-frame-inner {
+  stroke: color-mix(in oklch, var(--brand-2) 20%, transparent);
+}
+.pv-cut-field:focus-within .pv-cut-bg {
+  background: color-mix(in oklch, var(--card) 100%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--brand-2) 10%, transparent);
+}
+
+.pv-cut-field.is-valid .pv-cut-frame { stroke: oklch(0.72 0.17 152); }
+.pv-cut-field.is-valid .pv-cut-frame-inner { stroke: color-mix(in oklch, oklch(0.72 0.17 152) 22%, transparent); }
+.pv-cut-field.is-valid .pv-cut-label { color: oklch(0.6 0.15 152) !important; border-color: color-mix(in oklch, oklch(0.72 0.17 152) 55%, transparent) !important; }
+
+.pv-cut-field.is-error .pv-cut-frame { stroke: var(--destructive); }
+.pv-cut-field.is-error .pv-cut-frame-inner { stroke: color-mix(in oklch, var(--destructive) 22%, transparent); }
+.pv-cut-field.is-error .pv-cut-label { color: var(--destructive) !important; border-color: color-mix(in oklch, var(--destructive) 55%, transparent) !important; }
+
+.pv-cut-label {
+  position: absolute;
+  top: -10px;
+  left: 15px;
+  z-index: 3;
+  padding: 2px 9px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  background: var(--background);
+  border: 1px solid var(--border);
+  clip-path: polygon(0% 0%, 96% 0%, 100% 22%, 100% 78%, 96% 100%, 4% 100%, 0% 78%, 0% 22%);
+  white-space: nowrap;
+  transition: color 0.2s ease, letter-spacing 0.2s ease, border-color 0.2s ease;
+  pointer-events: none;
+}
+
+.pv-cut-field:hover .pv-cut-label {
+  color: color-mix(in oklch, var(--brand-2) 60%, var(--muted-foreground));
+  border-color: color-mix(in oklch, var(--brand-2) 35%, var(--border));
+}
+.pv-cut-field:focus-within .pv-cut-label {
+  color: var(--brand-2);
+  letter-spacing: 0.16em;
+  border-color: color-mix(in oklch, var(--brand-2) 55%, var(--border));
+}
+
 /* ── Auth left panel mesh grid ── */
 .auth-left-grid {
   background-image:
