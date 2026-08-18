@@ -15,6 +15,7 @@ import { GoogleOneTap } from '@/components/google-one-tap';
 import { GoogleButton } from '@/components/google-button';
 import { FloatingField } from '@/components/floating-field';
 import { GradientCheckbox } from '@/components/gradient-checkbox';
+import { CutSubmitButton } from '@/components/cut-submit-button';
 
 const REMEMBER_KEY = 'pv_remember_me';
 
@@ -177,32 +178,12 @@ export default function LoginPage() {
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="group relative mt-1 flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-2xl py-3.5 text-sm font-semibold text-white transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            style={{
-              background: 'linear-gradient(115deg, oklch(0.26 0.10 335) 0%, oklch(0.42 0.16 350) 48%, oklch(0.60 0.18 22) 100%)',
-              boxShadow: '0 4px 24px -8px oklch(0.60 0.18 22 / 0.55)',
-            }}
-          >
-            <span className="absolute inset-0 -translate-x-full bg-white/10 transition-transform duration-500 group-hover:translate-x-full" />
-            {loading ? (
-              <>
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                <span className="relative">Signing in…</span>
-              </>
-            ) : (
-              <>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="relative">
-                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                  <polyline points="10 17 15 12 10 7" />
-                  <line x1="15" y1="12" x2="3" y2="12" />
-                </svg>
-                <span className="relative">Sign in</span>
-              </>
-            )}
-          </button>
+          <CutSubmitButton
+            className="mt-1"
+            loading={loading}
+            label="Log In"
+            loadingLabel="Signing in…"
+          />
         </form>
 
         {/* Divider */}
