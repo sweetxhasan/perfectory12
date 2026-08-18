@@ -406,7 +406,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 <Link href="/login" className="hidden rounded-xl border border-border bg-card px-4 py-2 text-sm transition hover:border-brand-2 sm:inline-flex">Login</Link>
                 <CutPrimaryButton href="/signup">
                   Get Started
-                  <Icon name="arrow-right" size={14} />
                 </CutPrimaryButton>
               </>
             )}
