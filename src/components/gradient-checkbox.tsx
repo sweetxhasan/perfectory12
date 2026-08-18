@@ -11,8 +11,9 @@ type GradientCheckboxProps = {
  * Premium "cut-corner" checkbox — no CSS border. The box, the fill and the
  * checkmark are all drawn as SVG so the same angular-cut language used by
  * the input frames (see cut-frame.tsx) carries through to the checkbox.
- * The box has three chamfered corners (top-right, bottom-right, bottom-left)
- * and one square corner (top-left).
+ * The outline is the same 6-cut geometry as CUT_FRAME_PATH (chamfers +
+ * two small tab notches on opposite corners), scaled to a 20x20 box, with
+ * a crisp 1px stroke.
  */
 export function GradientCheckbox({ checked, onChange, label, className = '' }: GradientCheckboxProps) {
   const id = useId().replace(/:/g, '');
@@ -35,12 +36,13 @@ export function GradientCheckbox({ checked, onChange, label, className = '' }: G
             </linearGradient>
           </defs>
 
-          {/* Three-cut box: square top-left, chamfered top-right / bottom-right / bottom-left */}
+          {/* Six-cut box: same chamfer + tab-notch geometry as CUT_FRAME_PATH, scaled to 20x20 */}
           <path
-            d="M0.9 0.9 H13.4 L19.1 6.6 V13.4 L13.4 19.1 H6.6 L0.9 13.4 Z"
+            d="M0.8 0.2 H18.5 L19.0 2.1 L19.6 2.1 L20.0 4.6 V15.4 L19.2 19.8 H1.5 L1.1 17.9 L0.4 17.9 L0 15.4 V4.6 Z"
             fill={checked ? `url(#${gradId})` : 'color-mix(in oklch, var(--brand-2) 4%, transparent)'}
-            stroke={checked ? `url(#${gradId})` : 'oklch(0.6 0 0 / 0.5)'}
-            strokeWidth="1.5"
+            stroke={checked ? `url(#${gradId})` : 'oklch(0.6 0 0 / 0.6)'}
+            strokeWidth="1"
+            vectorEffect="non-scaling-stroke"
             style={{ transition: 'fill 0.2s ease, stroke 0.2s ease' }}
             className="transition-colors group-hover:[stroke:var(--brand-2)]"
           />
