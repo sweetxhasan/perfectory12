@@ -178,7 +178,7 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             maxLength={11} /* 10 digits + 1 hyphen */
-            className="min-w-0 flex-1 bg-transparent py-2 pr-2 pl-2 text-[15px] font-semibold tracking-wide text-foreground outline-none placeholder:font-normal placeholder:tracking-normal placeholder:text-muted-foreground/40"
+            className="min-w-0 flex-1 bg-transparent py-2 pr-2 pl-2 text-[15px] font-semibold tracking-wide text-foreground outline-none placeholder:font-normal placeholder:tracking-normal placeholder:text-muted-foreground/70"
             aria-label="Phone number"
             autoComplete="tel-national"
           />
@@ -373,6 +373,7 @@ export default function SignupPage() {
           <FloatingField
             id="signup-name"
             label="Full name"
+            placeholder="Enter your full name"
             icon="user"
             type="text"
             autoComplete="name"
@@ -391,7 +392,7 @@ export default function SignupPage() {
           <FloatingField
             id="signup-email"
             label="Email Address"
-            placeholder="Enter your email"
+            placeholder="you@gmail.com"
             icon="mail"
             type="email"
             autoComplete="email"
@@ -416,6 +417,7 @@ export default function SignupPage() {
           <FloatingField
             id="signup-password"
             label="Password"
+            placeholder="Create a strong password"
             icon="lock"
             type={showPw ? 'text' : 'password'}
             autoComplete="new-password"

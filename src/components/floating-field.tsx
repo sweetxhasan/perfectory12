@@ -57,7 +57,7 @@ export const FloatingField = forwardRef<HTMLInputElement, FloatingFieldProps>(
                 setFocused(false);
                 onBlur?.(e);
               }}
-              className={`w-full min-w-0 flex-1 bg-transparent px-3.5 py-2 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/40 ${icon ? 'pl-2.5' : ''} ${className}`}
+              className={`w-full min-w-0 flex-1 bg-transparent px-3.5 py-2 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 ${icon ? 'pl-2.5' : ''} ${className}`}
               {...props}
             />
             {rightSlot}

@@ -131,6 +131,7 @@ export default function LoginPage() {
           <FloatingField
             id="login-email"
             label="Email address"
+            placeholder="you@example.com"
             icon="mail"
             type="email"
             autoComplete="email"
@@ -143,6 +144,7 @@ export default function LoginPage() {
           <FloatingField
             id="login-password"
             label="Password"
+            placeholder="Enter your password"
             icon="lock"
             type={showPw ? 'text' : 'password'}
             autoComplete="current-password"
