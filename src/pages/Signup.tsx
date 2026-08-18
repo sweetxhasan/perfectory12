@@ -201,20 +201,6 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
           </div>
         </div>
       </div>
-
-      {/* Hint */}
-      <div className="min-h-[18px] pl-1">
-        {isError && validation.error ? (
-          <p className="text-[11px] text-destructive">{validation.error}</p>
-        ) : isValid ? (
-          <p className="flex items-center gap-1 text-[11px] text-emerald-600">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-            Valid Bangladesh number
-          </p>
-        ) : (
-          <p className="text-[11px] text-muted-foreground">10-digit number after +880 (e.g. 1712345678)</p>
-        )}
-      </div>
     </div>
   );
 }
