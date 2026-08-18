@@ -145,12 +145,12 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
   }
 
   return (
-    <div className="flex flex-col gap-1.5 pt-1.5">
+    <div className={`pv-field-wrap flex flex-col gap-1.5 ${statusCls}`}>
+      <span className="pv-cut-label">Phone number</span>
+
       <div className={`pv-cut-field relative flex h-14 items-stretch ${statusCls}`} onClick={() => inputRef.current?.focus()}>
         <div className="pv-cut-bg" />
         <CutFrame />
-
-        <span className="pv-cut-label">Phone Number</span>
 
         <div className="relative z-20 flex min-w-0 flex-1 items-stretch">
           {/* +880 country chip — angular cut edge to match the field's corner language */}
