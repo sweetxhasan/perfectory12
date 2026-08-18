@@ -13,5 +13,6 @@ export function friendlyAuthError(err: unknown): string {
   };
   const msg = err instanceof Error ? err.message : '';
   if (msg === 'phone-already-in-use') return 'This phone number is already linked to another account.';
+  if (msg === 'email-already-in-use') return 'This email is already registered. Please use another email.';
   return map[code] ?? (msg || 'Something went wrong.');
 }

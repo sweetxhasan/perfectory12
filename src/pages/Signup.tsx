@@ -12,9 +12,11 @@ import { GradientCheckbox } from '@/components/gradient-checkbox';
 import { GoogleButton } from '@/components/google-button';
 import { CutIconBadge } from '@/components/cut-icon-badge';
 import { PremiumTooltip } from '@/components/premium-tooltip';
-import { isPhoneUsed } from '@/lib/user-store';
+import { Icon } from '@/components/icon';
+import { isPhoneUsed, isEmailUsed } from '@/lib/user-store';
 
-const NAME_MAX = 40;
+const NAME_MIN = 3;
+const NAME_MAX = 20;
 const PW_MIN = 8;
 
 /* ── Phone validation (10 digits after +880, starts with 1[3-9]) ── */
@@ -274,6 +276,138 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
   );
 }
 
+/* ── Email Field (Gmail only, dot-trick-aware duplicate check) ── */
+interface EmailFieldProps {
+  value: string;
+  onChange: (v: string) => void;
+}
+type EmailDuplicateState = 'idle' | 'checking' | 'used' | 'free';
+
+function EmailField({ value, onChange }: EmailFieldProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const trimmed = value.trim();
+  const formatValid = trimmed !== '' && /^[^\s@]+@gmail\.com$/i.test(trimmed);
+  const isFormatError = trimmed !== '' && !formatValid;
+
+  /* Firestore duplicate-email check — debounced, Gmail dot-trick aware */
+  const [dup, setDup] = useState<EmailDuplicateState>('idle');
+  const isDuplicate = formatValid && dup === 'used';
+  const isValid = formatValid && dup === 'free';
+  const statusCls = isValid ? 'is-valid' : isFormatError || isDuplicate ? 'is-error' : '';
+
+  useEffect(() => {
+    if (!formatValid) {
+      setDup('idle');
+      return;
+    }
+    setDup('checking');
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      isEmailUsed(trimmed)
+        .then((used) => { if (!cancelled) setDup(used ? 'used' : 'free'); })
+        .catch(() => { if (!cancelled) setDup('free'); });
+    }, 450);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [formatValid, trimmed]);
+
+  const iconCls = isValid
+    ? 'text-emerald-500'
+    : isFormatError || isDuplicate
+      ? 'text-destructive'
+      : 'text-muted-foreground/50';
+
+  return (
+    <div className={`pv-field-wrap flex flex-col gap-1.5 ${statusCls}`}>
+      <span className="pv-cut-label">Email Address</span>
+
+      <div className={`pv-cut-field relative flex h-14 items-stretch ${statusCls}`} onClick={() => inputRef.current?.focus()}>
+        <div className="pv-cut-bg" />
+        <CutFrame />
+
+        <div className="relative z-20 flex min-w-0 flex-1 items-center">
+          <span className={`shrink-0 pl-4 transition-colors duration-200 ${iconCls}`}>
+            <Icon name="mail" size={18} />
+          </span>
+
+          <input
+            ref={inputRef}
+            type="email"
+            placeholder="you@gmail.com"
+            autoComplete="email"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="min-w-0 flex-1 bg-transparent px-3.5 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground/70"
+            aria-label="Email Address"
+            required
+          />
+
+          {/* Status icon — loading spinner, Gmail-only format notice,
+              duplicate-account notice, or valid checkmark. No default icon. */}
+          <div className="flex items-center pr-3">
+            {dup === 'checking' ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="animate-spin text-muted-foreground" aria-label="Checking email...">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.2" strokeWidth="2.4" />
+                <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+              </svg>
+            ) : isDuplicate ? (
+              <PremiumTooltip content="Your email is already used. Please use another email." variant="invalid">
+                {({ toggle }) => (
+                  <button
+                    type="button"
+                    onClick={toggle}
+                    aria-label="Your email is already used. Please use another email."
+                    className="flex items-center justify-center rounded-full p-0 outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
+                  >
+                    <CutIconBadge variant="invalid" size={18}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                      </svg>
+                    </CutIconBadge>
+                  </button>
+                )}
+              </PremiumTooltip>
+            ) : isValid ? (
+              <PremiumTooltip content="Your email is valid for use." variant="valid">
+                {({ toggle }) => (
+                  <button
+                    type="button"
+                    onClick={toggle}
+                    aria-label="Your email is valid for use."
+                    className="flex items-center justify-center rounded-full p-0 outline-none focus-visible:ring-2 focus-visible:ring-[oklch(0.60_0.15_152)]/40"
+                  >
+                    <CutIconBadge variant="valid" size={18}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </CutIconBadge>
+                  </button>
+                )}
+              </PremiumTooltip>
+            ) : isFormatError ? (
+              <PremiumTooltip content="Only @gmail.com email supported" variant="invalid">
+                {({ toggle }) => (
+                  <button
+                    type="button"
+                    onClick={toggle}
+                    aria-label="Only @gmail.com email supported"
+                    className="flex items-center justify-center rounded-full p-0 outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
+                  >
+                    <CutIconBadge variant="invalid" size={18}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                      </svg>
+                    </CutIconBadge>
+                  </button>
+                )}
+              </PremiumTooltip>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Terms checkbox ── */
 function TermsCheckbox({ checked, onChange, error }: { checked: boolean; onChange: (v: boolean) => void; error?: boolean }) {
   return (
@@ -341,16 +475,14 @@ export default function SignupPage() {
 
   /* field validation */
   const emailSt = emailState(email);
-  const emailFieldStatus: FieldStatus =
-    email === '' ? 'default' : emailSt === 'valid' ? 'valid' : 'error';
-  const emailHint =
-    email && emailSt === 'invalid'
-      ? <p className="text-[11px] text-red-500 pl-1">Only @gmail.com addresses are accepted</p>
-      : null;
+
+  const nameTrimmedLen = name.trim().length;
+  const nameLiveStatus: FieldStatus = name === '' ? 'default' : nameTrimmedLen < NAME_MIN ? 'error' : 'valid';
+  const nameAtMax = name.length >= NAME_MAX;
 
   function validateName(v: string) {
     if (!v.trim()) { setNameError('Name is required'); return false; }
-    if (v.trim().length < 2) { setNameError('At least 2 characters'); return false; }
+    if (v.trim().length < NAME_MIN) { setNameError(`At least ${NAME_MIN} characters`); return false; }
     if (v.trim().length > NAME_MAX) { setNameError(`Max ${NAME_MAX} characters`); return false; }
     setNameError('');
     return true;
@@ -423,7 +555,7 @@ export default function SignupPage() {
         )}
 
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          {/* Full name */}
+          {/* Full name — 3 to 20 characters */}
           <FloatingField
             id="signup-name"
             label="Full name"
@@ -437,25 +569,35 @@ export default function SignupPage() {
               setName(e.target.value);
               if (nameError) validateName(e.target.value);
             }}
-            status={nameError ? 'error' : name.trim().length >= 2 ? 'valid' : 'default'}
+            status={nameError ? 'error' : nameLiveStatus}
             hint={nameError ? <p className="text-[11px] text-red-500 pl-1">{nameError}</p> : null}
             required
+            rightSlot={
+              nameAtMax ? (
+                <div className="mr-3.5 flex shrink-0 items-center">
+                  <PremiumTooltip content="Name can't be more than 20 characters." variant="invalid" autoOpenDuration={3000}>
+                    {({ toggle }) => (
+                      <button
+                        type="button"
+                        onClick={toggle}
+                        aria-label="Name can't be more than 20 characters."
+                        className="flex items-center justify-center rounded-full p-0 outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
+                      >
+                        <CutIconBadge variant="invalid" size={18}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                          </svg>
+                        </CutIconBadge>
+                      </button>
+                    )}
+                  </PremiumTooltip>
+                </div>
+              ) : undefined
+            }
           />
 
-          {/* Email — Gmail only */}
-          <FloatingField
-            id="signup-email"
-            label="Email Address"
-            placeholder="you@gmail.com"
-            icon="mail"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            status={emailFieldStatus}
-            hint={emailHint}
-            required
-          />
+          {/* Email — Gmail only, dot-trick-aware duplicate check */}
+          <EmailField value={email} onChange={setEmail} />
 
           {/* Phone */}
           <PhoneField

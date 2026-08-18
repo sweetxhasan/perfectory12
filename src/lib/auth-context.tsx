@@ -12,7 +12,7 @@ import {
   type User,
 } from 'firebase/auth';
 import { auth, googleProvider } from './firebase';
-import { getProfile, subscribeUserProfile, upsertProfile, generateAvatarUrl, isPhoneUsed, checkAndExpirePlan, type AvatarGender, type UserProfile } from './user-store';
+import { getProfile, subscribeUserProfile, upsertProfile, generateAvatarUrl, isPhoneUsed, isEmailUsed, checkAndExpirePlan, type AvatarGender, type UserProfile } from './user-store';
 
 interface SignUpParams {
   email: string;
@@ -132,11 +132,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signUpEmail({ email, password, name, phone, gender }: SignUpParams) {
-    // Check phone uniqueness before creating account
-    if (phone) {
-      const phoneUsed = await isPhoneUsed(phone);
-      if (phoneUsed) throw new Error('phone-already-in-use');
-    }
+  // Check phone uniqueness before creating account
+  if (phone) {
+  const phoneUsed = await isPhoneUsed(phone);
+  if (phoneUsed) throw new Error('phone-already-in-use');
+  }
+  // Check email uniqueness (Gmail dot-trick aware) before creating account —
+  // hasan@gmail.com, h.asan@gmail.com, has.an@gmail.com etc. are one account.
+  const emailUsed = await isEmailUsed(email);
+  if (emailUsed) throw new Error('email-already-in-use');
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     const photoURL = generateAvatarUrl(name, gender);
     await fbUpdateProfile(cred.user, { displayName: name, photoURL });

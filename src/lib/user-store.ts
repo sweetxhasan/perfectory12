@@ -33,6 +33,7 @@ export interface UserProfile {
   username: string;
   name: string;
   email: string;
+  canonicalEmail?: string; // Gmail dot-trick-normalized email, used for duplicate detection
   phone: string;
   photoURL: string;
   bio: string;
@@ -98,6 +99,29 @@ export async function isPhoneUsed(phone: string): Promise<boolean> {
   return !snap.empty;
 }
 
+/* ── Gmail "dot trick" normalization ─────────────────────
+   Gmail ignores dots in the local part of an address, so
+   hasan@gmail.com, h.asan@gmail.com and has.an@gmail.com all
+   deliver to the same inbox. Normalize to a canonical form so
+   duplicate-account checks catch every dot variation. ── */
+export function normalizeGmailEmail(email: string): string {
+  const trimmed = email.trim().toLowerCase();
+  const at = trimmed.lastIndexOf('@');
+  if (at === -1) return trimmed;
+  const local = trimmed.slice(0, at);
+  const domain = trimmed.slice(at + 1);
+  if (domain !== 'gmail.com') return trimmed;
+  return `${local.replace(/\./g, '')}@gmail.com`;
+}
+
+/* ── Email uniqueness check (Gmail dot-trick aware) ──── */
+export async function isEmailUsed(email: string): Promise<boolean> {
+  if (!email) return false;
+  const canonical = normalizeGmailEmail(email);
+  const snap = await getDocs(query(collection(db, USERS), where('canonicalEmail', '==', canonical), limit(1)));
+  return !snap.empty;
+}
+
 /* ── CRUD ─────────────────────────────────────────────── */
 export async function getProfile(uid: string): Promise<UserProfile | null> {
   const snap = await getDoc(doc(db, USERS, uid));
@@ -158,6 +182,7 @@ export async function createProfile(
     username,
     name,
     email,
+    canonicalEmail: normalizeGmailEmail(email),
     phone,
     photoURL,
     bio: "I'm a Perfectory voice user.",
