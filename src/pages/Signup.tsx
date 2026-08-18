@@ -82,6 +82,25 @@ function getStrength(pw: string): StrengthResult | null {
   return { score, tips, ...map[score] };
 }
 
+/** Fixed-pixel chamfer so the cut corners stay crisp no matter how tall the
+ *  card grows (a percentage clip-path would stretch the corner cut and the
+ *  tail out of proportion as the content — and therefore height — varies). */
+function chamferClip(cut: number): string {
+  return `polygon(${cut}px 0, calc(100% - ${cut}px) 0, 100% ${cut}px, 100% calc(100% - ${cut}px), calc(100% - ${cut}px) 100%, ${cut}px 100%, 0 calc(100% - ${cut}px), 0 ${cut}px)`;
+}
+
+/** Password meets policy: at least PW_MIN characters and at least 3 of the
+ *  4 character-class rules below. */
+function passwordMeetsPolicy(pw: string): boolean {
+  if (pw.length < PW_MIN) return false;
+  const checks = [/[A-Z]/.test(pw), /[a-z]/.test(pw), /[0-9]/.test(pw), /[^A-Za-z0-9]/.test(pw)].filter(Boolean).length;
+  return checks >= 3;
+}
+
+/* ── Password requirements — premium cut-corner tooltip, floating top-center
+   above the password field (same visual language as the email/phone status
+   tooltips). Border color mirrors overall validity: success green once the
+   policy is met, danger red while it isn't. ── */
 function PasswordStrength({ password }: { password: string }) {
   if (!password) return null;
   const rules = [
@@ -91,21 +110,39 @@ function PasswordStrength({ password }: { password: string }) {
     ['Non-alphanumeric characters', /[^A-Za-z0-9]/.test(password)],
   ] as const;
   const passed = rules.filter(([, valid]) => valid).length;
+  const isValid = passwordMeetsPolicy(password);
+  const color = isValid ? 'oklch(0.60 0.15 152)' : 'var(--destructive)';
+
   return (
-    <div className="relative rounded-xl border border-[#b7b8c0] bg-card px-3.5 py-3 text-sm shadow-[0_12px_26px_rgba(40,40,50,0.12)] sm:rounded-2xl sm:px-5 sm:py-4 sm:text-base">
-      <p className="mb-2.5 max-w-[32rem] leading-5 text-muted-foreground sm:mb-3 sm:leading-6">Passwords must be at least 8 characters long and contain at least 3 of the following:</p>
-      <div className="flex flex-col gap-2 sm:gap-2.5">
-        {rules.map(([label, valid]) => (
-          <div key={label} className={`flex items-center gap-2 ${valid ? 'text-emerald-600' : 'text-muted-foreground'}`}>
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="8 12 11 15 16 9" />
-            </svg>
-            <span>{label}</span>
+    <div className="relative mx-auto w-[min(92vw,22rem)]">
+      <div className="relative" style={{ clipPath: chamferClip(14), filter: 'drop-shadow(0 12px 26px rgba(40,40,50,0.14))' }}>
+        <div className="absolute inset-0 transition-colors duration-200" style={{ background: color }} />
+        <div className="absolute inset-[1.5px]" style={{ background: 'var(--card)', clipPath: chamferClip(12.5) }} />
+        <div className="relative z-10 px-4 py-3.5 text-sm sm:px-5 sm:py-4">
+          <p className="mb-2.5 leading-5 text-muted-foreground sm:mb-3 sm:leading-6">
+            Passwords must be at least {PW_MIN} characters long and contain at least 3 of the following:
+          </p>
+          <div className="flex flex-col gap-2 sm:gap-2.5">
+            {rules.map(([label, valid]) => (
+              <div key={label} className={`flex items-center gap-2.5 ${valid ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                <CutIconBadge variant={valid ? 'valid' : 'neutral'} size={18} borderWidth={1}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </CutIconBadge>
+                <span>{label}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
-      <span className="sr-only">{passed} of 4 password requirements met</span>
+
+      {/* Tail — matching double-diamond notch pointing down at the field */}
+      <div className="absolute left-1/2 -bottom-[6px] h-[13px] w-[13px] -translate-x-1/2 rotate-45 transition-colors duration-200" style={{ background: color }}>
+        <div className="absolute inset-[1.5px]" style={{ background: 'var(--card)' }} />
+      </div>
+
+      <span className="sr-only">{passed} of 4 password requirements met, password {isValid ? 'meets' : 'does not meet'} the policy</span>
     </div>
   );
 }
@@ -555,10 +592,10 @@ export default function SignupPage() {
         )}
 
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          {/* Full name — 3 to 20 characters */}
+          {/* Name — 3 to 20 characters */}
           <FloatingField
             id="signup-name"
-            label="Full name"
+            label="Name"
             placeholder="Enter your full name"
             icon="user"
             type="text"
@@ -631,7 +668,7 @@ export default function SignupPage() {
                 <EyeIcon open={showPw} />
               </button>
             }
-            hintPlacement={keyboardOpen ? 'above' : 'below'}
+            hintPlacement="above"
             hint={<PasswordStrength password={password} />}
           />
 

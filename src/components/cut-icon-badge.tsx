@@ -9,20 +9,23 @@ import type { ReactNode } from 'react';
 const BADGE_CUT_CLIP_PATH = 'polygon(26% 0%, 74% 0%, 100% 26%, 100% 74%, 74% 100%, 26% 100%, 0% 74%, 0% 26%)';
 const BADGE_CUT_PATH = 'M26 0.9 L74 0.9 L99.1 26 L99.1 74 L74 99.1 L26 99.1 L0.9 74 L0.9 26 Z';
 
-export type CutIconVariant = 'valid' | 'invalid';
+export type CutIconVariant = 'valid' | 'invalid' | 'neutral';
 
 const VARIANT_COLOR: Record<CutIconVariant, string> = {
   valid: 'oklch(0.60 0.15 152)',   /* success green */
   invalid: 'var(--destructive)',    /* danger red */
+  neutral: 'var(--muted-foreground)', /* unmet / inactive */
 };
 
 export function CutIconBadge({
   variant,
   size = 20,
+  borderWidth = 1.4,
   children,
 }: {
   variant: CutIconVariant;
   size?: number;
+  borderWidth?: number;
   children: ReactNode;
 }) {
   const color = VARIANT_COLOR[variant];
@@ -32,7 +35,7 @@ export function CutIconBadge({
       style={{ width: size, height: size, color }}
     >
       <svg className="pv-icon-badge-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <path d={BADGE_CUT_PATH} fill="none" stroke="currentColor" strokeWidth="1.4" />
+        <path d={BADGE_CUT_PATH} fill="none" stroke="currentColor" strokeWidth={borderWidth} />
       </svg>
       <span className="relative z-10 flex items-center justify-center">{children}</span>
     </span>
