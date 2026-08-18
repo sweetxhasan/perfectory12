@@ -216,7 +216,7 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
                 <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
               </svg>
             ) : isDuplicate ? (
-              <PremiumTooltip content="Already used this phone number">
+              <PremiumTooltip content="Already used this phone number" variant="invalid">
                 {({ toggle }) => (
                   <button
                     type="button"
@@ -233,13 +233,24 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
                 )}
               </PremiumTooltip>
             ) : isValid && dup === 'free' ? (
-              <CutIconBadge variant="valid" size={18}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </CutIconBadge>
+              <PremiumTooltip content="Number is valid, please continue." variant="valid">
+                {({ toggle }) => (
+                  <button
+                    type="button"
+                    onClick={toggle}
+                    aria-label="Number is valid, please continue."
+                    className="flex items-center justify-center rounded-full p-0 outline-none focus-visible:ring-2 focus-visible:ring-[oklch(0.60_0.15_152)]/40"
+                  >
+                    <CutIconBadge variant="valid" size={18}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </CutIconBadge>
+                  </button>
+                )}
+              </PremiumTooltip>
             ) : isError && validation.error ? (
-              <PremiumTooltip content={validation.error}>
+              <PremiumTooltip content={validation.error} variant="invalid">
                 {({ toggle }) => (
                   <button
                     type="button"

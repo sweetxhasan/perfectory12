@@ -14,13 +14,23 @@ const TOOLTIP_CLIP_PATH =
 /* Same shape in raw SVG units for a 100×82 viewBox, inset ~0.6u for a crisp stroke. */
 const TOOLTIP_PATH = 'M8 0.6 L92 0.6 L99.4 8 L99.4 54 L96 61.4 L94 61.4 L90 79.4 L86 61.4 L8 61.4 L0.6 54 L0.6 8 Z';
 
+export type TooltipVariant = 'valid' | 'invalid' | 'neutral';
+
+const VARIANT_FRAME_COLOR: Record<TooltipVariant, string> = {
+  valid: 'oklch(0.60 0.15 152)',   /* success green */
+  invalid: 'var(--destructive)',    /* danger red */
+  neutral: 'oklch(0.12 0 0)',       /* black */
+};
+
 export function PremiumTooltip({
   content,
+  variant = 'neutral',
   autoOpenDelay = 150,
   autoOpenDuration = 2000,
   children,
 }: {
   content: ReactNode;
+  variant?: TooltipVariant;
   autoOpenDelay?: number;
   autoOpenDuration?: number;
   children: (opts: { open: boolean; toggle: () => void }) => ReactNode;
@@ -71,7 +81,13 @@ export function PremiumTooltip({
         }`}
       >
         <span className="pv-tooltip-bg absolute inset-0" style={{ clipPath: TOOLTIP_CLIP_PATH }} />
-        <svg className="pv-tooltip-frame" viewBox="0 0 100 82" preserveAspectRatio="none" aria-hidden="true">
+        <svg
+          className="pv-tooltip-frame"
+          viewBox="0 0 100 82"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          style={{ color: VARIANT_FRAME_COLOR[variant] }}
+        >
           <path d={TOOLTIP_PATH} fill="none" stroke="currentColor" strokeWidth="1.8" />
         </svg>
         <span className="pv-tooltip-text relative z-10 block px-3.5 pt-2.5 pb-6 text-[12px] font-semibold leading-snug">
