@@ -1,12 +1,16 @@
+import { CUT_FRAME_PATH, CUT_FRAME_CLIP_PATH } from '@/components/cut-frame';
+
 interface GoogleButtonProps {
   onClick?: () => void;
   loading?: boolean;
   disabled?: boolean;
 }
 
+const BUTTON_WIDTH = 250;
+
 function GoogleColorIcon({ size = 18 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="relative z-10 shrink-0">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -27,37 +31,56 @@ function GoogleColorIcon({ size = 18 }: { size?: number }) {
   );
 }
 
+/**
+ * Premium "6-cut" outline-only Google button — reuses the exact border
+ * geometry from the input frames (CUT_FRAME_PATH: 4 chamfered corners
+ * + 2 small notch steps on the top-right and bottom-left = 6 cuts
+ * total). No filled background — just the 1px cut-corner stroke, so
+ * the page background shows through. Fixed 250px wide on every
+ * device; must sit inside a centered wrapper (self-center on a
+ * flex-column form).
+ */
 export function GoogleButton({ onClick, loading = false, disabled = false }: GoogleButtonProps) {
   const busy = loading && !disabled;
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl transition-shadow hover:shadow-md"
-      style={
-        busy
-          ? { padding: '1.5px' }
-          : { border: '1px solid #DADCE0' }
-      }
+      className="group relative self-center shrink-0 transition-opacity"
+      style={{ width: BUTTON_WIDTH, aspectRatio: '250 / 52' }}
     >
-      {/* Spinning conic-gradient border — only when loading */}
-      {busy && <div className="google-border-spinner" aria-hidden="true" />}
+      {/* 6-cut border stroke */}
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full"
+      >
+        <path
+          d={CUT_FRAME_PATH}
+          fill="none"
+          stroke={busy ? '#9AA0A6' : '#DADCE0'}
+          strokeWidth="1"
+          vectorEffect="non-scaling-stroke"
+          className="transition-colors duration-200 group-hover:stroke-[#B8BCC2]"
+        />
+      </svg>
 
       <button
         type="button"
         onClick={onClick}
         disabled={disabled || loading}
-        className="relative z-10 flex w-full items-center justify-center gap-3 bg-white px-5 py-3.5 text-sm font-medium text-[#3c4043] transition hover:bg-[#f8f9fa] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-        style={{ borderRadius: busy ? 'calc(1rem - 1.5px)' : '1rem' }}
+        className="relative flex h-full w-full items-center justify-center gap-3 bg-transparent text-sm font-medium text-[#3c4043] transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60"
+        style={{ clipPath: CUT_FRAME_CLIP_PATH }}
       >
         {busy ? (
           /* keep icon slot same width so text doesn't jump */
-          <span className="flex h-[18px] w-[18px] items-center justify-center">
+          <span className="relative z-10 flex h-[18px] w-[18px] items-center justify-center">
             <span className="block h-4 w-4 rounded-full border-2 border-[#DADCE0] border-t-[#4285F4] animate-spin" />
           </span>
         ) : (
           <GoogleColorIcon size={18} />
         )}
-        <span>Continue with Google</span>
+        <span className="relative z-10">Continue with Google</span>
       </button>
     </div>
   );
