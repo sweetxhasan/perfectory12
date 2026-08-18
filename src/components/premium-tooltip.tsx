@@ -76,7 +76,7 @@ export function PremiumTooltip({
 
       <div
         role="tooltip"
-        className={`pv-tooltip absolute bottom-full right-[-10px] z-30 mb-3 w-[188px] transition-all duration-200 ${
+        className={`pv-tooltip absolute bottom-full right-[-10px] z-30 mb-0.5 w-[188px] transition-all duration-200 ${
           open ? 'visible translate-y-0 opacity-100' : 'invisible pointer-events-none translate-y-1 opacity-0'
         }`}
       >
