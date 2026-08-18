@@ -18,7 +18,7 @@ const VARIANT_COLOR: Record<CutIconVariant, string> = {
 
 export function CutIconBadge({
   variant,
-  size = 26,
+  size = 20,
   children,
 }: {
   variant: CutIconVariant;
@@ -32,7 +32,7 @@ export function CutIconBadge({
       style={{ width: size, height: size, color }}
     >
       <svg className="pv-icon-badge-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <path d={BADGE_CUT_PATH} fill="none" stroke="currentColor" strokeWidth="6" />
+        <path d={BADGE_CUT_PATH} fill="none" stroke="currentColor" strokeWidth="1.4" />
       </svg>
       <span className="relative z-10 flex items-center justify-center">{children}</span>
     </span>

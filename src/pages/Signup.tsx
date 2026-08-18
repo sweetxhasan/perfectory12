@@ -182,7 +182,7 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
               clipPath: 'polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%)',
             }}
           >
-            <svg width="21" height="15" viewBox="0 0 30 20" className="shrink-0 rounded-[2px] ring-1 ring-black/10" aria-hidden="true">
+            <svg width="21" height="15" viewBox="0 0 30 20" className="shrink-0 rounded-[2px]" aria-hidden="true">
               <rect width="30" height="20" fill="#006A4E" />
               <circle cx="13" cy="10" r="6" fill="#F42A41" />
             </svg>
@@ -206,9 +206,9 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
 
           {/* Status icon — only ever a loading spinner, a valid check, or an
               invalid/duplicate notice. No default placeholder icon. */}
-          <div className="flex items-center pr-3.5">
+          <div className="flex items-center pr-3">
             {dup === 'checking' ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="animate-spin text-muted-foreground" aria-label="Checking...">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="animate-spin text-muted-foreground" aria-label="Checking...">
                 <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.2" strokeWidth="2.4" />
                 <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
               </svg>
@@ -221,8 +221,8 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
                     aria-label="Already used this phone number"
                     className="flex items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
                   >
-                    <CutIconBadge variant="invalid">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                    <CutIconBadge variant="invalid" size={18}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" />
                       </svg>
                     </CutIconBadge>
@@ -230,8 +230,8 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
                 )}
               </PremiumTooltip>
             ) : isValid && dup === 'free' ? (
-              <CutIconBadge variant="valid">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+              <CutIconBadge variant="valid" size={18}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </CutIconBadge>
@@ -244,8 +244,8 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
                     aria-label={validation.error}
                     className="flex items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
                   >
-                    <CutIconBadge variant="invalid">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                    <CutIconBadge variant="invalid" size={18}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" />
                       </svg>
                     </CutIconBadge>
