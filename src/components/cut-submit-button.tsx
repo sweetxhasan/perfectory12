@@ -9,10 +9,11 @@ import type { ReactNode } from 'react';
  * SVG stroke on top, kept to a crisp 1px regardless of the button's
  * aspect ratio via `vectorEffect="non-scaling-stroke"`.
  *
- * The button never stretches full width — it sizes to its own label +
- * icon via padding, so it must be placed inside a centered wrapper
- * (e.g. `self-center` on a flex-column form).
+ * The button is a fixed 230px wide on every device (never stretches
+ * full width, never shrinks to fit its label), so it must be placed
+ * inside a centered wrapper (e.g. `self-center` on a flex-column form).
  */
+const BUTTON_WIDTH = 230;
 const BUTTON_CUT_PATH =
   'M9.7 0.7 L90.3 0.7 L99.3 9.7 L99.3 45 L95.3 45 L95.3 55 L99.3 55 L99.3 90.3 L90.3 99.3 L60 99.3 L60 95.3 L50 95.3 L50 99.3 L9.7 99.3 L0.7 90.3 L0.7 55 L4.7 55 L4.7 45 L0.7 45 L0.7 9.7 Z';
 const BUTTON_CUT_CLIP_PATH =
@@ -60,7 +61,8 @@ export function CutSubmitButton({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`group relative inline-flex self-center items-center justify-center gap-2.5 px-8 py-3.5 text-sm font-semibold text-white transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+      className={`group relative inline-flex shrink-0 self-center items-center justify-center gap-2.5 py-3.5 text-sm font-semibold text-white transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+      style={{ width: BUTTON_WIDTH }}
     >
       {/* Fill — clipped to the exact 3-cut shape, so it hugs the border precisely */}
       <span
