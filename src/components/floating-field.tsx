@@ -62,17 +62,18 @@ export const FloatingField = forwardRef<HTMLInputElement, FloatingFieldProps>(
             />
             {rightSlot}
           </div>
+
+          {/* Positioned relative to the field box only (not the label above
+              it), so an "above" hint sits a tight 2px over the input itself
+              instead of drifting up above the label. */}
+          {hint && focused && hintPlacement === 'above' && (
+            <div role="status" className="absolute bottom-[calc(100%+2px)] left-0 z-30 w-full max-w-[min(100%,32rem)]">
+              {hint}
+            </div>
+          )}
         </div>
-        {hint && focused && (
-          <div
-            role="status"
-            className={[
-              'z-30 w-full max-w-[min(100%,32rem)]',
-              hintPlacement === 'above'
-                ? 'absolute bottom-[calc(100%+10px)] left-0'
-                : 'relative mt-2',
-            ].join(' ')}
-          >
+        {hint && focused && hintPlacement === 'below' && (
+          <div role="status" className="relative z-30 mt-2 w-full max-w-[min(100%,32rem)]">
             {hint}
           </div>
         )}

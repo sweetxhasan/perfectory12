@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 
 /**
  * Premium "5-cut" tooltip — a chamfered speech-bubble (four cut corners plus
@@ -94,6 +94,88 @@ export function PremiumTooltip({
           {content}
         </span>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Premium "6-cut" speech-bubble card — same cut-corner + centered-tail
+ * visual language as PremiumTooltip above, but for content whose height
+ * isn't fixed (e.g. the password-requirements list, which grows/shrinks
+ * with the viewport and with text wrapping). The four corner chamfers and
+ * the two tail-notch diagonals — six cut facets in total — are computed
+ * from the card's real measured pixel size via ResizeObserver, so they
+ * stay crisp and the tail stays centered on any device instead of
+ * stretching the way a fixed percentage clip-path would on a
+ * variable-height box.
+ */
+export function CutBubbleCard({
+  children,
+  variant = 'neutral',
+  cornerCut = 14,
+  tailWidth = 18,
+  tailDrop = 11,
+  className = '',
+}: {
+  children: ReactNode;
+  variant?: TooltipVariant;
+  cornerCut?: number;
+  tailWidth?: number;
+  tailDrop?: number;
+  className?: string;
+}) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ w: 0, h: 0 });
+
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const measure = () => setSize({ w: el.offsetWidth, h: el.offsetHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const { w, h } = size;
+  const ready = w > 0 && h > 0;
+  const half = w / 2;
+  const shoulder = tailWidth / 2;
+
+  const points: [number, number][] = [
+    [cornerCut, 0],
+    [w - cornerCut, 0],
+    [w, cornerCut],
+    [w, h - cornerCut],
+    [w - cornerCut, h],
+    [half + shoulder, h],
+    [half, h + tailDrop],
+    [half - shoulder, h],
+    [cornerCut, h],
+    [0, h - cornerCut],
+    [0, cornerCut],
+  ];
+
+  const clipPath = ready ? `polygon(${points.map(([x, y]) => `${x}px ${y}px`).join(', ')})` : undefined;
+  const framePath = ready ? points.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x} ${y}`).join(' ') + ' Z' : '';
+
+  return (
+    <div className={`relative ${className}`} style={{ paddingBottom: ready ? tailDrop : 0 }}>
+      <div ref={bodyRef} className="pv-bubble-bg relative" style={clipPath ? { clipPath } : undefined}>
+        {children}
+      </div>
+      {ready && (
+        <svg
+          className="pv-bubble-frame"
+          width={w}
+          height={h + tailDrop}
+          viewBox={`0 0 ${w} ${h + tailDrop}`}
+          aria-hidden="true"
+          style={{ color: VARIANT_FRAME_COLOR[variant] }}
+        >
+          <path d={framePath} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+        </svg>
+      )}
     </div>
   );
 }

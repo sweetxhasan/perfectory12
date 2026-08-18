@@ -11,7 +11,7 @@ import { CutFrame } from '@/components/cut-frame';
 import { GradientCheckbox } from '@/components/gradient-checkbox';
 import { GoogleButton } from '@/components/google-button';
 import { CutIconBadge } from '@/components/cut-icon-badge';
-import { PremiumTooltip } from '@/components/premium-tooltip';
+import { PremiumTooltip, CutBubbleCard } from '@/components/premium-tooltip';
 import { Icon } from '@/components/icon';
 import { isPhoneUsed, isEmailUsed } from '@/lib/user-store';
 
@@ -82,13 +82,6 @@ function getStrength(pw: string): StrengthResult | null {
   return { score, tips, ...map[score] };
 }
 
-/** Fixed-pixel chamfer so the cut corners stay crisp no matter how tall the
- *  card grows (a percentage clip-path would stretch the corner cut and the
- *  tail out of proportion as the content — and therefore height — varies). */
-function chamferClip(cut: number): string {
-  return `polygon(${cut}px 0, calc(100% - ${cut}px) 0, 100% ${cut}px, 100% calc(100% - ${cut}px), calc(100% - ${cut}px) 100%, ${cut}px 100%, 0 calc(100% - ${cut}px), 0 ${cut}px)`;
-}
-
 /** Password meets policy: at least PW_MIN characters and at least 3 of the
  *  4 character-class rules below. */
 function passwordMeetsPolicy(pw: string): boolean {
@@ -97,10 +90,11 @@ function passwordMeetsPolicy(pw: string): boolean {
   return checks >= 3;
 }
 
-/* ── Password requirements — premium cut-corner tooltip, floating top-center
-   above the password field (same visual language as the email/phone status
-   tooltips). Border color mirrors overall validity: success green once the
-   policy is met, danger red while it isn't. ── */
+/* ── Password requirements — premium 6-cut bubble card, floating a tight
+   2px above the password field (same visual language, and the same tight
+   gap, as the email/phone status tooltips). Border color mirrors overall
+   validity: success green once the policy is met, danger red while it
+   isn't. ── */
 function PasswordStrength({ password }: { password: string }) {
   if (!password) return null;
   const rules = [
@@ -111,14 +105,11 @@ function PasswordStrength({ password }: { password: string }) {
   ] as const;
   const passed = rules.filter(([, valid]) => valid).length;
   const isValid = passwordMeetsPolicy(password);
-  const color = isValid ? 'oklch(0.60 0.15 152)' : 'var(--destructive)';
 
   return (
-    <div className="relative mx-auto w-[min(92vw,22rem)]">
-      <div className="relative" style={{ clipPath: chamferClip(14), filter: 'drop-shadow(0 12px 26px rgba(40,40,50,0.14))' }}>
-        <div className="absolute inset-0 transition-colors duration-200" style={{ background: color }} />
-        <div className="absolute inset-[1.5px]" style={{ background: 'var(--card)', clipPath: chamferClip(12.5) }} />
-        <div className="relative z-10 px-4 py-3.5 text-sm sm:px-5 sm:py-4">
+    <div className="mx-auto w-[min(92vw,22rem)]">
+      <CutBubbleCard variant={isValid ? 'valid' : 'invalid'}>
+        <div className="px-4 py-3.5 text-sm sm:px-5 sm:py-4">
           <p className="mb-2.5 leading-5 text-muted-foreground sm:mb-3 sm:leading-6">
             Passwords must be at least {PW_MIN} characters long and contain at least 3 of the following:
           </p>
@@ -135,12 +126,7 @@ function PasswordStrength({ password }: { password: string }) {
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Tail — matching double-diamond notch pointing down at the field */}
-      <div className="absolute left-1/2 -bottom-[6px] h-[13px] w-[13px] -translate-x-1/2 rotate-45 transition-colors duration-200" style={{ background: color }}>
-        <div className="absolute inset-[1.5px]" style={{ background: 'var(--card)' }} />
-      </div>
+      </CutBubbleCard>
 
       <span className="sr-only">{passed} of 4 password requirements met, password {isValid ? 'meets' : 'does not meet'} the policy</span>
     </div>

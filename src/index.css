@@ -272,6 +272,28 @@
   color: oklch(0.15 0 0);
 }
 
+/* ── Premium 6-cut bubble card (dynamic-height variant of the tooltip
+   above — measured in real pixels so it stays crisp at any content
+   height / viewport, e.g. the password-requirements card) ── */
+.pv-bubble-bg {
+  z-index: 0;
+  background: var(--card);
+  box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.28);
+  transition: clip-path 0.15s ease;
+}
+.pv-bubble-frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  overflow: visible;
+  pointer-events: none;
+}
+.pv-bubble-frame path {
+  vector-effect: non-scaling-stroke;
+  transition: stroke 0.2s ease;
+}
+
 /* ── Phone field country chip (angular cut divider) ── */
 .pv-phone-chip {
   position: relative;
