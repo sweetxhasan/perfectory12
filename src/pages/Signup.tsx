@@ -152,19 +152,20 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
 
         <span className="pv-cut-label">Phone Number</span>
 
-        <div className="relative z-20 flex min-w-0 flex-1 items-center">
-          {/* +880 badge */}
+        <div className="relative z-20 flex min-w-0 flex-1 items-stretch">
+          {/* +880 country chip — angular cut edge to match the field's corner language */}
           <div
-            className="flex shrink-0 items-center gap-1.5 border-r border-border/70 px-3 py-2 select-none"
+            className="pv-phone-chip flex shrink-0 items-center gap-2 py-2 pl-4 pr-6 select-none"
             style={{
-              background: 'linear-gradient(135deg, oklch(0.26 0.10 335 / 0.07), oklch(0.42 0.16 350 / 0.07))',
+              background: 'linear-gradient(135deg, oklch(0.26 0.10 335 / 0.12), oklch(0.42 0.16 350 / 0.12))',
+              clipPath: 'polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%)',
             }}
           >
-            <svg width="20" height="14" viewBox="0 0 30 20" aria-hidden="true">
-              <rect width="30" height="20" rx="2" fill="#006A4E" />
+            <svg width="21" height="15" viewBox="0 0 30 20" className="shrink-0 rounded-[2px] ring-1 ring-black/10" aria-hidden="true">
+              <rect width="30" height="20" fill="#006A4E" />
               <circle cx="13" cy="10" r="6" fill="#F42A41" />
             </svg>
-            <span className="text-[13px] font-bold text-secondary-foreground">+880</span>
+            <span className="text-[14px] font-bold tracking-wide text-foreground">+880</span>
           </div>
 
           {/* Input */}
@@ -177,7 +178,7 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             maxLength={11} /* 10 digits + 1 hyphen */
-            className="flex-1 bg-transparent px-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 outline-none"
+            className="min-w-0 flex-1 bg-transparent py-2 pr-2 pl-2 text-[15px] font-semibold tracking-wide text-foreground outline-none placeholder:font-normal placeholder:tracking-normal placeholder:text-muted-foreground/40"
             aria-label="Phone number"
             autoComplete="tel-national"
           />

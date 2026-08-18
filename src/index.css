@@ -182,15 +182,15 @@
 
 .pv-cut-frame {
   fill: none;
-  stroke: var(--border);
-  stroke-width: 1.2;
+  stroke: oklch(0.15 0 0);
+  stroke-width: 1.4;
   vector-effect: non-scaling-stroke;
   transition: stroke 0.25s ease, stroke-width 0.25s ease;
 }
 
 .pv-cut-frame-inner {
   fill: none;
-  stroke: color-mix(in oklch, var(--foreground) 6%, transparent);
+  stroke: oklch(0.15 0 0 / 0.14);
   stroke-width: 0.6;
   vector-effect: non-scaling-stroke;
   transition: stroke 0.25s ease;
@@ -233,9 +233,9 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted-foreground);
+  color: oklch(0.15 0 0);
   background: var(--background);
-  border: 1px solid var(--border);
+  border: 1.3px solid oklch(0.15 0 0);
   clip-path: polygon(0% 0%, 96% 0%, 100% 22%, 100% 78%, 96% 100%, 4% 100%, 0% 78%, 0% 22%);
   white-space: nowrap;
   transition: color 0.2s ease, letter-spacing 0.2s ease, border-color 0.2s ease;
@@ -243,13 +243,26 @@
 }
 
 .pv-cut-field:hover .pv-cut-label {
-  color: color-mix(in oklch, var(--brand-2) 60%, var(--muted-foreground));
-  border-color: color-mix(in oklch, var(--brand-2) 35%, var(--border));
+  color: color-mix(in oklch, var(--brand-2) 70%, oklch(0.15 0 0));
+  border-color: color-mix(in oklch, var(--brand-2) 45%, oklch(0.15 0 0));
 }
 .pv-cut-field:focus-within .pv-cut-label {
   color: var(--brand-2);
   letter-spacing: 0.16em;
   border-color: color-mix(in oklch, var(--brand-2) 55%, var(--border));
+}
+
+/* ── Phone field country chip (angular cut divider) ── */
+.pv-phone-chip {
+  position: relative;
+  filter: drop-shadow(1.5px 0 0 oklch(0.15 0 0 / 0.18));
+  transition: filter 0.25s ease;
+}
+.pv-cut-field:hover .pv-phone-chip {
+  filter: drop-shadow(1.5px 0 0 color-mix(in oklch, var(--brand-2) 45%, oklch(0.15 0 0)));
+}
+.pv-cut-field:focus-within .pv-phone-chip {
+  filter: drop-shadow(1.5px 0 0 var(--brand-2));
 }
 
 /* ── Auth left panel mesh grid ── */
