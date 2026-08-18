@@ -109,12 +109,27 @@ export function PremiumTooltip({
  * stretching the way a fixed percentage clip-path would on a
  * variable-height box.
  */
+/** True below the sm breakpoint (640px) — used to shrink the bubble card's
+ *  corner/tail geometry on phones so it reads as a compact, mobile-sized
+ *  bubble rather than the roomier tablet/desktop proportions. */
+function useIsCompact(): boolean {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    const update = () => setCompact(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  return compact;
+}
+
 export function CutBubbleCard({
   children,
   variant = 'neutral',
-  cornerCut = 14,
-  tailWidth = 18,
-  tailDrop = 11,
+  cornerCut,
+  tailWidth,
+  tailDrop,
   className = '',
 }: {
   children: ReactNode;
@@ -124,11 +139,22 @@ export function CutBubbleCard({
   tailDrop?: number;
   className?: string;
 }) {
-  const bodyRef = useRef<HTMLDivElement>(null);
+  const isCompact = useIsCompact();
+  const cCut = cornerCut ?? (isCompact ? 10 : 14);
+  const tWidth = tailWidth ?? (isCompact ? 13 : 18);
+  const tDrop = tailDrop ?? (isCompact ? 8 : 11);
+
+  /* Measure only the content's natural size — the background/clip layer
+     below is then given that height PLUS the tail drop explicitly, so its
+     fill color paints all the way through the tail notch instead of
+     stopping at the content's box edge (which left the tail area showing
+     the page background through the clip-path instead of the card's
+     surface color). */
+  const contentRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
 
   useLayoutEffect(() => {
-    const el = bodyRef.current;
+    const el = contentRef.current;
     if (!el) return;
     const measure = () => setSize({ w: el.offsetWidth, h: el.offsetHeight });
     measure();
@@ -140,36 +166,40 @@ export function CutBubbleCard({
   const { w, h } = size;
   const ready = w > 0 && h > 0;
   const half = w / 2;
-  const shoulder = tailWidth / 2;
+  const shoulder = tWidth / 2;
+  const totalH = h + tDrop;
 
   const points: [number, number][] = [
-    [cornerCut, 0],
-    [w - cornerCut, 0],
-    [w, cornerCut],
-    [w, h - cornerCut],
-    [w - cornerCut, h],
+    [cCut, 0],
+    [w - cCut, 0],
+    [w, cCut],
+    [w, h - cCut],
+    [w - cCut, h],
     [half + shoulder, h],
-    [half, h + tailDrop],
+    [half, totalH],
     [half - shoulder, h],
-    [cornerCut, h],
-    [0, h - cornerCut],
-    [0, cornerCut],
+    [cCut, h],
+    [0, h - cCut],
+    [0, cCut],
   ];
 
   const clipPath = ready ? `polygon(${points.map(([x, y]) => `${x}px ${y}px`).join(', ')})` : undefined;
   const framePath = ready ? points.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x} ${y}`).join(' ') + ' Z' : '';
 
   return (
-    <div className={`relative ${className}`} style={{ paddingBottom: ready ? tailDrop : 0 }}>
-      <div ref={bodyRef} className="pv-bubble-bg relative" style={clipPath ? { clipPath } : undefined}>
-        {children}
+    <div className={`relative ${className}`}>
+      <div
+        className="pv-bubble-bg relative"
+        style={ready ? { height: totalH, clipPath } : undefined}
+      >
+        <div ref={contentRef}>{children}</div>
       </div>
       {ready && (
         <svg
           className="pv-bubble-frame"
           width={w}
-          height={h + tailDrop}
-          viewBox={`0 0 ${w} ${h + tailDrop}`}
+          height={totalH}
+          viewBox={`0 0 ${w} ${totalH}`}
           aria-hidden="true"
           style={{ color: VARIANT_FRAME_COLOR[variant] }}
         >

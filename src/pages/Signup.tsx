@@ -107,17 +107,17 @@ function PasswordStrength({ password }: { password: string }) {
   const isValid = passwordMeetsPolicy(password);
 
   return (
-    <div className="mx-auto w-[min(92vw,22rem)]">
+    <div className="mx-auto w-[min(88vw,22rem)] sm:w-[min(92vw,22rem)]">
       <CutBubbleCard variant={isValid ? 'valid' : 'invalid'}>
-        <div className="px-4 py-3.5 text-sm sm:px-5 sm:py-4">
-          <p className="mb-2.5 leading-5 text-muted-foreground sm:mb-3 sm:leading-6">
+        <div className="px-3 py-2.5 text-[12px] sm:px-5 sm:py-4 sm:text-sm">
+          <p className="mb-2 leading-[1.35] text-muted-foreground sm:mb-3 sm:leading-6">
             Passwords must be at least {PW_MIN} characters long and contain at least 3 of the following:
           </p>
-          <div className="flex flex-col gap-2 sm:gap-2.5">
+          <div className="flex flex-col gap-1.5 sm:gap-2.5">
             {rules.map(([label, valid]) => (
-              <div key={label} className={`flex items-center gap-2.5 ${valid ? 'text-emerald-600' : 'text-muted-foreground'}`}>
-                <CutIconBadge variant={valid ? 'valid' : 'neutral'} size={18} borderWidth={1}>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <div key={label} className={`flex items-center gap-2 sm:gap-2.5 ${valid ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                <CutIconBadge variant={valid ? 'valid' : 'neutral'} size={15} borderWidth={1}>
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </CutIconBadge>
