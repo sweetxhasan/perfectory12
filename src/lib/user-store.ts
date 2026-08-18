@@ -114,12 +114,30 @@ export function normalizeGmailEmail(email: string): string {
   return `${local.replace(/\./g, '')}@gmail.com`;
 }
 
-/* ── Email uniqueness check (Gmail dot-trick aware) ──── */
+/* ── Email uniqueness check (Gmail dot-trick aware) ────
+   Firestore can't run a query against a computed/normalized
+   value, and accounts created before `canonicalEmail` existed
+   don't have that field stored at all — a `where('canonicalEmail', ...)`
+   query silently skips every one of those legacy docs and always
+   reports "free". Instead, scan all users and normalize each
+   stored email in memory so both legacy and new docs are caught.
+   Legacy docs are also self-healed with a backfilled canonicalEmail. ── */
 export async function isEmailUsed(email: string): Promise<boolean> {
   if (!email) return false;
   const canonical = normalizeGmailEmail(email);
-  const snap = await getDocs(query(collection(db, USERS), where('canonicalEmail', '==', canonical), limit(1)));
-  return !snap.empty;
+  const snap = await getDocs(collection(db, USERS));
+  for (const d of snap.docs) {
+    const data = d.data() as Partial<UserProfile>;
+    const storedCanonical = data.canonicalEmail ?? (data.email ? normalizeGmailEmail(data.email) : '');
+    if (storedCanonical && storedCanonical === canonical) {
+      // Backfill legacy docs that predate the canonicalEmail field.
+      if (!data.canonicalEmail) {
+        updateDoc(doc(db, USERS, d.id), { canonicalEmail: storedCanonical }).catch(() => {});
+      }
+      return true;
+    }
+  }
+  return false;
 }
 
 /* ── CRUD ─────────────────────────────────────────────── */
