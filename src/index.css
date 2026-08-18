@@ -235,6 +235,43 @@
   pointer-events: none;
 }
 
+/* ── Premium 4-cut icon badge (valid checkmark / duplicate info) ── */
+.pv-icon-badge-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.pv-icon-badge-frame path {
+  vector-effect: non-scaling-stroke;
+}
+
+/* ── Premium 5-cut tooltip (white surface, black svg outline) ── */
+.pv-tooltip-bg {
+  z-index: 0;
+  background: oklch(1 0 0);
+  box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.28);
+}
+.pv-tooltip-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  color: oklch(0.12 0 0);
+  pointer-events: none;
+}
+.pv-tooltip-frame path {
+  vector-effect: non-scaling-stroke;
+}
+.pv-tooltip-text {
+  color: oklch(0.15 0 0);
+}
+
 /* ── Phone field country chip (angular cut divider) ── */
 .pv-phone-chip {
   position: relative;

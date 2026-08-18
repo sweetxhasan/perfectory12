@@ -10,6 +10,9 @@ import { FloatingField, type FieldStatus } from '@/components/floating-field';
 import { CutFrame } from '@/components/cut-frame';
 import { GradientCheckbox } from '@/components/gradient-checkbox';
 import { GoogleButton } from '@/components/google-button';
+import { CutIconBadge } from '@/components/cut-icon-badge';
+import { PremiumTooltip } from '@/components/premium-tooltip';
+import { isPhoneUsed } from '@/lib/user-store';
 
 const NAME_MAX = 40;
 const PW_MIN = 8;
@@ -125,12 +128,31 @@ interface PhoneFieldProps {
   onChange: (v: string) => void;
   touched: boolean;
 }
+type DuplicateState = 'idle' | 'checking' | 'used' | 'free';
+
 function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const validation = touched && value.length > 0 ? validatePhone(value) : { valid: false };
   const isError = touched && value.length > 0 && !validation.valid && !!validation.error;
   const isValid = validation.valid;
   const statusCls = isValid ? 'is-valid' : isError ? 'is-error' : '';
+
+  /* Firebase duplicate-number check — debounced, cancels on edit/clear */
+  const [dup, setDup] = useState<DuplicateState>('idle');
+  useEffect(() => {
+    if (!isValid) {
+      setDup('idle');
+      return;
+    }
+    setDup('checking');
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      isPhoneUsed('+880' + value)
+        .then((used) => { if (!cancelled) setDup(true ? 'used' : (used ? 'used' : 'free')); })
+        .catch(() => { if (!cancelled) setDup('free'); });
+    }, 450);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [isValid, value]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value.replace(/\D/g, '').slice(0, 10);
@@ -184,10 +206,29 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
 
           {/* Status icon */}
           <div className="flex items-center pr-3.5">
-            {isValid ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="oklch(0.60 0.15 152)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
+            {isValid && dup === 'used' ? (
+              <PremiumTooltip content="Already used this phone number">
+                {({ toggle }) => (
+                  <button
+                    type="button"
+                    onClick={toggle}
+                    aria-label="Already used this phone number"
+                    className="flex items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-2)]/40"
+                  >
+                    <CutIconBadge variant="info">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                      </svg>
+                    </CutIconBadge>
+                  </button>
+                )}
+              </PremiumTooltip>
+            ) : isValid && dup !== 'checking' ? (
+              <CutIconBadge variant="valid">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </CutIconBadge>
             ) : isError ? (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-destructive" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
