@@ -148,7 +148,7 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
     let cancelled = false;
     const timer = setTimeout(() => {
       isPhoneUsed('+880' + value)
-        .then((used) => { if (!cancelled) setDup(true ? 'used' : (used ? 'used' : 'free')); })
+        .then((used) => { if (!cancelled) setDup(used ? 'used' : 'free'); })
         .catch(() => { if (!cancelled) setDup('free'); });
     }, 450);
     return () => { cancelled = true; clearTimeout(timer); };
@@ -204,18 +204,24 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
             autoComplete="tel-national"
           />
 
-          {/* Status icon */}
+          {/* Status icon — only ever a loading spinner, a valid check, or an
+              invalid/duplicate notice. No default placeholder icon. */}
           <div className="flex items-center pr-3.5">
-            {isValid && dup === 'used' ? (
+            {dup === 'checking' ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="animate-spin text-muted-foreground" aria-label="Checking...">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.2" strokeWidth="2.4" />
+                <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+              </svg>
+            ) : isValid && dup === 'used' ? (
               <PremiumTooltip content="Already used this phone number">
                 {({ toggle }) => (
                   <button
                     type="button"
                     onClick={toggle}
                     aria-label="Already used this phone number"
-                    className="flex items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-2)]/40"
+                    className="flex items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
                   >
-                    <CutIconBadge variant="info">
+                    <CutIconBadge variant="invalid">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" />
                       </svg>
@@ -223,22 +229,30 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
                   </button>
                 )}
               </PremiumTooltip>
-            ) : isValid && dup !== 'checking' ? (
+            ) : isValid && dup === 'free' ? (
               <CutIconBadge variant="valid">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </CutIconBadge>
-            ) : isError ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-destructive" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-muted-foreground/50" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="5" y="2" width="14" height="20" rx="2" />
-                <line x1="12" y1="18" x2="12.01" y2="18" strokeWidth="2.5" />
-              </svg>
-            )}
+            ) : isError && validation.error ? (
+              <PremiumTooltip content={validation.error}>
+                {({ toggle }) => (
+                  <button
+                    type="button"
+                    onClick={toggle}
+                    aria-label={validation.error}
+                    className="flex items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
+                  >
+                    <CutIconBadge variant="invalid">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                      </svg>
+                    </CutIconBadge>
+                  </button>
+                )}
+              </PremiumTooltip>
+            ) : null}
           </div>
         </div>
       </div>

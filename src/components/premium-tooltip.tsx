@@ -3,8 +3,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 /**
  * Premium "5-cut" tooltip — a chamfered speech-bubble (four cut corners plus
  * a pointed tail notch) with a white surface and a black svg outline.
- * Opens automatically once, 3s after it mounts, stays open briefly, then
- * only responds to clicks afterward. Anchored top-right so it never runs
+ * Opens automatically as soon as it mounts, stays open briefly, then closes —
+ * afterward it only responds to clicks. Anchored top-right so it never runs
  * off-screen on narrow / mobile viewports.
  */
 const TOOLTIP_CLIP_PATH =
@@ -14,8 +14,8 @@ const TOOLTIP_PATH = 'M8 0.6 L92 0.6 L99.4 8 L99.4 54 L92 61.4 L90 61.4 L85 79.4
 
 export function PremiumTooltip({
   content,
-  autoOpenDelay = 3000,
-  autoOpenDuration = 3200,
+  autoOpenDelay = 150,
+  autoOpenDuration = 2000,
   children,
 }: {
   content: ReactNode;
