@@ -13,9 +13,9 @@ import { Link } from 'wouter';
  *
  * Renders as a `<Link>` when `href` is passed, otherwise a `<button>`.
  */
-const PRIMARY_CUT_PATH =
+export const PRIMARY_CUT_PATH =
   'M8 0.6 L92 0.6 L99.4 8 L99.4 41.5 L94 41.5 L94 58.5 L99.4 58.5 L99.4 92 L92 99.4 L8 99.4 L0.6 92 L0.6 58.5 L6 58.5 L6 41.5 L0.6 41.5 L0.6 8 Z';
-const PRIMARY_CUT_CLIP_PATH =
+export const PRIMARY_CUT_CLIP_PATH =
   'polygon(8% 0.6%, 92% 0.6%, 99.4% 8%, 99.4% 41.5%, 94% 41.5%, 94% 58.5%, 99.4% 58.5%, 99.4% 92%, 92% 99.4%, 8% 99.4%, 0.6% 92%, 0.6% 58.5%, 6% 58.5%, 6% 41.5%, 0.6% 41.5%, 0.6% 8%)';
 
 interface CutPrimaryButtonProps {
