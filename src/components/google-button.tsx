@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { CUT_FRAME_PATH, CUT_FRAME_CLIP_PATH } from '@/components/cut-frame';
 
 interface GoogleButtonProps {
@@ -6,7 +7,7 @@ interface GoogleButtonProps {
   disabled?: boolean;
 }
 
-const BUTTON_WIDTH = 250;
+const BUTTON_WIDTH = 280;
 
 function GoogleColorIcon({ size = 18 }: { size?: number }) {
   return (
@@ -35,33 +36,42 @@ function GoogleColorIcon({ size = 18 }: { size?: number }) {
  * Premium "6-cut" outline-only Google button — reuses the exact border
  * geometry from the input frames (CUT_FRAME_PATH: 4 chamfered corners
  * + 2 small notch steps on the top-right and bottom-left = 6 cuts
- * total). No filled background — just the 1px cut-corner stroke, so
- * the page background shows through. Fixed 250px wide on every
- * device; must sit inside a centered wrapper (self-center on a
- * flex-column form).
+ * total). No filled background — just a 1px cut-corner stroke painted
+ * with the brand diagonal gradient (linear-gradient(-45deg, #ec5252,
+ * #6e1a52)), so the page background shows through everywhere else.
+ * Fixed 280px wide on every device, centered in its wrapper.
  */
 export function GoogleButton({ onClick, loading = false, disabled = false }: GoogleButtonProps) {
   const busy = loading && !disabled;
+  const gradId = useId();
 
   return (
     <div
-      className="group relative self-center shrink-0 transition-opacity"
-      style={{ width: BUTTON_WIDTH, aspectRatio: '250 / 52' }}
+      className="group relative mx-auto self-center shrink-0 transition-opacity"
+      style={{ width: BUTTON_WIDTH, aspectRatio: '280 / 52' }}
     >
-      {/* 6-cut border stroke */}
+      {/* 6-cut border stroke, painted with the brand diagonal gradient */}
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 h-full w-full"
       >
+        <defs>
+          {/* -45deg CSS gradient == diagonal from bottom-right (0%) to top-left (100%) */}
+          <linearGradient id={gradId} x1="100%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="#ec5252" />
+            <stop offset="100%" stopColor="#6e1a52" />
+          </linearGradient>
+        </defs>
         <path
           d={CUT_FRAME_PATH}
           fill="none"
-          stroke={busy ? '#9AA0A6' : '#DADCE0'}
-          strokeWidth="1"
+          stroke={`url(#${gradId})`}
+          strokeOpacity={busy ? 0.55 : 1}
+          strokeWidth="1.25"
           vectorEffect="non-scaling-stroke"
-          className="transition-colors duration-200 group-hover:stroke-[#B8BCC2]"
+          className="transition-opacity duration-200 group-hover:opacity-90"
         />
       </svg>
 
