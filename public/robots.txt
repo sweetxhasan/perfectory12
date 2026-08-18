@@ -1,0 +1,36 @@
+# Perfectory Voice — robots.txt
+# https://perfectoryvoice.com
+
+User-agent: *
+Allow: /
+
+# Block private / admin areas
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /profile/
+Disallow: /account-disabled
+Disallow: /live/
+Disallow: /buyplan/
+
+# Allow all crawlers to access public pages
+Allow: /$
+Allow: /generator$
+Allow: /plans$
+Allow: /signup$
+Allow: /login$
+Allow: /about$
+Allow: /faq$
+Allow: /contact$
+Allow: /privacy$
+Allow: /terms$
+
+# Block search-engine bots from crawling source assets
+Disallow: /src/
+Disallow: /*.ts$
+Disallow: /*.tsx$
+
+# Sitemap
+Sitemap: https://perfectoryvoice.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1

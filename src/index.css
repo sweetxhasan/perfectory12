@@ -1,0 +1,394 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Share+Tech&family=Share+Tech+Mono&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Share Tech', 'Noto Sans Bengali', sans-serif;
+  --font-serif: 'Lora', 'Noto Sans Bengali', serif;
+  --font-mono: 'Share Tech Mono', 'Noto Sans Bengali', monospace;
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-3: var(--brand-3);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 3);
+}
+
+:root {
+  color-scheme: light;
+  --background: oklch(0.995 0.002 240);
+  --foreground: oklch(0.18 0.02 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 250);
+  --primary: oklch(0.60 0.18 22);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.97 0.01 240);
+  --secondary-foreground: oklch(0.25 0.02 260);
+  --muted: oklch(0.97 0.008 240);
+  --muted-foreground: oklch(0.5 0.02 255);
+  --accent: oklch(0.96 0.03 230);
+  --accent-foreground: oklch(0.25 0.05 260);
+  --destructive: oklch(0.6 0.23 25);
+  --border: oklch(0.9 0.015 250);
+  --input: oklch(0.92 0.012 250);
+  --ring: oklch(0.60 0.15 22);
+  --radius: 0.9rem;
+
+  --brand: oklch(0.60 0.18 22);
+  --brand-2: oklch(0.42 0.16 350);
+  --brand-3: oklch(0.26 0.10 335);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply bg-background;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  :where(h1, h2, h3, h4, h5, h6, strong, b, [class*="font-bold"], [class*="font-semibold"], [class*="font-medium"]) {
+    font-family: 'Lora', 'Noto Sans Bengali', serif;
+  }
+}
+
+/* ── Shimmer skeleton animation ──────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.92 0.006 250) 0%,
+    oklch(0.96 0.003 250) 40%,
+    oklch(0.98 0.001 250) 50%,
+    oklch(0.96 0.003 250) 60%,
+    oklch(0.92 0.006 250) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ── Google button spinning border ── */
+@keyframes google-border-spin {
+  to { transform: rotate(360deg); }
+}
+.google-border-spinner {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: conic-gradient(
+    from 0deg,
+    #4285F4 0deg,
+    #EA4335 90deg,
+    #FBBC04 180deg,
+    #34A853 270deg,
+    #4285F4 360deg
+  );
+  animation: google-border-spin 1.6s linear infinite;
+}
+
+/* ── Auth field glow ── */
+.auth-field-glow {
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--brand-2) 12%, transparent),
+              0 4px 20px -8px color-mix(in oklch, var(--brand-2) 30%, transparent);
+}
+
+/* ── Auth card ── */
+.auth-card {
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--brand-2) 6%, transparent),
+    0 8px 40px -12px color-mix(in oklch, var(--brand-3) 20%, transparent),
+    0 2px 8px -2px rgba(0,0,0,0.06);
+}
+
+/* ── Auth submit button ── */
+.auth-submit-btn {
+  background: linear-gradient(115deg, var(--brand-3) 0%, var(--brand-2) 48%, var(--brand) 100%);
+  box-shadow: 0 4px 24px -8px color-mix(in oklch, var(--brand) 55%, transparent);
+  transition: opacity 0.18s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+.auth-submit-btn:hover:not(:disabled) {
+  box-shadow: 0 8px 32px -8px color-mix(in oklch, var(--brand) 60%, transparent);
+}
+
+/* ── Auth error banner ── */
+.auth-error-banner {
+  background: color-mix(in oklch, var(--destructive) 8%, transparent);
+  border-color: color-mix(in oklch, var(--destructive) 28%, transparent);
+}
+
+/* ── Auth left panel mesh grid ── */
+.auth-left-grid {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(100deg, var(--brand-3) 0%, var(--brand-2) 45%, var(--brand) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bg-gradient-brand {
+    background: linear-gradient(110deg, var(--brand-3) 0%, var(--brand-2) 50%, var(--brand) 100%);
+  }
+  .bg-gradient-soft {
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--brand-3) 10%, white) 0%,
+      color-mix(in oklch, var(--brand) 8%, white) 100%
+    );
+  }
+  .border-gradient {
+    position: relative;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .border-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    margin: -2px;
+    border-radius: inherit;
+    background: linear-gradient(130deg, var(--brand-3), var(--brand-2), var(--brand));
+  }
+  .ring-glow {
+    box-shadow: 0 10px 40px -12px color-mix(in oklch, var(--brand) 45%, transparent);
+  }
+}
+
+/* ── Welcome / onboarding animations ──────────────────────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Notification motion ───────────────────────────────────────── */
+@keyframes notification-bell-ring {
+  0%, 35%, 100% { transform: rotate(0deg); }
+  8%, 22% { transform: rotate(10deg); }
+  14%, 28% { transform: rotate(-10deg); }
+}
+
+@keyframes notification-icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes notification-icon-pulse {
+  0%, 100% { opacity: .75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes notification-icon-spark {
+  0%, 100% { transform: rotate(0deg) scale(.96); opacity: .7; }
+  50% { transform: rotate(8deg) scale(1.04); opacity: 1; }
+}
+
+@keyframes notification-icon-wave {
+  0%, 100% { transform: scaleY(.86); }
+  50% { transform: scaleY(1.08); }
+}
+
+.notification-bell-active {
+  transform-origin: 50% 20%;
+  animation: notification-bell-ring 2.8s ease-in-out infinite;
+}
+
+.notification-glyph {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+.notification-glyph-welcome { animation: notification-icon-spark 2.6s ease-in-out infinite; }
+.notification-glyph-credit { animation: notification-icon-pulse 2.2s ease-in-out infinite; }
+.notification-glyph-voice { animation: notification-icon-wave 1.8s ease-in-out infinite; transform-origin: center; }
+.notification-glyph-plan { animation: notification-icon-float 2.4s ease-in-out infinite; }
+.notification-glyph-security { animation: notification-icon-pulse 2.8s ease-in-out infinite; }
+.notification-glyph-feature { animation: notification-icon-spark 3s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-bell-active,
+  .notification-glyph-welcome,
+  .notification-glyph-credit,
+  .notification-glyph-voice,
+  .notification-glyph-plan,
+  .notification-glyph-security,
+  .notification-glyph-feature {
+    animation: none;
+  }
+}
+
+.line-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--brand) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--brand) 8%, transparent) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+}
+
+.animated-line {
+  stroke-dasharray: 6 10;
+  animation: dash-move 3s linear infinite;
+}
+@keyframes dash-move {
+  to { stroke-dashoffset: -160; }
+}
+
+.sweep-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--brand-2) 70%, transparent), transparent);
+  animation: sweep 6s ease-in-out infinite;
+}
+@keyframes sweep {
+  0%, 100% { transform: translateY(0) scaleX(0.6); opacity: 0.2; }
+  50% { transform: translateY(20px) scaleX(1); opacity: 0.9; }
+}
+
+@keyframes float-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes creditFlip {
+  0%   { opacity: 0; transform: translateY(-6px) scale(0.85); }
+  60%  { opacity: 1; transform: translateY(1px) scale(1.08); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes genBar {
+  from { transform: scaleY(0.4); opacity: 0.6; }
+  to   { transform: scaleY(1.8); opacity: 1;   }
+}
+.float-up {
+  animation: float-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes notification-pop {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  45% { transform: translateY(-1px) rotate(-5deg) scale(1.08); }
+  70% { transform: translateY(0) rotate(4deg) scale(0.98); }
+}
+
+@keyframes pulse-bar {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+.eq-bar {
+  transform-origin: center;
+  animation: pulse-bar 1.1s ease-in-out infinite;
+}
+
+/* ── Shake ─────────────────────────────────────────────────────────── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15%       { transform: translateX(-6px); }
+  30%       { transform: translateX(5px); }
+  45%       { transform: translateX(-4px); }
+  60%       { transform: translateX(3px); }
+  75%       { transform: translateX(-2px); }
+}
+.animate-shake { animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+/* ── Preloader ─────────────────────────────────────────────────────── */
+@keyframes preloader-wave {
+  0%, 100% { transform: scaleY(0.3); opacity: 0.5; }
+  50%       { transform: scaleY(1);   opacity: 1;   }
+}
+
+@keyframes preloader-bar {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+.animate-preloader-bar {
+  animation: preloader-bar 1.4s ease-in-out infinite;
+}
+
+/* ── Corner orb decoration ────────────────────────────────────── */
+@keyframes orb-drift {
+  0%   { transform: scale(1)    translate(0px,  0px);  opacity: 0.65; }
+  33%  { transform: scale(1.12) translate(-4px, 5px);  opacity: 0.85; }
+  66%  { transform: scale(0.95) translate(5px, -3px);  opacity: 0.7;  }
+  100% { transform: scale(1)    translate(0px,  0px);  opacity: 0.65; }
+}
+.animate-orb {
+  animation: orb-drift 7s ease-in-out infinite;
+}
+.animate-orb-delay {
+  animation: orb-drift 7s ease-in-out infinite;
+  animation-delay: -3.5s;
+}
+
+/* ── Overlay / bottom-sheet animation ─────────────────────────── */
+@keyframes overlay-backdrop {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes overlay-sheet-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes overlay-modal-in {
+  from { transform: translate(-50%, -46%) scale(0.95); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+}
+.animate-overlay-backdrop {
+  animation: overlay-backdrop 0.22s ease both;
+}
+.animate-overlay-sheet {
+  animation: overlay-sheet-up 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-overlay-modal {
+  animation: overlay-modal-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Voice Generator photo-style textarea scrollbar ── */
+.pv-textarea::-webkit-scrollbar { width: 5px; }
+.pv-textarea::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
+.pv-textarea::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 10px; }
+.pv-textarea::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.35); }
+.pv-textarea { scrollbar-width: thin; scrollbar-color: hsl(var(--border)) transparent; }
