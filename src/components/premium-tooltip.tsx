@@ -7,10 +7,12 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
  * afterward it only responds to clicks. Anchored top-right so it never runs
  * off-screen on narrow / mobile viewports.
  */
+/* Tail sits close to the right edge (~90%) so it lines up with a small
+   right-anchored trigger icon instead of drifting toward the center. */
 const TOOLTIP_CLIP_PATH =
-  'polygon(8% 0%, 92% 0%, 100% 9.76%, 100% 65.85%, 92% 75.61%, 90% 75.61%, 85% 97.56%, 80% 75.61%, 8% 75.61%, 0% 65.85%, 0% 9.76%)';
+  'polygon(8% 0%, 92% 0%, 100% 9.76%, 100% 65.85%, 96% 75.61%, 94% 75.61%, 90% 97.56%, 86% 75.61%, 8% 75.61%, 0% 65.85%, 0% 9.76%)';
 /* Same shape in raw SVG units for a 100×82 viewBox, inset ~0.6u for a crisp stroke. */
-const TOOLTIP_PATH = 'M8 0.6 L92 0.6 L99.4 8 L99.4 54 L92 61.4 L90 61.4 L85 79.4 L80 61.4 L8 61.4 L0.6 54 L0.6 8 Z';
+const TOOLTIP_PATH = 'M8 0.6 L92 0.6 L99.4 8 L99.4 54 L96 61.4 L94 61.4 L90 79.4 L86 61.4 L8 61.4 L0.6 54 L0.6 8 Z';
 
 export function PremiumTooltip({
   content,

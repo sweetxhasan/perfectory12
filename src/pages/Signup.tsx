@@ -135,10 +135,13 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
   const validation = touched && value.length > 0 ? validatePhone(value) : { valid: false };
   const isError = touched && value.length > 0 && !validation.valid && !!validation.error;
   const isValid = validation.valid;
-  const statusCls = isValid ? 'is-valid' : isError ? 'is-error' : '';
 
   /* Firebase duplicate-number check — debounced, cancels on edit/clear */
   const [dup, setDup] = useState<DuplicateState>('idle');
+  const isDuplicate = isValid && dup === 'used';
+  /* A duplicate number is still an error state — border/label must turn
+     red, never stay green, even though the format itself is valid. */
+  const statusCls = isValid && !isDuplicate ? 'is-valid' : isError || isDuplicate ? 'is-error' : '';
   useEffect(() => {
     if (!isValid) {
       setDup('idle');
@@ -212,14 +215,14 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
                 <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.2" strokeWidth="2.4" />
                 <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
               </svg>
-            ) : isValid && dup === 'used' ? (
+            ) : isDuplicate ? (
               <PremiumTooltip content="Already used this phone number">
                 {({ toggle }) => (
                   <button
                     type="button"
                     onClick={toggle}
                     aria-label="Already used this phone number"
-                    className="flex items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
+                    className="flex items-center justify-center rounded-full p-0 outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
                   >
                     <CutIconBadge variant="invalid" size={18}>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
@@ -242,7 +245,7 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
                     type="button"
                     onClick={toggle}
                     aria-label={validation.error}
-                    className="flex items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
+                    className="flex items-center justify-center rounded-full p-0 outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
                   >
                     <CutIconBadge variant="invalid" size={18}>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
