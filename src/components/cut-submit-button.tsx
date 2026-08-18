@@ -1,20 +1,22 @@
 import type { ReactNode } from 'react';
 
 /**
- * Premium "3-cut" submit button — square top-left corner, chamfered
- * top-right / bottom-right / bottom-left, matching the angular-cut
- * language of the input frames (see cut-frame.tsx). The fill is drawn
- * as a clip-path layer (so it hugs the exact cut shape at any width)
- * and the border is a separate SVG stroke on top, kept to a crisp 1px
- * regardless of the button's aspect ratio via `vectorEffect="non-scaling-stroke"`.
+ * Premium "7-cut" submit button — 4 chamfered corners plus 3 inward
+ * notch cuts (right edge, bottom edge, left edge), matching the
+ * angular-cut language of the input frames (see cut-frame.tsx) at a
+ * more elaborate tier. The fill is drawn as a clip-path layer (so it
+ * hugs the exact cut shape at any width) and the border is a separate
+ * SVG stroke on top, kept to a crisp 1px regardless of the button's
+ * aspect ratio via `vectorEffect="non-scaling-stroke"`.
  *
  * The button never stretches full width — it sizes to its own label +
  * icon via padding, so it must be placed inside a centered wrapper
  * (e.g. `self-center` on a flex-column form).
  */
-const BUTTON_CUT_PATH = 'M0.7 0.7 H93 L99.3 14 V86 L93 99.3 H7 L0.7 86 Z';
+const BUTTON_CUT_PATH =
+  'M9.7 0.7 L90.3 0.7 L99.3 9.7 L99.3 45 L95.3 45 L95.3 55 L99.3 55 L99.3 90.3 L90.3 99.3 L60 99.3 L60 95.3 L50 95.3 L50 99.3 L9.7 99.3 L0.7 90.3 L0.7 55 L4.7 55 L4.7 45 L0.7 45 L0.7 9.7 Z';
 const BUTTON_CUT_CLIP_PATH =
-  'polygon(0.7% 0.7%, 93% 0.7%, 99.3% 14%, 99.3% 86%, 93% 99.3%, 7% 99.3%, 0.7% 86%)';
+  'polygon(9.7% 0.7%, 90.3% 0.7%, 99.3% 9.7%, 99.3% 45%, 95.3% 45%, 95.3% 55%, 99.3% 55%, 99.3% 90.3%, 90.3% 99.3%, 60% 99.3%, 60% 95.3%, 50% 95.3%, 50% 99.3%, 9.7% 99.3%, 0.7% 90.3%, 0.7% 55%, 4.7% 55%, 4.7% 45%, 0.7% 45%, 0.7% 9.7%)';
 
 function ArrowRightIcon() {
   return (
