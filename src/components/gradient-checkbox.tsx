@@ -7,9 +7,16 @@ type GradientCheckboxProps = {
   className?: string;
 };
 
+/**
+ * Premium "cut-corner" checkbox — no CSS border. The box, the fill and the
+ * checkmark are all drawn as SVG so the same angular-cut language used by
+ * the input frames (see cut-frame.tsx) carries through to the checkbox.
+ * The box has three chamfered corners (top-right, bottom-right, bottom-left)
+ * and one square corner (top-left).
+ */
 export function GradientCheckbox({ checked, onChange, label, className = '' }: GradientCheckboxProps) {
   const id = useId().replace(/:/g, '');
-  const filterId = `goo-${id}`;
+  const gradId = `pv-check-grad-${id}`;
 
   return (
     <button
@@ -17,35 +24,45 @@ export function GradientCheckbox({ checked, onChange, label, className = '' }: G
       role="checkbox"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`group inline-flex items-center gap-2.5 select-none text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec5252]/40 ${className}`}
+      className={`group inline-flex items-center gap-2.5 select-none text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-2)]/35 focus-visible:ring-offset-1 ${className}`}
     >
       <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
-        <span
-          className="absolute inset-0 rounded-full border-2 transition-all duration-200"
-          style={{
-            borderColor: checked ? '#6e1a52' : '#cfd6df',
-            background: 'transparent',
-            boxShadow: checked ? '0 0 0 2px rgba(236,82,82,.14)' : 'none',
-          }}
-        />
-        <svg viewBox="0 0 15 14" fill="none" className="relative z-10 h-3.5 w-3.5" aria-hidden="true">
-          <path d="M2 8.36364L6.23077 12L13 2" stroke={`url(#${filterId}-check)`} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="19" strokeDashoffset={checked ? 0 : 19} style={{ transition: 'stroke-dashoffset .3s ease' }} />
+        <svg viewBox="0 0 20 20" className="h-6 w-6 overflow-visible" aria-hidden="true">
+          <defs>
+            <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#ec5252" />
+              <stop offset="1" stopColor="#6e1a52" />
+            </linearGradient>
+          </defs>
+
+          {/* Three-cut box: square top-left, chamfered top-right / bottom-right / bottom-left */}
+          <path
+            d="M0.9 0.9 H13.4 L19.1 6.6 V13.4 L13.4 19.1 H6.6 L0.9 13.4 Z"
+            fill={checked ? `url(#${gradId})` : 'color-mix(in oklch, var(--brand-2) 4%, transparent)'}
+            stroke={checked ? `url(#${gradId})` : 'oklch(0.6 0 0 / 0.5)'}
+            strokeWidth="1.5"
+            style={{ transition: 'fill 0.2s ease, stroke 0.2s ease' }}
+            className="transition-colors group-hover:[stroke:var(--brand-2)]"
+          />
+
+          {/* Checkmark — revealed fully, no border, scales in */}
+          <path
+            d="M4.6 10.3 L8.3 14 L15.4 6.2"
+            fill="none"
+            stroke="oklch(1 0 0)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              opacity: checked ? 1 : 0,
+              transform: checked ? 'scale(1)' : 'scale(0.5)',
+              transformOrigin: '10px 10px',
+              transition: 'opacity 0.16s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1)',
+            }}
+          />
         </svg>
       </span>
       {label && <span>{label}</span>}
-      <svg aria-hidden="true" className="pointer-events-none absolute h-0 w-0">
-        <defs>
-          <linearGradient id={`${filterId}-check`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#ec5252" />
-            <stop offset="1" stopColor="#6e1a52" />
-          </linearGradient>
-          <filter id={filterId}>
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
-            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -6" result="goo" />
-            <feBlend in="SourceGraphic" in2="goo" />
-          </filter>
-        </defs>
-      </svg>
     </button>
   );
 }

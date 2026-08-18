@@ -157,7 +157,6 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
           <div
             className="pv-phone-chip flex shrink-0 items-center gap-2 py-2 pl-4 pr-6 select-none"
             style={{
-              background: 'linear-gradient(135deg, oklch(0.26 0.10 335 / 0.12), oklch(0.42 0.16 350 / 0.12))',
               clipPath: 'polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%)',
             }}
           >
@@ -353,7 +352,7 @@ export default function SignupPage() {
       <GoogleOneTap />
       <AuthLayout
         title={<>Create your account <SparkleIcon /></>}
-        subtitle="Sign up free and get 10 credits to start"
+        subtitle="Sign up to claim free credits daily"
       >
         {/* Error banner */}
         {error && (

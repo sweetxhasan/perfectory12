@@ -217,39 +217,26 @@
 
 .pv-cut-field.is-valid .pv-cut-frame { stroke: oklch(0.72 0.17 152); }
 .pv-cut-field.is-valid .pv-cut-frame-inner { stroke: color-mix(in oklch, oklch(0.72 0.17 152) 22%, transparent); }
-.pv-cut-field.is-valid .pv-cut-label { color: oklch(0.6 0.15 152) !important; border-color: color-mix(in oklch, oklch(0.72 0.17 152) 55%, transparent) !important; }
+.pv-cut-field.is-valid .pv-cut-label { color: oklch(0.6 0.15 152) !important; }
 
 .pv-cut-field.is-error .pv-cut-frame { stroke: var(--destructive); }
 .pv-cut-field.is-error .pv-cut-frame-inner { stroke: color-mix(in oklch, var(--destructive) 22%, transparent); }
-.pv-cut-field.is-error .pv-cut-label { color: var(--destructive) !important; border-color: color-mix(in oklch, var(--destructive) 55%, transparent) !important; }
+.pv-cut-field.is-error .pv-cut-label { color: var(--destructive) !important; }
 
+/* Plain static label — no pill/border, no hover or focus animation */
 .pv-cut-label {
   position: absolute;
-  top: -10px;
+  top: -9px;
   left: 15px;
   z-index: 3;
-  padding: 2px 9px;
+  padding: 0 4px;
   font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: oklch(0.15 0 0);
-  background: var(--background);
-  border: 1.3px solid oklch(0.15 0 0);
-  clip-path: polygon(0% 0%, 96% 0%, 100% 22%, 100% 78%, 96% 100%, 4% 100%, 0% 78%, 0% 22%);
+  color: var(--foreground);
   white-space: nowrap;
-  transition: color 0.2s ease, letter-spacing 0.2s ease, border-color 0.2s ease;
   pointer-events: none;
-}
-
-.pv-cut-field:hover .pv-cut-label {
-  color: color-mix(in oklch, var(--brand-2) 70%, oklch(0.15 0 0));
-  border-color: color-mix(in oklch, var(--brand-2) 45%, oklch(0.15 0 0));
-}
-.pv-cut-field:focus-within .pv-cut-label {
-  color: var(--brand-2);
-  letter-spacing: 0.16em;
-  border-color: color-mix(in oklch, var(--brand-2) 55%, var(--border));
 }
 
 /* ── Phone field country chip (angular cut divider) ── */
