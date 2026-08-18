@@ -262,7 +262,7 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
               <Link href="/generator">
-                <GradientButton>Start Generating</GradientButton>
+                <GradientButton icon="arrow-right" iconRight>Start Generating</GradientButton>
               </Link>
               <Link href="/plans">
                 <OutlineButton icon="crown">View Plans</OutlineButton>

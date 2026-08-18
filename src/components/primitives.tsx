@@ -1,6 +1,5 @@
-import { forwardRef, useId, type ButtonHTMLAttributes, type InputHTMLAttributes, type TextareaHTMLAttributes, type ReactNode } from 'react';
+import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type TextareaHTMLAttributes, type ReactNode } from 'react';
 import { Icon, type IconName } from './icon';
-import { PRIMARY_CUT_PATH, PRIMARY_CUT_CLIP_PATH } from './cut-primary-button';
 
 /* ── Buttons ── */
 interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -10,100 +9,38 @@ interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
 }
 
-/**
- * Premium 6-cut chamfered CTA — same geometry as CutPrimaryButton
- * (4 corner chamfers + left/right edge notches), filled with the
- * brand diagonal gradient (linear-deg(-45deg, #ec5252, #6e1a52)) and
- * outlined with a crisp 1px SVG stroke. Used everywhere a primary
- * action button is rendered via the shared BtnProps API.
- */
 export function GradientButton({ children, loading, icon, iconRight, fullWidth, className = '', disabled, ...props }: BtnProps) {
   return (
     <button
       {...props}
       disabled={disabled || loading}
-      className={`group relative inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${fullWidth ? 'w-full' : ''} ${className}`}
+      className={`group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-brand px-5 py-3 text-sm text-primary-foreground ring-glow transition hover:opacity-95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 ${fullWidth ? 'w-full' : ''} ${className}`}
     >
-      {/* Fill — clipped to the exact 6-cut shape */}
-      <span
-        className="absolute inset-0"
-        style={{
-          clipPath: PRIMARY_CUT_CLIP_PATH,
-          background: 'linear-gradient(-45deg, #ec5252, #6e1a52)',
-          boxShadow: '0 4px 18px -6px oklch(0.42 0.16 350 / 0.55)',
-        }}
-      />
-      {/* Hover sheen, same clip */}
-      <span
-        className="absolute inset-0 -translate-x-full bg-white/15 transition-transform duration-500 group-hover:translate-x-full"
-        style={{ clipPath: PRIMARY_CUT_CLIP_PATH }}
-      />
-      {/* Crisp 1px cut-corner border */}
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <path d={PRIMARY_CUT_PATH} fill="none" stroke="oklch(1 0 0 / 0.4)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
-      </svg>
-      <span className="relative z-10 flex items-center gap-2">
-        {loading ? (
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-        ) : !iconRight ? (
-          icon && <Icon name={icon} size={18} />
-        ) : null}
-        <span>{children}</span>
-        {!loading && iconRight && icon && <Icon name={icon} size={18} />}
-      </span>
+      <span className="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
+      {loading ? (
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground" />
+      ) : !iconRight ? (
+        icon && <Icon name={icon} size={18} />
+      ) : null}
+      <span className="relative">{children}</span>
+      {!loading && iconRight && icon && <Icon name={icon} size={18} />}
     </button>
   );
 }
 
-/**
- * Premium 6-cut chamfered outline button — same cut geometry as
- * GradientButton, but border-only: no CSS border, no fill, just a
- * crisp 1px SVG stroke painted with the brand diagonal gradient, so
- * the page background always shows through.
- */
 export function OutlineButton({ children, icon, fullWidth, loading, className = '', disabled, ...props }: BtnProps) {
-  const gradId = useId();
-
   return (
     <button
       {...props}
       disabled={disabled || loading}
-      className={`group relative inline-flex items-center justify-center gap-2 bg-transparent px-5 py-3 text-sm font-medium text-foreground transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${fullWidth ? 'w-full' : ''} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-card px-5 py-3 text-sm transition hover:border-brand-2 hover:text-brand-2 active:scale-[0.98] disabled:opacity-60 ${fullWidth ? 'w-full' : ''} ${className}`}
     >
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <defs>
-          <linearGradient id={gradId} x1="100%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#ec5252" />
-            <stop offset="100%" stopColor="#6e1a52" />
-          </linearGradient>
-        </defs>
-        <path
-          d={PRIMARY_CUT_PATH}
-          fill="none"
-          stroke={`url(#${gradId})`}
-          strokeWidth={1.25}
-          vectorEffect="non-scaling-stroke"
-          className="transition-opacity duration-200 group-hover:opacity-80"
-        />
-      </svg>
-      <span className="relative z-10 flex items-center gap-2">
-        {loading ? (
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-2/40 border-t-brand-2" />
-        ) : (
-          icon && <Icon name={icon} size={18} />
-        )}
-        {children}
-      </span>
+      {loading ? (
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-2/40 border-t-brand-2" />
+      ) : (
+        icon && <Icon name={icon} size={18} />
+      )}
+      {children}
     </button>
   );
 }

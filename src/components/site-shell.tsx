@@ -5,8 +5,6 @@ import { isAnyAdmin } from '@/lib/admin';
 import { VerifiedBadge } from './verified-badge';
 import { BrandLogo } from './brand-logo';
 import { Icon, type IconName } from './icon';
-import { CutPrimaryButton } from './cut-primary-button';
-import { CutIconButton } from './cut-icon-button';
 import { subscribeUserConversations, subscribeAdminConversations, setPresence } from '@/lib/chat';
 import {
   subscribeNotifications,
@@ -191,9 +189,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex items-center gap-2">
-            <CutIconButton onClick={() => setSidebarOpen(true)} ariaLabel="Open menu" className="lg:hidden">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition hover:border-brand-2 hover:text-brand-2 lg:hidden"
+              aria-label="Open menu"
+            >
               <Icon name="menu" size={20} />
-            </CutIconButton>
+            </button>
             <BrandLogo />
           </div>
 
@@ -404,9 +407,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
             ) : !loading && (
               <>
                 <Link href="/login" className="hidden rounded-xl border border-border bg-card px-4 py-2 text-sm transition hover:border-brand-2 sm:inline-flex">Login</Link>
-                <CutPrimaryButton href="/signup">
-                  Get Started
-                </CutPrimaryButton>
+                <Link href="/signup" className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm text-primary-foreground ring-glow transition hover:opacity-95">
+                  Get Started <Icon name="arrow-right" size={16} />
+                </Link>
               </>
             )}
           </div>
