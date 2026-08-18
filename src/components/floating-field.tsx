@@ -32,12 +32,12 @@ export const FloatingField = forwardRef<HTMLInputElement, FloatingFieldProps>(
     const statusCls = status === 'valid' ? 'is-valid' : status === 'error' ? 'is-error' : '';
 
     return (
-      <div className="relative flex flex-col gap-1.5 pt-1.5">
+      <div className="relative flex flex-col gap-1.5">
+        <span className="pv-cut-label">{label}</span>
+
         <div className={`pv-cut-field relative flex h-14 items-stretch ${statusCls}`}>
           <div className="pv-cut-bg" />
           <CutFrame />
-
-          <span className="pv-cut-label">{label}</span>
 
           <div className="relative z-20 flex min-w-0 flex-1 items-center">
             {icon && (
