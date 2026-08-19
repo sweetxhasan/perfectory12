@@ -57,6 +57,7 @@ export async function handleSendVerificationCode(
     };
   }
 
+  console.log('[v0] OTP code for', email.trim(), '=', result.code);
   try {
     await sendMail({
       smtp,
