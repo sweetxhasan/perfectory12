@@ -51,7 +51,6 @@ import Profile from '@/pages/Profile';
 import EditProfile from '@/pages/EditProfile';
 import AdminEditProfile from '@/pages/AdminEditProfile';
 import Disabled from '@/pages/Disabled';
-import VerifyEmail from '@/pages/VerifyEmail';
 import ForgotPassword from '@/pages/ForgotPassword';
 import NotFound from '@/pages/NotFound';
 import AdminDashboard from '@/pages/admin/Dashboard';
@@ -88,7 +87,6 @@ function Router() {
       <Route path="/">{() => <GuestRoute component={Home} />}</Route>
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
-      <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/generator" component={Generator} />
       <Route path="/plans" component={Plans} />

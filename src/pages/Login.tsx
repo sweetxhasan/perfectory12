@@ -57,8 +57,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!user) return;
-    if (user.emailVerified) setLocation(redirectTo);
-    else setLocation('/verify-email');
+    // Accounts are only ever created after the signup OTP overlay confirms
+    // the email, so every signed-in user is already verified.
+    setLocation(redirectTo);
   }, [user, setLocation, redirectTo]);
 
   function handleRemember(v: boolean) {

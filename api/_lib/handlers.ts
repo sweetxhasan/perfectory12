@@ -1,10 +1,118 @@
 import { promises as dns } from 'dns';
+import { doc, getDoc } from 'firebase/firestore';
 import { verifyAdminToken, AdminAuthError } from './admin-auth';
-import { sendMail, assertValidSmtpConfig, verifyConnection } from './mailer';
+import { sendMail, assertValidSmtpConfig, verifyConnection, type SmtpConfigInput } from './mailer';
+import { serverDb } from './firebase-server';
+import { issueOtp, verifyOtp, OTP_EXPIRY_MS, OTP_RESEND_COOLDOWN_MS } from './otp-store';
+import { verificationEmailHtml, VERIFY_EMAIL_SUBJECT } from './email-templates';
 
 export interface HandlerResult {
   status: number;
   body: Record<string, unknown>;
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+async function loadAdminSmtpConfig(): Promise<SmtpConfigInput | null> {
+  const snap = await getDoc(doc(serverDb, 'perfectory_config', 'smtp'));
+  if (!snap.exists()) return null;
+  const data = snap.data() as Partial<SmtpConfigInput>;
+  if (!data.host || !data.fromEmail) return null;
+  return {
+    host: data.host,
+    port: data.port ?? 587,
+    encryption: data.encryption ?? 'starttls',
+    username: data.username ?? '',
+    password: data.password ?? '',
+    fromName: data.fromName ?? 'Perfectory Voice',
+    fromEmail: data.fromEmail,
+    replyTo: data.replyTo,
+  };
+}
+
+/* ── /api/send-verification-code ────────────────────── */
+
+export async function handleSendVerificationCode(
+  body: Record<string, unknown>,
+): Promise<HandlerResult> {
+  const { email, name } = body || ({} as Record<string, unknown>);
+
+  if (!email || typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
+    return { status: 400, body: { error: 'A valid email address is required.' } };
+  }
+
+  const smtp = await loadAdminSmtpConfig();
+  if (!smtp) {
+    return { status: 503, body: { error: 'Email service is not configured yet. Please try again later.' } };
+  }
+
+  const result = await issueOtp(email.trim());
+  if (!result.code) {
+    return {
+      status: 429,
+      body: {
+        error: `Please wait ${Math.ceil(result.cooldownRemainingMs / 1000)}s before requesting another code.`,
+        cooldownRemainingMs: result.cooldownRemainingMs,
+      },
+    };
+  }
+
+  try {
+    await sendMail({
+      smtp,
+      to: email.trim(),
+      subject: VERIFY_EMAIL_SUBJECT,
+      html: verificationEmailHtml({ code: result.code, name: typeof name === 'string' ? name : undefined }),
+    });
+  } catch (err) {
+    return {
+      status: 502,
+      body: { error: err instanceof Error ? err.message : 'Failed to send the verification email.' },
+    };
+  }
+
+  return {
+    status: 200,
+    body: { success: true, cooldownSec: Math.round(OTP_RESEND_COOLDOWN_MS / 1000), expiresInSec: Math.round(OTP_EXPIRY_MS / 1000) },
+  };
+}
+
+/* ── /api/verify-code ───────────────────────────────── */
+
+export async function handleVerifyCode(
+  body: Record<string, unknown>,
+): Promise<HandlerResult> {
+  const { email, code } = body || ({} as Record<string, unknown>);
+
+  if (!email || typeof email !== 'string') {
+    return { status: 400, body: { error: 'An email address is required.' } };
+  }
+  if (!code || typeof code !== 'string' || !/^\d{6}$/.test(code)) {
+    return { status: 400, body: { error: 'Please enter the 6-digit code.' } };
+  }
+
+  const outcome = await verifyOtp(email.trim(), code);
+
+  if (outcome.ok) {
+    return { status: 200, body: { success: true } };
+  }
+
+  switch (outcome.reason) {
+    case 'not-found':
+      return { status: 400, body: { error: 'No verification code found for this email. Please request a new one.' } };
+    case 'expired':
+      return { status: 400, body: { error: 'This code has expired. Please request a new one.' } };
+    case 'too-many-attempts':
+      return { status: 429, body: { error: 'Too many attempts. Please request a new code.' } };
+    default:
+      return {
+        status: 400,
+        body: {
+          error: `Invalid code.${outcome.attemptsLeft ? ` ${outcome.attemptsLeft} attempt${outcome.attemptsLeft === 1 ? '' : 's'} left.` : ''}`,
+          attemptsLeft: outcome.attemptsLeft,
+        },
+      };
+  }
 }
 
 /* ── /api/send-email ────────────────────────────────── */

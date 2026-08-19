@@ -15,6 +15,8 @@ import { CutIconBadge } from '@/components/cut-icon-badge';
 import { PremiumTooltip, CutBubbleCard } from '@/components/premium-tooltip';
 import { Icon } from '@/components/icon';
 import { isPhoneUsed, isEmailUsed } from '@/lib/user-store';
+import { EmailVerifyOverlay } from '@/components/email-verify-overlay';
+import { requestSignupCode } from '@/lib/email-verify';
 
 const NAME_MIN = 3;
 const NAME_MAX = 20;
@@ -491,10 +493,17 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [nameError, setNameError] = useState('');
 
+  /* Email verify overlay — opened after the OTP is sent, closed once the
+     account is created post-verification. */
+  const [verifyOpen, setVerifyOpen] = useState(false);
+  const [verifyCooldownSec, setVerifyCooldownSec] = useState(0);
+  const [pendingSignup, setPendingSignup] = useState<{ email: string; password: string; name: string; phone: string } | null>(null);
+
   useEffect(() => {
+    // Accounts are only ever created after the OTP overlay confirms the
+    // email, so any signed-in user here is already verified.
     if (!user) return;
-    if (user.emailVerified) setLocation('/dashboard');
-    else setLocation('/verify-email');
+    setLocation('/dashboard');
   }, [user, setLocation]);
 
   /* field validation */
@@ -537,24 +546,50 @@ export default function SignupPage() {
     try {
       // International format: +880 + 10 digits (user typed without leading 0)
       const intlPhone = '+880' + phone;
-      await signUpEmail({
-        email: email.trim(),
-        password,
-        name: name.trim(),
-        phone: intlPhone,
-        gender: 'male',
-      });
-      setLocation('/verify-email');
+      const trimmedEmail = email.trim();
+      const trimmedName = name.trim();
+
+      // Send the OTP first — if the email service isn't configured, show
+      // the error inline on the form instead of opening the overlay.
+      const res = await requestSignupCode(trimmedEmail, trimmedName);
+
+      setPendingSignup({ email: trimmedEmail, password, name: trimmedName, phone: intlPhone });
+      setVerifyCooldownSec(res.cooldownSec);
+      setVerifyOpen(true);
     } catch (err) {
       const msg = (err as Error).message ?? '';
       if (msg === 'phone-already-in-use') {
         setError('This phone number is already registered with another account.');
       } else {
-        setError(friendlyAuthError(err));
+        setError(msg || friendlyAuthError(err));
       }
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleVerified() {
+    if (!pendingSignup) return;
+    try {
+      await signUpEmail({
+        email: pendingSignup.email,
+        password: pendingSignup.password,
+        name: pendingSignup.name,
+        phone: pendingSignup.phone,
+        gender: 'male',
+      });
+    } catch (err) {
+      const msg = (err as Error).message ?? '';
+      if (msg === 'phone-already-in-use') {
+        throw new Error('This phone number is already registered with another account.');
+      }
+      if (msg === 'email-already-in-use') {
+        throw new Error('This email is already registered with another account.');
+      }
+      throw new Error(friendlyAuthError(err));
+    }
+    setVerifyOpen(false);
+    setLocation('/dashboard');
   }
 
   return (
@@ -715,6 +750,15 @@ export default function SignupPage() {
           </Link>
         </p>
       </AuthLayout>
+
+      <EmailVerifyOverlay
+        open={verifyOpen}
+        email={pendingSignup?.email ?? email.trim()}
+        name={pendingSignup?.name ?? name.trim()}
+        initialCooldownSec={verifyCooldownSec}
+        onClose={() => setVerifyOpen(false)}
+        onVerified={handleVerified}
+      />
     </>
   );
 }

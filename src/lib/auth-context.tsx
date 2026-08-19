@@ -7,7 +7,6 @@ import {
   signInWithCredential,
   signOut,
   updateProfile as fbUpdateProfile,
-  sendEmailVerification,
   GoogleAuthProvider,
   type User,
 } from 'firebase/auth';
@@ -31,7 +30,6 @@ interface AuthContextType {
   signInGoogle: () => Promise<void>;
   signInCredential: (idToken: string) => Promise<void>;
   signUpEmail: (params: SignUpParams) => Promise<void>;
-  resendVerification: () => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -106,11 +104,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function signInGoogle() {
     const cred = await signInWithPopup(auth, googleProvider);
     const avatarUrl = cred.user.photoURL ?? generateAvatarUrl(cred.user.displayName ?? 'User', 'male');
+    // Google already verifies the email address, so new profiles are marked verified immediately.
     const p = await upsertProfile(
       cred.user.uid,
       cred.user.displayName ?? 'User',
       cred.user.email ?? '',
       avatarUrl,
+      '',
+      true,
     );
     setProfile(p);
   }
@@ -122,15 +123,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const avatarUrl =
       result.user.photoURL ??
       generateAvatarUrl(result.user.displayName ?? 'User', 'male');
+    // Google already verifies the email address, so new profiles are marked verified immediately.
     const p = await upsertProfile(
       result.user.uid,
       result.user.displayName ?? 'User',
       result.user.email ?? '',
       avatarUrl,
+      '',
+      true,
     );
     setProfile(p);
   }
 
+  /**
+   * Called only after the caller has already confirmed the email OTP
+   * (see the EmailVerifyOverlay flow in Signup.tsx) — the Firebase Auth
+   * account and Firestore profile are created here, already marked as
+   * email-verified.
+   */
   async function signUpEmail({ email, password, name, phone, gender }: SignUpParams) {
   // Check phone uniqueness before creating account
   if (phone) {
@@ -144,15 +154,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     const photoURL = generateAvatarUrl(name, gender);
     await fbUpdateProfile(cred.user, { displayName: name, photoURL });
-    await sendEmailVerification(cred.user);
-    const p = await upsertProfile(cred.user.uid, name, email, photoURL, phone);
+    const p = await upsertProfile(cred.user.uid, name, email, photoURL, phone, true);
     setProfile(p);
-  }
-
-  async function resendVerification() {
-    if (auth.currentUser && !auth.currentUser.emailVerified) {
-      await sendEmailVerification(auth.currentUser);
-    }
   }
 
   async function logout() {
@@ -169,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, accountDisabled, signInEmail, signInGoogle, signInCredential, signUpEmail, resendVerification, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, accountDisabled, signInEmail, signInGoogle, signInCredential, signUpEmail, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

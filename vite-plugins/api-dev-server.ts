@@ -10,10 +10,17 @@ import type { Plugin, ViteDevServer } from 'vite';
  * and the actual `api/*.ts` serverless functions take over unchanged.
  */
 
-const ROUTES: Record<string, keyof Awaited<ReturnType<ViteDevServer['ssrLoadModule']>>> = {
+/** Routes whose handler signature is `(authHeader, body)` — admin-protected endpoints. */
+const AUTHED_ROUTES: Record<string, keyof Awaited<ReturnType<ViteDevServer['ssrLoadModule']>>> = {
   '/api/send-email': 'handleSendEmail',
   '/api/verify-smtp': 'handleVerifySmtp',
   '/api/check-dns': 'handleCheckDns',
+};
+
+/** Routes whose handler signature is `(body)` only — public, unauthenticated endpoints. */
+const PUBLIC_ROUTES: Record<string, keyof Awaited<ReturnType<ViteDevServer['ssrLoadModule']>>> = {
+  '/api/send-verification-code': 'handleSendVerificationCode',
+  '/api/verify-code': 'handleVerifyCode',
 };
 
 function readJsonBody(req: IncomingMessage): Promise<Record<string, unknown>> {
@@ -47,25 +54,35 @@ export function apiDevServerPlugin(): Plugin {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const url = req.url?.split('?')[0];
-        if (!url || !(url in ROUTES)) return next();
+        const isAuthed = url && url in AUTHED_ROUTES;
+        const isPublic = url && url in PUBLIC_ROUTES;
+        if (!url || (!isAuthed && !isPublic)) return next();
 
         if (req.method !== 'POST') {
           return sendJson(res, 405, { error: 'Method not allowed.' });
         }
 
         try {
-          const handlerName = ROUTES[url];
           const mod = await server.ssrLoadModule('/api/_lib/handlers.ts');
-          const handlerFn = mod[handlerName] as (
-            authHeader: string | null | undefined,
-            body: Record<string, unknown>,
-          ) => Promise<{ status: number; body: unknown }>;
-
-          const authHeader = (req.headers.authorization as string | undefined) ?? null;
           const body = await readJsonBody(req);
 
-          const { status, body: responseBody } = await handlerFn(authHeader, body);
-          sendJson(res, status, responseBody);
+          if (isAuthed) {
+            const handlerName = AUTHED_ROUTES[url];
+            const handlerFn = mod[handlerName] as (
+              authHeader: string | null | undefined,
+              body: Record<string, unknown>,
+            ) => Promise<{ status: number; body: unknown }>;
+            const authHeader = (req.headers.authorization as string | undefined) ?? null;
+            const { status, body: responseBody } = await handlerFn(authHeader, body);
+            return sendJson(res, status, responseBody);
+          }
+
+          const handlerName = PUBLIC_ROUTES[url];
+          const handlerFn = mod[handlerName] as (
+            body: Record<string, unknown>,
+          ) => Promise<{ status: number; body: unknown }>;
+          const { status, body: responseBody } = await handlerFn(body);
+          return sendJson(res, status, responseBody);
         } catch (err) {
           console.error('[api-dev-server]', err);
           sendJson(res, 500, { error: err instanceof Error ? err.message : 'Internal server error.' });

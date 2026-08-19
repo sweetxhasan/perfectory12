@@ -51,6 +51,7 @@ export interface UserProfile {
   isBlocked?: boolean;    // account blocked by admin — blocks all access
   onboardingDone?: boolean; // whether the onboarding overlay has been completed/dismissed
   useCase?: string;         // how the user plans to use Perfectory Voice (set in onboarding)
+  emailVerified?: boolean;  // OTP-verified email (missing = treated as verified, for legacy accounts)
   createdAt: unknown;
 }
 
@@ -194,6 +195,7 @@ export async function createProfile(
   email: string,
   phone: string,
   photoURL: string,
+  emailVerified = false,
 ): Promise<UserProfile> {
   const username = await generateUsernameFromEmail(email);
   const profile: Omit<UserProfile, 'uid'> = {
@@ -211,6 +213,7 @@ export async function createProfile(
     planExpiresAt: null,
     lastDailyAt: null,
     isPublic: true,
+    emailVerified,
     createdAt: serverTimestamp(),
   };
   await setDoc(doc(db, USERS, uid), profile);
@@ -224,6 +227,7 @@ export async function upsertProfile(
   email: string,
   photoURL: string,
   phone = '',
+  emailVerified = false,
 ): Promise<UserProfile> {
   const existing = await getProfile(uid);
   if (existing) {
@@ -233,7 +237,7 @@ export async function upsertProfile(
     }
     return existing;
   }
-  return createProfile(uid, name, email, phone, photoURL);
+  return createProfile(uid, name, email, phone, photoURL, emailVerified);
 }
 
 export async function updateUserProfile(
