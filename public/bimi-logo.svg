@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps" viewBox="0 0 200 200" width="200" height="200">
+  <title>Perfectory Voice</title>
+  <rect x="0" y="0" width="200" height="200" rx="40" fill="#8A1250"/>
+  <path d="M74,148 V52 H104 A30,27 0 0 1 104,106 H74" fill="none" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="150" cy="54" r="4" fill="#FFFFFF"/>
+  <path d="M141,46 A13,13 0 0 1 159,46" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M133,38 A25,25 0 0 1 167,38" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -135,6 +135,31 @@ async function checkDkim(domain: string, selector: string): Promise<TxtCheckResu
   }
 }
 
+interface BimiCheckResult {
+  found: boolean;
+  record: string | null;
+  logoUrl: string | null;
+}
+
+async function checkBimi(domain: string, selector: string): Promise<BimiCheckResult> {
+  try {
+    const records = await dns.resolveTxt(`${selector}._bimi.${domain}`);
+    const flat = records.map((r) => r.join(''));
+    const record = flat.find((r) => /v=bimi1/i.test(r)) || null;
+    const logoMatch = record ? record.match(/l=([^;]+)/i) : null;
+    return { found: !!record, record, logoUrl: logoMatch ? logoMatch[1].trim() : null };
+  } catch {
+    return { found: false, record: null, logoUrl: null };
+  }
+}
+
+/** Extracts the DMARC enforcement policy (p=) from a DMARC TXT record, e.g. "none" | "quarantine" | "reject". */
+function parseDmarcPolicy(record: string | null): string | null {
+  if (!record) return null;
+  const match = record.match(/p=(none|quarantine|reject)/i);
+  return match ? match[1].toLowerCase() : null;
+}
+
 export async function handleCheckDns(
   authHeader: string | null | undefined,
   body: Record<string, unknown>,
@@ -158,14 +183,27 @@ export async function handleCheckDns(
 
     const selector = typeof dkimSelector === 'string' && dkimSelector.trim() ? dkimSelector.trim() : 'default';
 
-    const [spf, dmarc, mx, dkim] = await Promise.all([
+    const [spf, dmarc, mx, dkim, bimi] = await Promise.all([
       checkSpf(clean),
       checkDmarc(clean),
       checkMx(clean),
       checkDkim(clean, selector),
+      checkBimi(clean, 'default'),
     ]);
 
-    return { status: 200, body: { domain: clean, spf, dmarc, mx, dkim, dkimSelector: selector } };
+    return {
+      status: 200,
+      body: {
+        domain: clean,
+        spf,
+        dmarc,
+        mx,
+        dkim,
+        bimi,
+        dkimSelector: selector,
+        dmarcPolicy: parseDmarcPolicy(dmarc.record),
+      },
+    };
   } catch (err) {
     if (err instanceof AdminAuthError) {
       return { status: err.status, body: { error: err.message } };
