@@ -179,11 +179,32 @@ function VoiceVisualPanel() {
               <p className="text-xs font-semibold text-white/90 truncate">Sample: English · Natural</p>
               <p className="mt-0.5 text-[10px] text-white/40">Generating in real-time…</p>
             </div>
-            <div
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-              style={{ background: 'linear-gradient(135deg, oklch(0.26 0.10 335), oklch(0.60 0.18 22))' }}
-            >
-              <SvgPlayIcon />
+            <div className="relative h-8 w-8 shrink-0">
+              <span
+                aria-hidden="true"
+                className="absolute inset-0"
+                style={{
+                  clipPath: CUT_FRAME_CLIP_PATH,
+                  background: 'linear-gradient(135deg, oklch(0.26 0.10 335), oklch(0.60 0.18 22))',
+                }}
+              />
+              <svg
+                className="pointer-events-none absolute inset-0 h-full w-full"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <path
+                  d={CUT_FRAME_PATH}
+                  fill="none"
+                  stroke="oklch(1 0 0 / 0.5)"
+                  strokeWidth="1.4"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+              <span className="relative z-10 flex h-full w-full items-center justify-center">
+                <SvgPlayIcon />
+              </span>
             </div>
           </div>
         </CutGlassPanel>
