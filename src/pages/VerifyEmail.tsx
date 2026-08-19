@@ -8,7 +8,7 @@ import { CutFrame } from '@/components/cut-frame';
 import { CutSubmitButton } from '@/components/cut-submit-button';
 import { Icon } from '@/components/icon';
 import { updateUserProfile } from '@/lib/user-store';
-import { requestSignupCode, confirmSignupCode, sendWelcomeEmail } from '@/lib/email-verify';
+import { requestSignupCode, confirmSignupCode } from '@/lib/email-verify';
 
 const CODE_LENGTH = 6;
 
@@ -18,7 +18,8 @@ const CODE_LENGTH = 6;
    created, emailVerified: false) or after logging
    in to an unverified account. Auto-sends a code
    on mount and lets the user resend as many times
-   as they want (only a 60s cooldown between sends).
+   as they want — resend is completely unlimited,
+   with no cooldown or cap of any kind.
 ════════════════════════════════════════════ */
 export default function VerifyEmailPage() {
   const { user, profile, loading, logout, refreshProfile } = useAuth();
@@ -27,7 +28,6 @@ export default function VerifyEmailPage() {
   const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''));
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
-  const [cooldown, setCooldown] = useState(0);
   const [resending, setResending] = useState(false);
   const [sentOnce, setSentOnce] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -51,12 +51,9 @@ export default function VerifyEmailPage() {
     setError('');
     if (isResend) setResending(true);
     try {
-      const res = await requestSignupCode(email, name);
-      setCooldown(res.cooldownSec);
+      await requestSignupCode(email, name);
       setSentOnce(true);
     } catch (err) {
-      const cooldownMs = (err as { cooldownRemainingMs?: number })?.cooldownRemainingMs;
-      if (cooldownMs) setCooldown(Math.ceil(cooldownMs / 1000));
       setError((err as Error).message || 'Failed to send verification code.');
     } finally {
       if (isResend) setResending(false);
@@ -71,12 +68,6 @@ export default function VerifyEmailPage() {
     sendCode(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, user, isVerified, email, sentOnce]);
-
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [cooldown]);
 
   useEffect(() => {
     if (!loading && user && !isVerified) setTimeout(() => inputRefs.current[0]?.focus(), 50);
@@ -149,13 +140,14 @@ export default function VerifyEmailPage() {
     setVerifying(true);
     setError('');
     try {
-      await confirmSignupCode(email, code);
+      // The server sends the welcome email itself, in this same request,
+      // the instant the code is confirmed — no separate client follow-up
+      // call that could get cut off by the redirect right after.
+      await confirmSignupCode(email, code, name);
       // Flip the profile's emailVerified flag — the user's own Firestore
       // doc, so this is a normal client-side write under their own uid.
       await updateUserProfile(user.uid, { emailVerified: true });
       await refreshProfile();
-      // Fire the welcome email — best-effort, never blocks the redirect.
-      sendWelcomeEmail(email, name).catch(() => {});
       setLocation('/dashboard');
     } catch (err) {
       setError((err as Error).message || 'Invalid code. Please try again.');
@@ -252,15 +244,18 @@ export default function VerifyEmailPage() {
             />
           </div>
 
-          {/* Resend — unlimited, gated only by the 60s cooldown */}
+          {/* Resend — completely unlimited, no cooldown or cap. Only
+              disabled for the moment a request is actually in flight, so
+              a user can't fire a dozen overlapping sends by mashing the
+              button. */}
           <button
             type="button"
             onClick={() => sendCode(true)}
-            disabled={resending || cooldown > 0}
-            className="mt-4 text-xs font-medium text-muted-foreground underline-offset-2 transition hover:underline disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
-            style={{ color: cooldown > 0 ? undefined : 'oklch(0.42 0.16 350)' }}
+            disabled={resending}
+            className="mt-4 text-xs font-medium underline-offset-2 transition hover:underline disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
+            style={{ color: 'oklch(0.42 0.16 350)' }}
           >
-            {resending ? 'Resending…' : cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend code'}
+            {resending ? 'Resending…' : 'Resend code'}
           </button>
 
           {/* Wrong account? Log out and start over */}

@@ -17,7 +17,6 @@ import { serverDb } from './firebase-server';
 const OTPS = 'perfectory_email_otps';
 
 export const OTP_EXPIRY_MS = 60 * 60 * 1000; // 60 minutes
-export const OTP_RESEND_COOLDOWN_MS = 60 * 1000; // 60 seconds (resend is otherwise unlimited)
 export const OTP_MAX_ATTEMPTS = 5;
 
 export interface OtpRecord {
@@ -27,6 +26,7 @@ export interface OtpRecord {
   lastSentAt: Timestamp;
   attempts: number;
   verified: boolean;
+  welcomeSent?: boolean;
   createdAt: unknown;
 }
 
@@ -57,21 +57,16 @@ export async function getOtp(email: string): Promise<(OtpRecord & { id: string }
   return { id, ...(snap.data() as OtpRecord) };
 }
 
-/** Creates/overwrites the OTP record with a brand-new code, enforcing the resend cooldown. */
-export async function issueOtp(email: string): Promise<{ code: string; cooldownRemainingMs: number } | { code: null; cooldownRemainingMs: number }> {
-  const existing = await getOtp(email);
-  const now = Date.now();
-
-  if (existing?.lastSentAt) {
-    const elapsed = now - existing.lastSentAt.toMillis();
-    if (elapsed < OTP_RESEND_COOLDOWN_MS) {
-      return { code: null, cooldownRemainingMs: OTP_RESEND_COOLDOWN_MS - elapsed };
-    }
-  }
-
+/**
+ * Creates/overwrites the OTP record with a brand-new code. Resend is
+ * completely unlimited — no cooldown, no cap on how many times a user can
+ * request a fresh code for the same email.
+ */
+export async function issueOtp(email: string): Promise<{ code: string }> {
   const code = generateCode();
   const salt = crypto.randomBytes(16).toString('hex');
   const id = otpDocId(email);
+  const now = Date.now();
 
   await setDoc(doc(serverDb, OTPS, id), {
     codeHash: hashCode(code, salt),
@@ -80,21 +75,25 @@ export async function issueOtp(email: string): Promise<{ code: string; cooldownR
     lastSentAt: Timestamp.fromMillis(now),
     attempts: 0,
     verified: false,
+    welcomeSent: false,
     createdAt: serverTimestamp(),
   });
 
-  return { code, cooldownRemainingMs: OTP_RESEND_COOLDOWN_MS };
+  return { code };
 }
 
 export type VerifyOutcome =
-  | { ok: true }
+  | { ok: true; justVerified: boolean }
   | { ok: false; reason: 'not-found' | 'expired' | 'too-many-attempts' | 'invalid'; attemptsLeft?: number };
 
 export async function verifyOtp(email: string, code: string): Promise<VerifyOutcome> {
   const record = await getOtp(email);
   if (!record) return { ok: false, reason: 'not-found' };
 
-  if (record.verified) return { ok: true };
+  // Already verified in a previous call — report ok but justVerified: false
+  // so callers know not to re-trigger one-time side effects like the
+  // welcome email.
+  if (record.verified) return { ok: true, justVerified: false };
 
   if (Date.now() > record.expiresAt.toMillis()) {
     // Expired codes are deleted immediately on the next touch, instead of
@@ -118,7 +117,7 @@ export async function verifyOtp(email: string, code: string): Promise<VerifyOutc
   }
 
   await updateDoc(doc(serverDb, OTPS, record.id), { verified: true });
-  return { ok: true };
+  return { ok: true, justVerified: true };
 }
 
 /** Whether this email has a currently-verified, unexpired OTP record. */
@@ -126,6 +125,23 @@ export async function isOtpVerified(email: string): Promise<boolean> {
   const record = await getOtp(email);
   if (!record || !record.verified) return false;
   return Date.now() <= record.expiresAt.toMillis();
+}
+
+/**
+ * Marks the OTP record's welcome email as sent, so a retried verify call
+ * (or a duplicate request) never fires a second welcome email for the same
+ * signup. Best-effort — if this write fails we still already sent the mail.
+ */
+export async function markWelcomeSent(email: string): Promise<void> {
+  const record = await getOtp(email);
+  if (!record) return;
+  await updateDoc(doc(serverDb, OTPS, record.id), { welcomeSent: true }).catch(() => {});
+}
+
+/** Whether the welcome email has already gone out for this email's OTP record. */
+export async function wasWelcomeSent(email: string): Promise<boolean> {
+  const record = await getOtp(email);
+  return !!record?.welcomeSent;
 }
 
 /**

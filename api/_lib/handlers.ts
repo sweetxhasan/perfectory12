@@ -3,7 +3,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { verifyAdminToken, AdminAuthError } from './admin-auth';
 import { sendMail, assertValidSmtpConfig, verifyConnection, type SmtpConfigInput } from './mailer';
 import { serverDb } from './firebase-server';
-import { issueOtp, verifyOtp, isOtpVerified, cleanupExpiredOtps, OTP_EXPIRY_MS, OTP_RESEND_COOLDOWN_MS } from './otp-store';
+import { issueOtp, verifyOtp, isOtpVerified, markWelcomeSent, wasWelcomeSent, cleanupExpiredOtps, OTP_EXPIRY_MS } from './otp-store';
 import { verificationEmailHtml, VERIFY_EMAIL_SUBJECT, welcomeEmailHtml, WELCOME_EMAIL_SUBJECT } from './email-templates';
 
 export interface HandlerResult {
@@ -46,16 +46,9 @@ export async function handleSendVerificationCode(
     return { status: 503, body: { error: 'Email service is not configured yet. Please try again later.' } };
   }
 
+  // Resend is completely unlimited — no cooldown, no cap on how many times
+  // a user can request a fresh code for the same email.
   const result = await issueOtp(email.trim());
-  if (!result.code) {
-    return {
-      status: 429,
-      body: {
-        error: `Please wait ${Math.ceil(result.cooldownRemainingMs / 1000)}s before requesting another code.`,
-        cooldownRemainingMs: result.cooldownRemainingMs,
-      },
-    };
-  }
 
   console.log('[v0] OTP code for', email.trim(), '=', result.code);
   try {
@@ -74,7 +67,7 @@ export async function handleSendVerificationCode(
 
   return {
     status: 200,
-    body: { success: true, cooldownSec: Math.round(OTP_RESEND_COOLDOWN_MS / 1000), expiresInSec: Math.round(OTP_EXPIRY_MS / 1000) },
+    body: { success: true, expiresInSec: Math.round(OTP_EXPIRY_MS / 1000) },
   };
 }
 
@@ -83,7 +76,7 @@ export async function handleSendVerificationCode(
 export async function handleVerifyCode(
   body: Record<string, unknown>,
 ): Promise<HandlerResult> {
-  const { email, code } = body || ({} as Record<string, unknown>);
+  const { email, code, name } = body || ({} as Record<string, unknown>);
 
   if (!email || typeof email !== 'string') {
     return { status: 400, body: { error: 'An email address is required.' } };
@@ -92,9 +85,34 @@ export async function handleVerifyCode(
     return { status: 400, body: { error: 'Please enter the 6-digit code.' } };
   }
 
-  const outcome = await verifyOtp(email.trim(), code);
+  const trimmedEmail = email.trim();
+  const outcome = await verifyOtp(trimmedEmail, code);
 
   if (outcome.ok) {
+    // Send the welcome email right here, server-side, as part of this same
+    // request — instead of relying on a second, separate client fetch that
+    // can get cut off by the redirect to /dashboard right after. Guarded
+    // by welcomeSent so a retried/duplicate verify call never double-sends.
+    if (outcome.justVerified && !(await wasWelcomeSent(trimmedEmail))) {
+      try {
+        const smtp = await loadAdminSmtpConfig();
+        if (smtp) {
+          await sendMail({
+            smtp,
+            to: trimmedEmail,
+            subject: WELCOME_EMAIL_SUBJECT,
+            html: welcomeEmailHtml({ name: typeof name === 'string' ? name : undefined }),
+          });
+          await markWelcomeSent(trimmedEmail);
+        } else {
+          console.log('[v0] Skipping welcome email for', trimmedEmail, '— SMTP not configured.');
+        }
+      } catch (err) {
+        // Never fail verification because the welcome email had trouble —
+        // the user is verified either way. Just log it for debugging.
+        console.log('[v0] Failed to send welcome email to', trimmedEmail, ':', err instanceof Error ? err.message : err);
+      }
+    }
     return { status: 200, body: { success: true } };
   }
 

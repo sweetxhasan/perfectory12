@@ -6,14 +6,12 @@
 
 export interface SendCodeResult {
   success: true;
-  cooldownSec: number;
   expiresInSec: number;
 }
 
 export interface SendCodeError {
   success: false;
   error: string;
-  cooldownRemainingMs?: number;
 }
 
 export interface VerifyCodeError {
@@ -32,10 +30,8 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
   if (!res.ok) {
     const err = new Error((data as { error?: string }).error || `Request failed (${res.status}).`) as Error & {
       attemptsLeft?: number;
-      cooldownRemainingMs?: number;
     };
     err.attemptsLeft = (data as { attemptsLeft?: number }).attemptsLeft;
-    err.cooldownRemainingMs = (data as { cooldownRemainingMs?: number }).cooldownRemainingMs;
     throw err;
   }
   return data as T;
@@ -45,15 +41,20 @@ export async function requestSignupCode(email: string, name?: string): Promise<S
   return postJson<SendCodeResult>('/api/send-verification-code', { email, name });
 }
 
-export async function confirmSignupCode(email: string, code: string): Promise<{ success: true }> {
-  return postJson<{ success: true }>('/api/verify-code', { email, code });
+/**
+ * Confirms the OTP code. The server sends the "Welcome to Perfectory
+ * Voice!" email itself, in the same request, the moment the code is
+ * confirmed — no separate client follow-up call needed.
+ */
+export async function confirmSignupCode(email: string, code: string, name?: string): Promise<{ success: true }> {
+  return postJson<{ success: true }>('/api/verify-code', { email, code, name });
 }
 
 /**
- * Fires the "Welcome to Perfectory Voice!" email once the OTP for this
- * address has been confirmed. The server re-checks that the OTP record is
- * actually verified before sending, so this can't be abused to spam an
- * address that never completed the code flow.
+ * Manual fallback: re-fires the welcome email for an address that has
+ * already completed OTP verification. The server re-checks that the OTP
+ * record is actually verified before sending, so this can't be abused to
+ * spam an address that never completed the code flow.
  */
 export async function sendWelcomeEmail(email: string, name?: string): Promise<void> {
   await postJson('/api/send-welcome-email', { email, name });
