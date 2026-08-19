@@ -86,6 +86,12 @@ export const PAGE_SEO: Record<string, SEOMeta> = {
     noIndex: true,
     canonical: `${SITE_URL}/dashboard`,
   },
+  verifyEmail: {
+    title: 'Verify Your Email | Perfectory Voice',
+    description: 'Confirm your email address with the code we sent you to finish setting up your Perfectory Voice account.',
+    noIndex: true,
+    canonical: `${SITE_URL}/verify/email`,
+  },
   profile: {
     title: 'My Profile | Perfectory Voice',
     description: 'Manage your Perfectory Voice profile and account settings.',

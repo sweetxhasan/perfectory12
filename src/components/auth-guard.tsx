@@ -13,7 +13,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading) return;
     if (!user) { setLocation('/login'); return; }
-    if (!isVerified) { setLocation('/login'); return; }
+    if (!isVerified) { setLocation('/verify/email'); return; }
     if (accountDisabled) { setLocation('/account-disabled'); }
   }, [loading, user, isVerified, accountDisabled, setLocation]);
 
@@ -23,8 +23,9 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   /* Unauthenticated — redirect is already triggered above, render nothing */
   if (!user) return null;
 
-  /* Email not verified — redirect triggered above (shouldn't happen since
-     accounts are only created post-verification, but guards legacy edge cases) */
+  /* Email not verified — accounts are created before verification now, so
+     this fires for every fresh signup until the OTP is confirmed. Redirect
+     is triggered above. */
   if (!isVerified) return null;
 
   /* Disabled — redirect triggered above */

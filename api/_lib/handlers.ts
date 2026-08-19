@@ -3,8 +3,8 @@ import { doc, getDoc } from 'firebase/firestore';
 import { verifyAdminToken, AdminAuthError } from './admin-auth';
 import { sendMail, assertValidSmtpConfig, verifyConnection, type SmtpConfigInput } from './mailer';
 import { serverDb } from './firebase-server';
-import { issueOtp, verifyOtp, cleanupExpiredOtps, OTP_EXPIRY_MS, OTP_RESEND_COOLDOWN_MS } from './otp-store';
-import { verificationEmailHtml, VERIFY_EMAIL_SUBJECT } from './email-templates';
+import { issueOtp, verifyOtp, isOtpVerified, cleanupExpiredOtps, OTP_EXPIRY_MS, OTP_RESEND_COOLDOWN_MS } from './otp-store';
+import { verificationEmailHtml, VERIFY_EMAIL_SUBJECT, welcomeEmailHtml, WELCOME_EMAIL_SUBJECT } from './email-templates';
 
 export interface HandlerResult {
   status: number;
@@ -113,6 +113,50 @@ export async function handleVerifyCode(
         },
       };
   }
+}
+
+/* ── /api/send-welcome-email ────────────────────────── */
+
+/**
+ * Sends the "Welcome to Perfectory Voice!" email. Public endpoint (no auth
+ * token — the account may have only just been created), but gated on the
+ * target address having a verified OTP record, so it can't be used to spam
+ * arbitrary inboxes that never completed the code flow.
+ */
+export async function handleSendWelcomeEmail(
+  body: Record<string, unknown>,
+): Promise<HandlerResult> {
+  const { email, name } = body || ({} as Record<string, unknown>);
+
+  if (!email || typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
+    return { status: 400, body: { error: 'A valid email address is required.' } };
+  }
+
+  const verified = await isOtpVerified(email.trim());
+  if (!verified) {
+    return { status: 403, body: { error: 'This email has not completed verification yet.' } };
+  }
+
+  const smtp = await loadAdminSmtpConfig();
+  if (!smtp) {
+    return { status: 503, body: { error: 'Email service is not configured yet.' } };
+  }
+
+  try {
+    await sendMail({
+      smtp,
+      to: email.trim(),
+      subject: WELCOME_EMAIL_SUBJECT,
+      html: welcomeEmailHtml({ name: typeof name === 'string' ? name : undefined }),
+    });
+  } catch (err) {
+    return {
+      status: 502,
+      body: { error: err instanceof Error ? err.message : 'Failed to send the welcome email.' },
+    };
+  }
+
+  return { status: 200, body: { success: true } };
 }
 
 /* ── /api/cleanup-expired-otps ──────────────────────── */

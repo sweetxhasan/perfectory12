@@ -39,7 +39,7 @@ function EyeIcon({ open }: { open: boolean }) {
 }
 
 export default function LoginPage() {
-  const { user, signInEmail, signInGoogle } = useAuth();
+  const { user, profile, loading: authLoading, signInEmail, signInGoogle } = useAuth();
   const [, setLocation] = useLocation();
   const search = useSearch();
   const redirectTo = new URLSearchParams(search).get('redirect') ?? '/dashboard';
@@ -56,11 +56,16 @@ export default function LoginPage() {
   const [errorType, setErrorType] = useState<'generic' | 'wrong-password'>('generic');
 
   useEffect(() => {
-    if (!user) return;
-    // Accounts are only ever created after the signup OTP overlay confirms
-    // the email, so every signed-in user is already verified.
+    if (authLoading || !user) return;
+    // Unverified accounts (created but never confirmed the OTP) get sent
+    // to the verify page instead of straight through to the redirect
+    // target — that page auto-sends a fresh code and asks them to confirm.
+    if (profile && profile.emailVerified === false) {
+      setLocation('/verify/email');
+      return;
+    }
     setLocation(redirectTo);
-  }, [user, setLocation, redirectTo]);
+  }, [user, profile, authLoading, setLocation, redirectTo]);
 
   function handleRemember(v: boolean) {
     setRememberMe(v);
@@ -74,8 +79,10 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      // Redirect (dashboard vs. /verify/email) is decided by the effect
+      // above once `user`/`profile` update — avoids racing this call
+      // against an unverified account and sending them to the wrong place.
       await signInEmail(email, password);
-      setLocation(redirectTo);
     } catch (err) {
       const code = (err as { code?: string })?.code ?? '';
       const isWrongPassword =

@@ -15,8 +15,6 @@ import { CutIconBadge } from '@/components/cut-icon-badge';
 import { PremiumTooltip, CutBubbleCard } from '@/components/premium-tooltip';
 import { Icon } from '@/components/icon';
 import { isPhoneUsed, isEmailUsed } from '@/lib/user-store';
-import { EmailVerifyOverlay } from '@/components/email-verify-overlay';
-import { requestSignupCode } from '@/lib/email-verify';
 
 const NAME_MIN = 3;
 const NAME_MAX = 20;
@@ -467,7 +465,7 @@ function TermsCheckbox({ checked, onChange, error }: { checked: boolean; onChang
    Sign Up Page
 ════════════════════════════════════════════ */
 export default function SignupPage() {
-  const { user, signUpEmail, signInGoogle } = useAuth();
+  const { user, profile, loading: authLoading, signUpEmail, signInGoogle } = useAuth();
   const [, setLocation] = useLocation();
 
   const [name, setName] = useState('');
@@ -493,18 +491,17 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [nameError, setNameError] = useState('');
 
-  /* Email verify overlay — opened after the OTP is sent, closed once the
-     account is created post-verification. */
-  const [verifyOpen, setVerifyOpen] = useState(false);
-  const [verifyCooldownSec, setVerifyCooldownSec] = useState(0);
-  const [pendingSignup, setPendingSignup] = useState<{ email: string; password: string; name: string; phone: string } | null>(null);
-
   useEffect(() => {
-    // Accounts are only ever created after the OTP overlay confirms the
-    // email, so any signed-in user here is already verified.
-    if (!user) return;
+    if (authLoading || !user) return;
+    // Fresh email/password signups are created unverified — send them to
+    // the OTP page instead of straight to the dashboard. Google signups
+    // are verified immediately, so they skip straight through.
+    if (profile && profile.emailVerified === false) {
+      setLocation('/verify/email');
+      return;
+    }
     setLocation('/dashboard');
-  }, [user, setLocation]);
+  }, [user, profile, authLoading, setLocation]);
 
   /* field validation */
   const emailSt = emailState(email);
@@ -549,47 +546,28 @@ export default function SignupPage() {
       const trimmedEmail = email.trim();
       const trimmedName = name.trim();
 
-      // Send the OTP first — if the email service isn't configured, show
-      // the error inline on the form instead of opening the overlay.
-      const res = await requestSignupCode(trimmedEmail, trimmedName);
-
-      setPendingSignup({ email: trimmedEmail, password, name: trimmedName, phone: intlPhone });
-      setVerifyCooldownSec(res.cooldownSec);
-      setVerifyOpen(true);
+      // Create the account right away (emailVerified: false) — the redirect
+      // effect above sends the now-signed-in user to /verify/email, which
+      // sends the OTP itself.
+      await signUpEmail({
+        email: trimmedEmail,
+        password,
+        name: trimmedName,
+        phone: intlPhone,
+        gender: 'male',
+      });
     } catch (err) {
       const msg = (err as Error).message ?? '';
       if (msg === 'phone-already-in-use') {
         setError('This phone number is already registered with another account.');
+      } else if (msg === 'email-already-in-use') {
+        setError('This email is already registered with another account.');
       } else {
         setError(msg || friendlyAuthError(err));
       }
     } finally {
       setLoading(false);
     }
-  }
-
-  async function handleVerified() {
-    if (!pendingSignup) return;
-    try {
-      await signUpEmail({
-        email: pendingSignup.email,
-        password: pendingSignup.password,
-        name: pendingSignup.name,
-        phone: pendingSignup.phone,
-        gender: 'male',
-      });
-    } catch (err) {
-      const msg = (err as Error).message ?? '';
-      if (msg === 'phone-already-in-use') {
-        throw new Error('This phone number is already registered with another account.');
-      }
-      if (msg === 'email-already-in-use') {
-        throw new Error('This email is already registered with another account.');
-      }
-      throw new Error(friendlyAuthError(err));
-    }
-    setVerifyOpen(false);
-    setLocation('/dashboard');
   }
 
   return (
@@ -750,15 +728,6 @@ export default function SignupPage() {
           </Link>
         </p>
       </AuthLayout>
-
-      <EmailVerifyOverlay
-        open={verifyOpen}
-        email={pendingSignup?.email ?? email.trim()}
-        name={pendingSignup?.name ?? name.trim()}
-        initialCooldownSec={verifyCooldownSec}
-        onClose={() => setVerifyOpen(false)}
-        onVerified={handleVerified}
-      />
     </>
   );
 }

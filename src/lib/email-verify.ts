@@ -48,3 +48,13 @@ export async function requestSignupCode(email: string, name?: string): Promise<S
 export async function confirmSignupCode(email: string, code: string): Promise<{ success: true }> {
   return postJson<{ success: true }>('/api/verify-code', { email, code });
 }
+
+/**
+ * Fires the "Welcome to Perfectory Voice!" email once the OTP for this
+ * address has been confirmed. The server re-checks that the OTP record is
+ * actually verified before sending, so this can't be abused to spam an
+ * address that never completed the code flow.
+ */
+export async function sendWelcomeEmail(email: string, name?: string): Promise<void> {
+  await postJson('/api/send-welcome-email', { email, name });
+}

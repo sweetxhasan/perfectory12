@@ -26,7 +26,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   accountDisabled: boolean;
-  signInEmail: (email: string, password: string) => Promise<void>;
+  signInEmail: (email: string, password: string) => Promise<UserProfile | null>;
   signInGoogle: () => Promise<void>;
   signInCredential: (idToken: string) => Promise<void>;
   signUpEmail: (params: SignUpParams) => Promise<void>;
@@ -99,6 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cred.user.photoURL ?? '',
     );
     setProfile(p);
+    return p;
   }
 
   async function signInGoogle() {
@@ -136,10 +137,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   /**
-   * Called only after the caller has already confirmed the email OTP
-   * (see the EmailVerifyOverlay flow in Signup.tsx) — the Firebase Auth
-   * account and Firestore profile are created here, already marked as
-   * email-verified.
+   * Creates the Firebase Auth account and Firestore profile right away —
+   * marked emailVerified: false. The caller is signed in immediately after
+   * (createUserWithEmailAndPassword does this automatically) and is expected
+   * to redirect to /verify/email, where the OTP flow finishes the job by
+   * flipping emailVerified to true.
    */
   async function signUpEmail({ email, password, name, phone, gender }: SignUpParams) {
   // Check phone uniqueness before creating account
@@ -154,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     const photoURL = generateAvatarUrl(name, gender);
     await fbUpdateProfile(cred.user, { displayName: name, photoURL });
-    const p = await upsertProfile(cred.user.uid, name, email, photoURL, phone, true);
+    const p = await upsertProfile(cred.user.uid, name, email, photoURL, phone, false);
     setProfile(p);
   }
 

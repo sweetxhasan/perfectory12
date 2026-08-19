@@ -52,6 +52,7 @@ import EditProfile from '@/pages/EditProfile';
 import AdminEditProfile from '@/pages/AdminEditProfile';
 import Disabled from '@/pages/Disabled';
 import ForgotPassword from '@/pages/ForgotPassword';
+import VerifyEmail from '@/pages/VerifyEmail';
 import NotFound from '@/pages/NotFound';
 import AdminDashboard from '@/pages/admin/Dashboard';
 import AdminUsers from '@/pages/admin/Users';
@@ -88,6 +89,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
       <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/verify/email" component={VerifyEmail} />
       <Route path="/generator" component={Generator} />
       <Route path="/plans" component={Plans} />
       <Route path="/buyplan/:plan/:method" component={BuyPlanCheckout} />
