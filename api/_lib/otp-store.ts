@@ -1,11 +1,23 @@
 import crypto from 'crypto';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  serverTimestamp,
+  Timestamp,
+} from 'firebase/firestore';
 import { serverDb } from './firebase-server';
 
 const OTPS = 'perfectory_email_otps';
 
-export const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
-export const OTP_RESEND_COOLDOWN_MS = 60 * 1000; // 60 seconds
+export const OTP_EXPIRY_MS = 60 * 60 * 1000; // 60 minutes
+export const OTP_RESEND_COOLDOWN_MS = 60 * 1000; // 60 seconds (resend is otherwise unlimited)
 export const OTP_MAX_ATTEMPTS = 5;
 
 export interface OtpRecord {
@@ -85,6 +97,9 @@ export async function verifyOtp(email: string, code: string): Promise<VerifyOutc
   if (record.verified) return { ok: true };
 
   if (Date.now() > record.expiresAt.toMillis()) {
+    // Expired codes are deleted immediately on the next touch, instead of
+    // lingering in Firestore until something else overwrites them.
+    await deleteDoc(doc(serverDb, OTPS, record.id)).catch(() => {});
     return { ok: false, reason: 'expired' };
   }
 
@@ -111,4 +126,19 @@ export async function isOtpVerified(email: string): Promise<boolean> {
   const record = await getOtp(email);
   if (!record || !record.verified) return false;
   return Date.now() <= record.expiresAt.toMillis();
+}
+
+/**
+ * Sweeps every OTP record whose `expiresAt` has passed and deletes it from
+ * Firestore. `verifyOtp` already deletes a record the moment it's touched
+ * past expiry, but nobody may ever re-touch an abandoned signup — so this
+ * runs on a schedule (see /api/cleanup-expired-otps + vercel.json crons)
+ * to guarantee expired codes don't linger in the database indefinitely.
+ */
+export async function cleanupExpiredOtps(): Promise<{ deleted: number }> {
+  const now = Timestamp.fromMillis(Date.now());
+  const q = query(collection(serverDb, OTPS), where('expiresAt', '<=', now));
+  const snap = await getDocs(q);
+  await Promise.all(snap.docs.map((d) => deleteDoc(d.ref).catch(() => {})));
+  return { deleted: snap.size };
 }

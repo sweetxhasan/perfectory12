@@ -53,7 +53,7 @@ export function verificationEmailHtml({ code, name }: { code: string; name?: str
           <tr>
             <td align="center" style="padding:16px 32px 0 32px;">
               <p style="margin:0;font-size:13px;line-height:1.6;color:#8a8a8a;text-align:center;">
-                This code expires in 10 minutes. If you didn't request this, you can safely ignore this email.
+                This code expires in 60 minutes. If you didn't request this, you can safely ignore this email.
               </p>
             </td>
           </tr>

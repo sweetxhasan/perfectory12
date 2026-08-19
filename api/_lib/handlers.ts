@@ -3,7 +3,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { verifyAdminToken, AdminAuthError } from './admin-auth';
 import { sendMail, assertValidSmtpConfig, verifyConnection, type SmtpConfigInput } from './mailer';
 import { serverDb } from './firebase-server';
-import { issueOtp, verifyOtp, OTP_EXPIRY_MS, OTP_RESEND_COOLDOWN_MS } from './otp-store';
+import { issueOtp, verifyOtp, cleanupExpiredOtps, OTP_EXPIRY_MS, OTP_RESEND_COOLDOWN_MS } from './otp-store';
 import { verificationEmailHtml, VERIFY_EMAIL_SUBJECT } from './email-templates';
 
 export interface HandlerResult {
@@ -112,6 +112,23 @@ export async function handleVerifyCode(
           attemptsLeft: outcome.attemptsLeft,
         },
       };
+  }
+}
+
+/* ── /api/cleanup-expired-otps ──────────────────────── */
+
+/**
+ * Deletes every expired email-OTP record from Firestore. Only ever removes
+ * codes that have already expired, so it's safe to run unauthenticated on
+ * a schedule (see vercel.json crons) — there's nothing sensitive to read
+ * or any live code it could invalidate.
+ */
+export async function handleCleanupExpiredOtps(): Promise<HandlerResult> {
+  try {
+    const { deleted } = await cleanupExpiredOtps();
+    return { status: 200, body: { success: true, deleted } };
+  } catch (err) {
+    return { status: 500, body: { error: err instanceof Error ? err.message : 'Cleanup failed.' } };
   }
 }
 

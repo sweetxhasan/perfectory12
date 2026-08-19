@@ -6,10 +6,6 @@ import { requestSignupCode, confirmSignupCode } from '@/lib/email-verify';
 
 const CODE_LENGTH = 6;
 
-/** Small 4-cut single-digit input box, reusing the same cut geometry as the badge icons. */
-const DIGIT_CUT_CLIP_PATH = 'polygon(18% 0%, 82% 0%, 100% 18%, 100% 82%, 82% 100%, 18% 100%, 0% 82%, 0% 18%)';
-const DIGIT_CUT_PATH = 'M18 0.9 L82 0.9 L99.1 18 L99.1 82 L82 99.1 L18 99.1 L0.9 82 L0.9 18 Z';
-
 interface EmailVerifyOverlayProps {
   open: boolean;
   email: string;
@@ -113,10 +109,19 @@ export function EmailVerifyOverlay({ open, email, name, onClose, onVerified, ini
 
   function handleKeyDown(index: number, e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Backspace') {
-      if (!digits[index] && index > 0) {
+      // Deleting is a single keypress per digit: clear whatever the
+      // current box holds and immediately hop back one box, so holding
+      // Backspace erases the whole code without ever clicking into
+      // another input.
+      e.preventDefault();
+      if (digits[index]) {
+        setDigitAt(index, '');
+        if (index > 0) inputRefs.current[index - 1]?.focus();
+      } else if (index > 0) {
         inputRefs.current[index - 1]?.focus();
         setDigitAt(index - 1, '');
       }
+      if (error) setError('');
     } else if (e.key === 'ArrowLeft' && index > 0) {
       inputRefs.current[index - 1]?.focus();
     } else if (e.key === 'ArrowRight' && index < CODE_LENGTH - 1) {
@@ -124,21 +129,20 @@ export function EmailVerifyOverlay({ open, email, name, onClose, onVerified, ini
     }
   }
 
-  function handlePaste(index: number, e: ClipboardEvent<HTMLInputElement>) {
+  function handlePaste(e: ClipboardEvent<HTMLInputElement>) {
     const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
     if (!pasted) return;
     e.preventDefault();
-    setDigits((prev) => {
-      const next = [...prev];
-      let cursor = index;
-      for (const ch of pasted) {
-        if (cursor >= CODE_LENGTH) break;
-        next[cursor] = ch;
-        cursor++;
+    // Always fill starting from the very first box, no matter which box
+    // the paste landed in.
+    setDigits(() => {
+      const next = Array(CODE_LENGTH).fill('');
+      for (let i = 0; i < CODE_LENGTH && i < pasted.length; i++) {
+        next[i] = pasted[i];
       }
       return next;
     });
-    const lastFilled = Math.min(index + pasted.length, CODE_LENGTH) - 1;
+    const lastFilled = Math.min(pasted.length, CODE_LENGTH) - 1;
     inputRefs.current[Math.max(lastFilled, 0)]?.focus();
     if (error) setError('');
   }
@@ -170,23 +174,6 @@ export function EmailVerifyOverlay({ open, email, name, onClose, onVerified, ini
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 px-3 py-8 backdrop-blur-sm sm:px-4"
     >
       <div className="relative w-full max-w-[22rem] sm:max-w-md">
-        {/* Close chip — premium cut-corner square, top-right, outside/above the card */}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="group absolute -right-1 -top-12 z-10 flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white sm:-top-14"
-        >
-          <span
-            className="absolute inset-0"
-            style={{ clipPath: DIGIT_CUT_CLIP_PATH, background: 'oklch(1 0 0 / 0.12)' }}
-          />
-          <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <path d={DIGIT_CUT_PATH} fill="none" stroke="oklch(1 0 0 / 0.55)" strokeWidth={1.4} vectorEffect="non-scaling-stroke" className="transition-[stroke] group-hover:stroke-white" />
-          </svg>
-          <Icon name="close" size={16} className="relative z-10" />
-        </button>
-
         {/* Card */}
         <div className="relative bg-card p-6 shadow-2xl sm:p-8" style={{ clipPath: CUT_FRAME_CLIP_PATH }}>
           <div className="absolute inset-0" style={{ clipPath: CUT_FRAME_CLIP_PATH, background: 'var(--card)' }} />
@@ -194,13 +181,27 @@ export function EmailVerifyOverlay({ open, email, name, onClose, onVerified, ini
             <path d={CUT_FRAME_PATH} fill="none" stroke="oklch(0.15 0 0 / 0.14)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
           </svg>
 
+          {/* Close chip — same premium cut-corner frame as every other field, inside the card, top-right.
+              Positioning lives on this wrapper because .pv-cut-field itself forces position:relative,
+              which would otherwise fight the button's own `absolute` placement. */}
+          <div className="absolute right-3 top-3 z-20">
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="pv-cut-field flex h-9 w-9 items-center justify-center text-muted-foreground transition hover:text-foreground"
+            >
+              <div className="pv-cut-bg" />
+              <CutFrame />
+              <Icon name="close" size={16} className="relative z-10" />
+            </button>
+          </div>
+
           <div className="relative z-10 flex flex-col items-center text-center">
             {/* Icon */}
-            <div className="relative flex h-14 w-14 items-center justify-center text-[oklch(0.42_0.16_350)] sm:h-16 sm:w-16">
-              <span className="absolute inset-0" style={{ clipPath: DIGIT_CUT_CLIP_PATH, background: 'color-mix(in oklch, var(--brand-2) 12%, transparent)' }} />
-              <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                <path d={DIGIT_CUT_PATH} fill="none" stroke="currentColor" strokeWidth={1.4} vectorEffect="non-scaling-stroke" />
-              </svg>
+            <div className="pv-cut-field relative flex h-14 w-14 items-center justify-center text-brand-2 sm:h-16 sm:w-16">
+              <div className="pv-cut-bg" />
+              <CutFrame />
               <Icon name="mail" size={26} className="relative z-10" />
             </div>
 
@@ -215,10 +216,8 @@ export function EmailVerifyOverlay({ open, email, name, onClose, onVerified, ini
             <div className="mt-6 flex justify-center gap-2 sm:gap-2.5">
               {digits.map((d, i) => (
                 <div key={i} className="pv-cut-field relative h-12 w-10 sm:h-14 sm:w-12">
-                  <div className="pv-cut-bg" style={{ clipPath: DIGIT_CUT_CLIP_PATH }} />
-                  <svg className="pv-cut-frame-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                    <path className="pv-cut-frame" d={DIGIT_CUT_PATH} />
-                  </svg>
+                  <div className="pv-cut-bg" />
+                  <CutFrame />
                   <input
                     ref={(el) => { inputRefs.current[i] = el; }}
                     type="text"
@@ -228,7 +227,7 @@ export function EmailVerifyOverlay({ open, email, name, onClose, onVerified, ini
                     value={d}
                     onChange={(e) => handleChange(i, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(i, e)}
-                    onPaste={(e) => handlePaste(i, e)}
+                    onPaste={handlePaste}
                     aria-label={`Digit ${i + 1} of ${CODE_LENGTH}`}
                     className="relative z-20 h-full w-full bg-transparent text-center text-lg font-bold text-foreground outline-none sm:text-xl"
                   />
