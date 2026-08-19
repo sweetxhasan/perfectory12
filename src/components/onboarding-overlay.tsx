@@ -371,6 +371,30 @@ function CutPanel({
   );
 }
 
+/** Small square icon badge that shares the same cut-corner frame as the
+    rest of the overlay — used for feature-tile icons and plan feature
+    bullets so every icon container speaks the same visual language. */
+function CutIconBox({
+  icon,
+  className = 'h-9 w-9',
+  fill,
+  stroke = 'transparent',
+  iconClassName = 'text-white',
+}: {
+  icon: ReactNode;
+  className?: string;
+  fill: string;
+  stroke?: string;
+  iconClassName?: string;
+}) {
+  return (
+    <div className={`relative flex shrink-0 items-center justify-center ${className}`}>
+      <CutFrameLayers fill={fill} stroke={stroke} strokeWidth={1.1} />
+      <span className={`relative z-10 flex items-center justify-center ${iconClassName}`}>{icon}</span>
+    </div>
+  );
+}
+
 /** Selection chip — replaces the old rounded `Chip`. */
 function CutChip({ icon, label, selected, onClick }: { icon: ReactNode; label: string; selected: boolean; onClick: () => void }) {
   return (
@@ -639,7 +663,7 @@ export function OnboardingOverlay() {
                     fill="color-mix(in oklch, var(--card) 85%, transparent)"
                     className="flex flex-col items-center gap-2 px-2 py-4 text-center backdrop-blur-sm"
                   >
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-soft text-brand">{icon}</div>
+                    <CutIconBox icon={icon} className="h-9 w-9" fill={BRAND_FILL} iconClassName="text-white" />
                     <p className="text-[11px] font-bold text-foreground">{label}</p>
                     <p className="text-[10px] leading-tight text-muted-foreground">{sub}</p>
                   </CutPanel>
@@ -839,26 +863,27 @@ export function OnboardingOverlay() {
                   </div>
                 ) : (
                   <>
-                    {/* Plan tab selector */}
-                    <CutPanel fill="color-mix(in oklch, var(--muted) 55%, transparent)" className="flex gap-1.5 p-1.5">
+                    {/* Plan tab selector — each option is its own primary cut-frame button */}
+                    <div className="flex gap-2">
                       {PLAN_DETAILS.map((p) => (
                         <button
                           key={p.id}
+                          type="button"
                           onClick={() => setActivePlan(p.id as typeof activePlan)}
-                          className={`relative flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs font-semibold transition-all duration-200 ${
+                          className={`relative flex-1 py-2.5 text-xs font-semibold transition-colors duration-200 ${
                             activePlan === p.id ? 'text-white' : 'text-muted-foreground hover:text-foreground'
                           }`}
                         >
-                          {activePlan === p.id && (
-                            <span aria-hidden="true" className="absolute inset-0" style={{ background: BRAND_FILL }} />
-                          )}
-                          <span className="relative z-10 flex items-center gap-1.5">
-                            {p.id === 'free' ? <SvgShield /> : p.id === 'monthly' ? <SvgStar /> : <SvgCrown />}
+                          <CutFrameLayers
+                            fill={activePlan === p.id ? BRAND_FILL : 'color-mix(in oklch, var(--muted) 55%, transparent)'}
+                            stroke={activePlan === p.id ? 'transparent' : SOFT_STROKE}
+                          />
+                          <span className="relative z-10">
                             {p.id === 'free' ? 'Free' : p.id === 'monthly' ? 'Monthly' : 'Yearly'}
                           </span>
                         </button>
                       ))}
-                    </CutPanel>
+                    </div>
 
                     {/* Active plan card */}
                     <CutPanel
@@ -896,11 +921,12 @@ export function OnboardingOverlay() {
                       <div className="space-y-2.5 p-5 pt-4">
                         {activePlanDetail.features.map((f) => (
                           <div key={f.text} className={`flex items-center gap-3 text-sm ${f.highlight ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
-                            <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg ${
-                              f.highlight ? 'bg-gradient-brand text-white' : 'bg-muted text-muted-foreground'
-                            }`}>
-                              {f.icon}
-                            </span>
+                            <CutIconBox
+                              icon={f.icon}
+                              className="h-6 w-6"
+                              fill={f.highlight ? BRAND_FILL : 'var(--muted)'}
+                              iconClassName={f.highlight ? 'text-white' : 'text-muted-foreground'}
+                            />
                             {f.text}
                           </div>
                         ))}
