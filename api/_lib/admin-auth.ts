@@ -35,15 +35,23 @@ export interface VerifiedAdmin {
   email: string;
 }
 
-function getBearerToken(req: VercelRequest): string | null {
-  const header = (req.headers.authorization || req.headers.Authorization) as string | undefined;
+function extractBearerToken(header: string | null | undefined): string | null {
   if (!header || !header.startsWith('Bearer ')) return null;
   const token = header.slice(7).trim();
   return token || null;
 }
 
-export async function verifyAdmin(req: VercelRequest): Promise<VerifiedAdmin> {
-  const token = getBearerToken(req);
+function getBearerToken(req: VercelRequest): string | null {
+  const header = (req.headers.authorization || req.headers.Authorization) as string | undefined;
+  return extractBearerToken(header);
+}
+
+/**
+ * Core verification logic, usable both from Vercel's VercelRequest (production)
+ * and from the plain Node `Authorization` header string (local Vite dev middleware).
+ */
+export async function verifyAdminToken(authHeader: string | null | undefined): Promise<VerifiedAdmin> {
+  const token = extractBearerToken(authHeader);
   if (!token) {
     throw new AdminAuthError('Missing Authorization header. Please sign in again.', 401);
   }
@@ -67,4 +75,8 @@ export async function verifyAdmin(req: VercelRequest): Promise<VerifiedAdmin> {
   }
 
   return { uid, email };
+}
+
+export async function verifyAdmin(req: VercelRequest): Promise<VerifiedAdmin> {
+  return verifyAdminToken(getBearerToken(req));
 }
