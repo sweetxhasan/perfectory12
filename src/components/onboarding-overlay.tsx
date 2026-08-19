@@ -340,10 +340,17 @@ function CutFrameLayers({
   );
 }
 
-/** Generic cut-corner container — for tiles, cards, tab bars, etc. */
+/** Generic cut-corner container — for tiles, cards, tab bars, etc.
+    `className` is applied to the inner content wrapper so that layout
+    utilities (flex, items-center, justify-center, gap, padding,
+    text-center, etc.) actually govern the real children instead of
+    being inert on the outer positioning shell. Use `outerClassName`
+    for classes that must live on the outer box itself, like margin
+    spacing relative to siblings or `overflow-hidden`. */
 function CutPanel({
   children,
   className = '',
+  outerClassName = '',
   fill = 'var(--card)',
   stroke = SOFT_STROKE,
   style,
@@ -351,14 +358,15 @@ function CutPanel({
 }: {
   children: ReactNode;
   className?: string;
+  outerClassName?: string;
   fill?: string;
   stroke?: string;
   style?: CSSProperties;
 } & HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`relative ${className}`} style={style} {...rest}>
+    <div className={`relative ${outerClassName}`} style={style} {...rest}>
       <CutFrameLayers fill={fill} stroke={stroke} />
-      <div className="relative z-10">{children}</div>
+      <div className={`relative z-10 ${className}`}>{children}</div>
     </div>
   );
 }
@@ -566,17 +574,36 @@ export function OnboardingOverlay() {
 
             <div className="relative flex flex-1 flex-col items-center justify-center px-6 pb-10 pt-12 sm:px-10 sm:pb-14 sm:pt-16">
 
-              {/* Logo */}
-              <div className="relative mb-7">
+              {/* Logo — primary cut-corner UI, matching the brand buttons/panels */}
+              <div className="relative mb-7 h-28 w-28">
                 <div className="absolute inset-0 scale-150 rounded-full bg-gradient-to-br from-brand/25 to-brand-2/15 blur-xl" />
-                <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14),0_0_0_1px_rgba(0,0,0,0.05)] overflow-hidden">
-                  <img
-                    src="/favicon.png"
-                    alt="Perfectory Voice"
-                    className="h-24 w-24 object-contain"
-                  />
-                </div>
-                <div className="absolute inset-0 rounded-full border-2 border-brand/35 animate-ping" style={{ animationDuration: '2.4s' }} />
+                <CutPanel
+                  fill={BRAND_FILL}
+                  stroke="transparent"
+                  outerClassName="h-28 w-28"
+                  className="flex h-full w-full items-center justify-center p-[9px]"
+                  style={{ boxShadow: '0 10px 34px -8px color-mix(in oklch, var(--brand) 55%, transparent)' }}
+                >
+                  <div
+                    className="flex h-full w-full items-center justify-center bg-white"
+                    style={{ clipPath: CUT_FRAME_CLIP_PATH }}
+                  >
+                    <img
+                      src="/favicon.png"
+                      alt="Perfectory Voice"
+                      className="h-[4.4rem] w-[4.4rem] object-contain"
+                    />
+                  </div>
+                </CutPanel>
+                <svg
+                  className="absolute inset-0 h-full w-full animate-ping"
+                  style={{ animationDuration: '2.4s' }}
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <path d={CUT_FRAME_PATH} fill="none" stroke="var(--brand)" strokeOpacity="0.4" strokeWidth="2.2" vectorEffect="non-scaling-stroke" />
+                </svg>
               </div>
 
               {/* Title */}
@@ -837,7 +864,8 @@ export function OnboardingOverlay() {
                     <CutPanel
                       fill={activePlan === 'free' ? 'var(--card)' : 'linear-gradient(135deg, color-mix(in oklch, var(--brand-3) 10%, white) 0%, color-mix(in oklch, var(--brand) 8%, white) 100%)'}
                       stroke={activePlan === 'monthly' ? 'var(--brand)' : activePlan === 'yearly' ? 'color-mix(in oklch, var(--brand) 60%, transparent)' : SOFT_STROKE}
-                      className="mt-4 overflow-hidden transition-all duration-300"
+                      outerClassName="mt-4 overflow-hidden"
+                      className="transition-all duration-300"
                     >
                       {/* Card header */}
                       <div className="relative p-5 pb-4">

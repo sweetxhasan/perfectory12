@@ -75,11 +75,6 @@ import Privacy from '@/pages/Privacy';
 import Terms from '@/pages/Terms';
 
 /** Guest-only route: wait for auth to resolve before deciding */
-import { OnboardingOverlay } from '@/components/onboarding-overlay';
-function OnboardingPreviewDev() {
-  return <OnboardingOverlay />;
-}
-
 function GuestRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, loading } = useAuth();
   if (loading) return <Component />;
@@ -123,7 +118,6 @@ function Router() {
       <Route path="/faq" component={FAQ} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
-      <Route path="/dev/onboarding-preview" component={OnboardingPreviewDev} />
       <Route component={NotFound} />
     </Switch>
   );
