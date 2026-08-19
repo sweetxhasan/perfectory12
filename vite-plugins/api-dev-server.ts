@@ -21,6 +21,9 @@ const AUTHED_ROUTES: Record<string, keyof Awaited<ReturnType<ViteDevServer['ssrL
 const PUBLIC_ROUTES: Record<string, keyof Awaited<ReturnType<ViteDevServer['ssrLoadModule']>>> = {
   '/api/send-verification-code': 'handleSendVerificationCode',
   '/api/verify-code': 'handleVerifyCode',
+  '/api/send-reset-code': 'handleSendResetCode',
+  '/api/verify-reset-code': 'handleVerifyResetCode',
+  '/api/reset-password': 'handleResetPassword',
 };
 
 function readJsonBody(req: IncomingMessage): Promise<Record<string, unknown>> {

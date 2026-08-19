@@ -1,14 +1,17 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent, type KeyboardEvent } from 'react';
 import { Link } from 'wouter';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import { isEmailUsed } from '@/lib/user-store';
+import { requestResetCode, confirmResetCode, submitNewPassword } from '@/lib/password-reset';
 import { AuthLayout } from '@/components/auth-layout';
 import { CutSubmitButton } from '@/components/cut-submit-button';
 import { CutFrame, CUT_FRAME_PATH, CUT_FRAME_CLIP_PATH } from '@/components/cut-frame';
 import { CutIconBadge } from '@/components/cut-icon-badge';
 import { PremiumTooltip } from '@/components/premium-tooltip';
 import { Icon } from '@/components/icon';
+import { FloatingField } from '@/components/floating-field';
+import { PasswordField, passwordMeetsPolicy } from '@/components/password-field';
+
+const CODE_LENGTH = 6;
 
 /** Basic email shape check — deliberately looser than Signup's Gmail-only
  *  rule, since a reset request may target any address already on file. */
@@ -25,9 +28,8 @@ function CheckmarkIcon({ size = 34 }: { size?: number }) {
   );
 }
 
-/** The standard "info" glyph (dot on top, stem below) — reused for both the
- *  format-error and "no account found" states, matching the icon language
- *  already used across the Signup fields. */
+/** The standard "info" glyph (dot on top, stem below) — reused for every
+ *  format/notice icon across this flow, matching Signup's icon language. */
 function InfoGlyph() {
   return (
     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
@@ -39,7 +41,7 @@ function InfoGlyph() {
 /**
  * Square, radius-0 icon badge that reuses the exact same primary cut-frame
  * shape as the inputs/buttons (CUT_FRAME_PATH / CUT_FRAME_CLIP_PATH), so the
- * confirmation icon on the "sent" state matches the rest of the auth UI.
+ * confirmation icon on the "done" step matches the rest of the auth UI.
  */
 function CutIconTile({ children }: { children: React.ReactNode }) {
   return (
@@ -61,9 +63,8 @@ function CutIconTile({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * The same primary cut-corner frame used everywhere else, wrapped around the
- * whole reset-password card: radius 0, tinted backdrop, 1px cut-frame stroke
- * on top. Keeps the container itself on-brand with the inputs and buttons.
+ * The same primary cut-corner frame used everywhere else, wrapped around
+ * each step's card: radius 0, tinted backdrop, 1px cut-frame stroke on top.
  */
 function ResetCard({ children }: { children: React.ReactNode }) {
   return (
@@ -80,6 +81,14 @@ function ResetCard({ children }: { children: React.ReactNode }) {
         <path d={CUT_FRAME_PATH} fill="none" stroke="oklch(0.15 0 0 / 0.85)" strokeWidth={1.4} vectorEffect="non-scaling-stroke" />
       </svg>
       <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
+function ErrorBanner({ message }: { message: string }) {
+  return (
+    <div role="alert" className="mb-4 rounded-none border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-600">
+      {message}
     </div>
   );
 }
@@ -192,12 +201,12 @@ function ResetEmailField({
                 )}
               </PremiumTooltip>
             ) : isValid ? (
-              <PremiumTooltip content="Account found — you can send the reset link." variant="valid">
+              <PremiumTooltip content="Account found — you can send the reset code." variant="valid">
                 {({ toggle }) => (
                   <button
                     type="button"
                     onClick={toggle}
-                    aria-label="Account found — you can send the reset link."
+                    aria-label="Account found — you can send the reset code."
                     className="flex items-center justify-center rounded-full p-0 outline-none focus-visible:ring-2 focus-visible:ring-[oklch(0.60_0.15_152)]/40"
                   >
                     <CutIconBadge variant="valid" size={18}>
@@ -231,45 +240,249 @@ function ResetEmailField({
   );
 }
 
+/**
+ * 6-box OTP code input — same cut-frame boxes, paste-fills-from-first-box,
+ * and backspace-hops-back behavior as VerifyEmail's signup code entry.
+ */
+function OtpCodeInputs({
+  digits,
+  onDigitsChange,
+  autoFocus,
+}: {
+  digits: string[];
+  onDigitsChange: (next: string[]) => void;
+  autoFocus?: boolean;
+}) {
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  useEffect(() => {
+    if (autoFocus) setTimeout(() => inputRefs.current[0]?.focus(), 50);
+  }, [autoFocus]);
+
+  function setDigitAt(index: number, value: string) {
+    const next = [...digits];
+    next[index] = value;
+    onDigitsChange(next);
+  }
+
+  function handleChange(index: number, raw: string) {
+    const value = raw.replace(/\D/g, '').slice(-1);
+    setDigitAt(index, value);
+    if (value && index < CODE_LENGTH - 1) inputRefs.current[index + 1]?.focus();
+  }
+
+  function handleKeyDown(index: number, e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      if (digits[index]) {
+        setDigitAt(index, '');
+        if (index > 0) inputRefs.current[index - 1]?.focus();
+      } else if (index > 0) {
+        inputRefs.current[index - 1]?.focus();
+        setDigitAt(index - 1, '');
+      }
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < CODE_LENGTH - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  }
+
+  function handlePaste(e: ClipboardEvent<HTMLInputElement>) {
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
+    if (!pasted) return;
+    e.preventDefault();
+    const next = Array(CODE_LENGTH).fill('');
+    for (let i = 0; i < CODE_LENGTH && i < pasted.length; i++) next[i] = pasted[i];
+    onDigitsChange(next);
+    const lastFilled = Math.min(pasted.length, CODE_LENGTH) - 1;
+    inputRefs.current[Math.max(lastFilled, 0)]?.focus();
+  }
+
+  return (
+    <div className="flex justify-center gap-2 sm:gap-2.5">
+      {digits.map((d, i) => (
+        <div key={i} className="pv-cut-field relative h-12 w-10 sm:h-14 sm:w-12">
+          <div className="pv-cut-bg" />
+          <CutFrame />
+          <input
+            ref={(el) => { inputRefs.current[i] = el; }}
+            type="text"
+            inputMode="numeric"
+            autoComplete={i === 0 ? 'one-time-code' : 'off'}
+            maxLength={1}
+            value={d}
+            onChange={(e) => handleChange(i, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(i, e)}
+            onPaste={handlePaste}
+            aria-label={`Digit ${i + 1} of ${CODE_LENGTH}`}
+            className="relative z-20 h-full w-full bg-transparent text-center text-lg font-bold text-foreground outline-none sm:text-xl"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Plain "confirm password" field — no strength meter, just a live match check against the new password. */
+function ConfirmPasswordField({
+  value,
+  onChange,
+  matchTarget,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  matchTarget: string;
+}) {
+  const [showPw, setShowPw] = useState(false);
+  const touched = value.length > 0;
+  const matches = touched && value === matchTarget;
+  const mismatch = touched && matchTarget.length > 0 && value !== matchTarget;
+
+  return (
+    <FloatingField
+      id="reset-confirm-password"
+      label="Confirm new password"
+      placeholder="Re-enter your new password"
+      icon="lock"
+      type={showPw ? 'text' : 'password'}
+      autoComplete="new-password"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      status={matches ? 'valid' : mismatch ? 'error' : 'default'}
+      required
+      rightSlot={
+        <button
+          type="button"
+          tabIndex={-1}
+          onClick={() => setShowPw((p) => !p)}
+          className="mr-3.5 shrink-0 text-gray-400 transition hover:text-gray-600"
+          aria-label={showPw ? 'Hide password' : 'Show password'}
+        >
+          {showPw ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7S1 12 1 12Z" /><circle cx="12" cy="12" r="3" />
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22" />
+            </svg>
+          )}
+        </button>
+      }
+      hint={mismatch ? <p className="pl-1 text-[11px] text-red-500">Passwords don&apos;t match</p> : null}
+    />
+  );
+}
+
+type Step = 'email' | 'code' | 'password' | 'done';
+
 export default function ForgotPasswordPage() {
+  const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
-  const [errMsg, setErrMsg] = useState('');
+  const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''));
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState('');
   /** Bumped whenever a Send click is blocked by a missing account, so the
    *  "no account found" tooltip remounts and auto-opens again even if it
    *  had already auto-closed from an earlier keystroke check. */
   const [notFoundSignal, setNotFoundSignal] = useState(0);
 
-  async function onSubmit(e: FormEvent) {
+  const code = digits.join('');
+
+  async function onSubmitEmail(e: FormEvent) {
     e.preventDefault();
     const trimmed = email.trim();
     if (!trimmed || !isValidEmailFormat(trimmed)) return;
 
-    setStatus('loading');
-    setErrMsg('');
+    setLoading(true);
+    setError('');
     try {
-      // Always verify against Firestore first — a reset link is only ever
-      // sent for an email address that actually has an account on file.
+      // Always verify against Firestore first — a code is only ever sent
+      // for an email address that actually has an account on file.
       const accountExists = await isEmailUsed(trimmed);
       if (!accountExists) {
-        setStatus('idle');
+        setLoading(false);
         setNotFoundSignal((n) => n + 1);
         return;
       }
-      await sendPasswordResetEmail(auth, trimmed);
-      setStatus('sent');
+      await requestResetCode(trimmed);
+      setDigits(Array(CODE_LENGTH).fill(''));
+      setStep('code');
     } catch (err) {
-      setStatus('error');
-      setErrMsg(err instanceof Error ? err.message : 'We could not send the reset link. Please try again.');
+      setError((err as Error).message || 'We could not send the reset code. Please try again.');
+    } finally {
+      setLoading(false);
     }
   }
 
+  async function onResend() {
+    setResending(true);
+    setError('');
+    try {
+      await requestResetCode(email.trim());
+      setDigits(Array(CODE_LENGTH).fill(''));
+    } catch (err) {
+      setError((err as Error).message || 'Failed to resend the code.');
+    } finally {
+      setResending(false);
+    }
+  }
+
+  async function onSubmitCode() {
+    if (code.length !== CODE_LENGTH) {
+      setError('Please enter the full 6-digit code.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await confirmResetCode(email.trim(), code);
+      setStep('password');
+    } catch (err) {
+      setError((err as Error).message || 'Invalid code. Please try again.');
+      setDigits(Array(CODE_LENGTH).fill(''));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onSubmitPassword(e: FormEvent) {
+    e.preventDefault();
+    if (!passwordMeetsPolicy(newPassword)) {
+      setError('Please choose a stronger password.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('Passwords don\u2019t match.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await submitNewPassword(email.trim(), code, newPassword);
+      setStep('done');
+    } catch (err) {
+      setError((err as Error).message || 'We could not update your password. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const titles: Record<Step, { title: string; subtitle: string }> = {
+    email: { title: 'Reset your password', subtitle: 'Recover access to your Perfectory Voice account' },
+    code: { title: 'Enter your code', subtitle: 'One quick step before you can set a new password' },
+    password: { title: 'Choose a new password', subtitle: 'Almost there — set a new password for your account' },
+    done: { title: 'Password updated', subtitle: 'You can now sign in with your new password' },
+  };
+
   return (
-    <AuthLayout
-      title={status === 'sent' ? 'Reset link on its way' : 'Reset your password'}
-      subtitle={status === 'sent' ? 'One click and you are back in' : 'Recover access to your Perfectory Voice account'}
-    >
-      {status === 'sent' ? (
+    <AuthLayout title={titles[step].title} subtitle={titles[step].subtitle}>
+      {step === 'done' ? (
         <ResetCard>
           <div className="flex flex-col items-center gap-5 text-center">
             <CutIconTile>
@@ -277,29 +490,86 @@ export default function ForgotPasswordPage() {
             </CutIconTile>
             <div className="max-w-sm">
               <p className="text-base leading-7 text-gray-600">
-                We&apos;ve emailed a secure reset link to <strong className="font-semibold text-gray-900">{email}</strong>. Open it within the next 60 minutes to choose a new password.
+                Your password has been updated. You can now sign in to <strong className="font-semibold text-gray-900">{email}</strong> with your new password.
               </p>
-              <p className="mt-2 text-sm leading-6 text-gray-400">Don&apos;t see it? Check your spam or promotions folder — delivery can take a minute during busy hours.</p>
             </div>
             <Link href="/login" className="inline-flex items-center gap-2 text-sm font-semibold text-[#6e1a52] transition hover:text-[#ec5252]">
               <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4 6 10l6 6" /><path d="M7 10h8" /></svg> Return to login
             </Link>
           </div>
         </ResetCard>
+      ) : step === 'code' ? (
+        <ResetCard>
+          {error && <ErrorBanner message={error} />}
+          <div className="flex flex-col items-center text-center">
+            <div className="pv-cut-field relative flex h-14 w-14 items-center justify-center text-brand-2 sm:h-16 sm:w-16">
+              <div className="pv-cut-bg" />
+              <CutFrame />
+              <Icon name="mail" size={26} className="relative z-10" />
+            </div>
+
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+              Enter the 6-digit code sent to
+              <br />
+              <span className="font-medium text-foreground">{email}</span>
+            </p>
+
+            <div className="mt-6 w-full">
+              <OtpCodeInputs digits={digits} onDigitsChange={(next) => { setDigits(next); if (error) setError(''); }} autoFocus />
+            </div>
+
+            <div className="mt-6 w-full">
+              <CutSubmitButton
+                label="Verify code"
+                loadingLabel="Verifying…"
+                loading={loading}
+                disabled={code.length !== CODE_LENGTH}
+                onClick={onSubmitCode}
+                type="button"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={onResend}
+              disabled={resending}
+              className="mt-4 text-xs font-medium underline-offset-2 transition hover:underline disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
+              style={{ color: 'oklch(0.42 0.16 350)' }}
+            >
+              {resending ? 'Resending…' : 'Resend code'}
+            </button>
+
+            <p className="mt-5 text-center text-sm text-gray-500">
+              Wrong email?{' '}
+              <button
+                type="button"
+                onClick={() => { setStep('email'); setError(''); }}
+                className="font-semibold text-[#6e1a52] transition hover:underline"
+              >
+                Go back
+              </button>
+            </p>
+          </div>
+        </ResetCard>
+      ) : step === 'password' ? (
+        <ResetCard>
+          {error && <ErrorBanner message={error} />}
+          <form onSubmit={onSubmitPassword} className="flex flex-col gap-4">
+            <PasswordField id="reset-new-password" label="New password" placeholder="Create a strong password" value={newPassword} onChange={setNewPassword} />
+            <ConfirmPasswordField value={confirmPassword} onChange={setConfirmPassword} matchTarget={newPassword} />
+            <CutSubmitButton label="Update password" loadingLabel="Updating…" loading={loading} />
+          </form>
+        </ResetCard>
       ) : (
         <ResetCard>
-          {errMsg && (
-            <div role="alert" className="mb-4 rounded-none border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-600">{errMsg}</div>
-          )}
-
-          <form onSubmit={onSubmit} className="flex flex-col gap-5">
+          {error && <ErrorBanner message={error} />}
+          <form onSubmit={onSubmitEmail} className="flex flex-col gap-5">
             <ResetEmailField value={email} onChange={setEmail} notFoundSignal={notFoundSignal} />
-
             <CutSubmitButton
-              label="Send secure reset link"
+              label="Send reset code"
               loadingLabel="Checking your account..."
-              loading={status === 'loading'}
-              disabled={status === 'loading'}
+              loading={loading}
+              disabled={loading}
             />
           </form>
 

@@ -4,7 +4,24 @@ import { verifyAdminToken, AdminAuthError } from './admin-auth';
 import { sendMail, assertValidSmtpConfig, verifyConnection, type SmtpConfigInput } from './mailer';
 import { serverDb } from './firebase-server';
 import { issueOtp, verifyOtp, isOtpVerified, markWelcomeSent, wasWelcomeSent, cleanupExpiredOtps, OTP_EXPIRY_MS } from './otp-store';
-import { verificationEmailHtml, VERIFY_EMAIL_SUBJECT, welcomeEmailHtml, WELCOME_EMAIL_SUBJECT } from './email-templates';
+import {
+  issueResetOtp,
+  verifyResetOtp,
+  isResetOtpVerified,
+  consumeResetOtp,
+  cleanupExpiredResetOtps,
+  RESET_OTP_EXPIRY_MS,
+} from './reset-otp-store';
+import { accountExistsForEmail } from './user-lookup';
+import { isAdminConfigured, getAdminAuth } from './firebase-admin';
+import {
+  verificationEmailHtml,
+  VERIFY_EMAIL_SUBJECT,
+  welcomeEmailHtml,
+  WELCOME_EMAIL_SUBJECT,
+  resetCodeEmailHtml,
+  RESET_CODE_EMAIL_SUBJECT,
+} from './email-templates';
 
 export interface HandlerResult {
   status: number;
@@ -178,6 +195,158 @@ export async function handleSendWelcomeEmail(
   return { status: 200, body: { success: true } };
 }
 
+/* ── /api/send-reset-code ───────────────────────────── */
+
+/** Mirrors Signup.tsx's passwordMeetsPolicy: at least 8 characters and 3 of the 4 character-class rules. */
+function passwordMeetsPolicy(pw: string): boolean {
+  if (pw.length < 8) return false;
+  const checks = [/[A-Z]/.test(pw), /[a-z]/.test(pw), /[0-9]/.test(pw), /[^A-Za-z0-9]/.test(pw)].filter(Boolean).length;
+  return checks >= 3;
+}
+
+export async function handleSendResetCode(
+  body: Record<string, unknown>,
+): Promise<HandlerResult> {
+  const { email, name } = body || ({} as Record<string, unknown>);
+
+  if (!email || typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
+    return { status: 400, body: { error: 'A valid email address is required.' } };
+  }
+
+  const trimmedEmail = email.trim();
+
+  // Never mail a reset code to an address with no account on file.
+  const exists = await accountExistsForEmail(trimmedEmail);
+  if (!exists) {
+    return { status: 404, body: { error: 'No account found with this email address.' } };
+  }
+
+  const smtp = await loadAdminSmtpConfig();
+  if (!smtp) {
+    return { status: 503, body: { error: 'Email service is not configured yet. Please try again later.' } };
+  }
+
+  // Resend is unlimited, same policy as the signup OTP flow.
+  const result = await issueResetOtp(trimmedEmail);
+
+  console.log('[v0] Password reset code for', trimmedEmail, '=', result.code);
+  try {
+    await sendMail({
+      smtp,
+      to: trimmedEmail,
+      subject: RESET_CODE_EMAIL_SUBJECT,
+      html: resetCodeEmailHtml({ code: result.code, name: typeof name === 'string' ? name : undefined }),
+    });
+  } catch (err) {
+    return {
+      status: 502,
+      body: { error: err instanceof Error ? err.message : 'Failed to send the reset code email.' },
+    };
+  }
+
+  return {
+    status: 200,
+    body: { success: true, expiresInSec: Math.round(RESET_OTP_EXPIRY_MS / 1000) },
+  };
+}
+
+/* ── /api/verify-reset-code ─────────────────────────── */
+
+export async function handleVerifyResetCode(
+  body: Record<string, unknown>,
+): Promise<HandlerResult> {
+  const { email, code } = body || ({} as Record<string, unknown>);
+
+  if (!email || typeof email !== 'string') {
+    return { status: 400, body: { error: 'An email address is required.' } };
+  }
+  if (!code || typeof code !== 'string' || !/^\d{6}$/.test(code)) {
+    return { status: 400, body: { error: 'Please enter the 6-digit code.' } };
+  }
+
+  const outcome = await verifyResetOtp(email.trim(), code);
+  if (outcome.ok) {
+    return { status: 200, body: { success: true } };
+  }
+
+  switch (outcome.reason) {
+    case 'not-found':
+      return { status: 400, body: { error: 'No reset code found for this email. Please request a new one.' } };
+    case 'expired':
+      return { status: 400, body: { error: 'This code has expired. Please request a new one.' } };
+    case 'too-many-attempts':
+      return { status: 429, body: { error: 'Too many attempts. Please request a new code.' } };
+    default:
+      return {
+        status: 400,
+        body: {
+          error: `Invalid code.${outcome.attemptsLeft ? ` ${outcome.attemptsLeft} attempt${outcome.attemptsLeft === 1 ? '' : 's'} left.` : ''}`,
+          attemptsLeft: outcome.attemptsLeft,
+        },
+      };
+  }
+}
+
+/* ── /api/reset-password ────────────────────────────── */
+
+/**
+ * Final step of the forgot-password flow: sets a brand-new password for a
+ * signed-out user. Requires a reset-OTP record that has already been
+ * verified for this exact email (via /api/verify-reset-code) — the code
+ * itself is re-checked here too, so a stale "verified" flag from a much
+ * earlier request can't be replayed. Uses the Firebase Admin SDK, since
+ * there is no other way to set a new password without the user being
+ * signed in.
+ */
+export async function handleResetPassword(
+  body: Record<string, unknown>,
+): Promise<HandlerResult> {
+  const { email, code, newPassword } = body || ({} as Record<string, unknown>);
+
+  if (!email || typeof email !== 'string') {
+    return { status: 400, body: { error: 'An email address is required.' } };
+  }
+  if (!code || typeof code !== 'string' || !/^\d{6}$/.test(code)) {
+    return { status: 400, body: { error: 'Please enter the 6-digit code.' } };
+  }
+  if (!newPassword || typeof newPassword !== 'string' || !passwordMeetsPolicy(newPassword)) {
+    return { status: 400, body: { error: 'Please choose a stronger password.' } };
+  }
+
+  const trimmedEmail = email.trim();
+
+  const outcome = await verifyResetOtp(trimmedEmail, code);
+  if (!outcome.ok) {
+    return { status: 403, body: { error: 'Your reset code is no longer valid. Please start over.' } };
+  }
+
+  if (!isAdminConfigured()) {
+    return {
+      status: 503,
+      body: { error: 'Password reset is not available yet. Please contact support.' },
+    };
+  }
+
+  try {
+    const adminAuth = getAdminAuth();
+    const userRecord = await adminAuth.getUserByEmail(trimmedEmail);
+    await adminAuth.updateUser(userRecord.uid, { password: newPassword });
+  } catch (err) {
+    const code = (err as { code?: string })?.code;
+    if (code === 'auth/user-not-found') {
+      return { status: 404, body: { error: 'No account found with this email address.' } };
+    }
+    return {
+      status: 502,
+      body: { error: err instanceof Error ? err.message : 'Failed to update the password.' },
+    };
+  }
+
+  await consumeResetOtp(trimmedEmail);
+
+  return { status: 200, body: { success: true } };
+}
+
 /* ── /api/cleanup-expired-otps ──────────────────────── */
 
 /**
@@ -188,8 +357,11 @@ export async function handleSendWelcomeEmail(
  */
 export async function handleCleanupExpiredOtps(): Promise<HandlerResult> {
   try {
-    const { deleted } = await cleanupExpiredOtps();
-    return { status: 200, body: { success: true, deleted } };
+    const [{ deleted: signupDeleted }, { deleted: resetDeleted }] = await Promise.all([
+      cleanupExpiredOtps(),
+      cleanupExpiredResetOtps(),
+    ]);
+    return { status: 200, body: { success: true, deleted: signupDeleted + resetDeleted } };
   } catch (err) {
     return { status: 500, body: { error: err instanceof Error ? err.message : 'Cleanup failed.' } };
   }
