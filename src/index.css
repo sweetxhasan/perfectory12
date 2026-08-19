@@ -319,6 +319,16 @@
   }
 }
 
+/* ── Onboarding outer shell — primary cut-corner frame, desktop only ──
+   Same CUT_FRAME_CLIP_PATH geometry as the auth shell / inputs / buttons,
+   applied to the whole modal sheet in place of the rounded, shadowed
+   card. Mobile keeps the existing full-bleed flat sheet untouched. */
+@media (min-width: 640px) {
+  .pv-onboarding-shell {
+    clip-path: polygon(4.1% 0.9%, 92.4% 0.9%, 94.7% 10.7%, 98.2% 10.7%, 99.9% 23.2%, 99.9% 76.8%, 95.9% 99.1%, 7.6% 99.1%, 5.6% 89.3%, 2.1% 89.3%, 0.1% 76.8%, 0.1% 23.2%);
+  }
+}
+
 /* ── Premium button spinner (CutSpinner) ── */
 @keyframes pv-cut-spin {
   from { transform: rotate(0deg); }

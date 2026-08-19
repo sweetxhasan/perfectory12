@@ -9,7 +9,7 @@
  *
  * Dismissed state stored in Firestore (onboardingDone: true).
  */
-import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactNode, type CSSProperties, type HTMLAttributes } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -19,6 +19,9 @@ import {
   type PlanConfig,
   type UsernameStatus,
 } from '@/lib/user-store';
+import { CUT_FRAME_PATH, CUT_FRAME_CLIP_PATH, CUT_LABEL_CLIP_PATH } from '@/components/cut-frame';
+import { CutSubmitButton } from '@/components/cut-submit-button';
+import { FloatingField } from '@/components/floating-field';
 
 /* ─── debounce hook ──────────────────────────────────── */
 function useDebounce<T>(value: T, ms: number): T {
@@ -58,7 +61,7 @@ function StepBar({ current, total }: { current: number; total: number }) {
       {Array.from({ length: total }).map((_, i) => (
         <div
           key={i}
-          className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+          className={`h-1 flex-1 rounded-none transition-all duration-500 ${
             i < current ? 'bg-brand' : i === current ? 'bg-brand/40' : 'bg-border'
           }`}
         />
@@ -302,21 +305,128 @@ const PLAN_DETAILS: PlanDetail[] = [
   },
 ];
 
-/* ─── chip component ─────────────────────────────────── */
-function Chip({ icon, label, selected, onClick }: { icon: ReactNode; label: string; selected: boolean; onClick: () => void }) {
+/* ─── cut-frame building blocks ──────────────────────────────────
+   Shared "premium cut-corner" geometry (CUT_FRAME_PATH /
+   CUT_FRAME_CLIP_PATH) reused from the Login/Signup pages so every
+   container, chip and button in this overlay speaks the same visual
+   language. `CutFrameLayers` renders just the two absolute paint
+   layers (clipped fill + crisp SVG stroke) so it can be dropped
+   inside any relatively-positioned button/div. ─────────────────── */
+const BRAND_FILL = 'linear-gradient(-45deg, #ec5252, #6e1a52)';
+const SOFT_STROKE = 'color-mix(in oklch, var(--foreground) 13%, transparent)';
+
+function CutFrameLayers({
+  fill = 'var(--card)',
+  stroke = SOFT_STROKE,
+  strokeWidth = 1.3,
+  boxShadow,
+}: {
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+  boxShadow?: string;
+}) {
+  return (
+    <>
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 transition-[background] duration-200"
+        style={{ clipPath: CUT_FRAME_CLIP_PATH, background: fill, boxShadow }}
+      />
+      <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d={CUT_FRAME_PATH} fill="none" stroke={stroke} strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
+      </svg>
+    </>
+  );
+}
+
+/** Generic cut-corner container — for tiles, cards, tab bars, etc. */
+function CutPanel({
+  children,
+  className = '',
+  fill = 'var(--card)',
+  stroke = SOFT_STROKE,
+  style,
+  ...rest
+}: {
+  children: ReactNode;
+  className?: string;
+  fill?: string;
+  stroke?: string;
+  style?: CSSProperties;
+} & HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={`relative ${className}`} style={style} {...rest}>
+      <CutFrameLayers fill={fill} stroke={stroke} />
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
+/** Selection chip — replaces the old rounded `Chip`. */
+function CutChip({ icon, label, selected, onClick }: { icon: ReactNode; label: string; selected: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-2 rounded-2xl border px-3.5 py-2.5 text-sm font-medium transition-all duration-200 active:scale-95 ${
-        selected
-          ? 'border-brand bg-gradient-soft text-brand shadow-[0_0_14px_color-mix(in_oklch,var(--brand)_18%,transparent)]'
-          : 'border-border bg-card text-foreground hover:border-brand/40 hover:bg-gradient-soft/60 hover:text-brand'
-      }`}
+      className="group relative flex items-center gap-2 px-3.5 py-2.5 text-sm font-medium transition-all duration-200 active:scale-95"
     >
-      {icon}
-      {label}
+      <CutFrameLayers
+        fill={selected ? BRAND_FILL : 'var(--card)'}
+        stroke={selected ? 'transparent' : SOFT_STROKE}
+        boxShadow={selected ? '0 4px 18px -6px color-mix(in oklch, var(--brand) 45%, transparent)' : undefined}
+      />
+      <span className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${selected ? 'text-white' : 'text-foreground group-hover:text-brand'}`}>
+        {icon}
+        {label}
+      </span>
     </button>
+  );
+}
+
+/** Light/outline cut-corner action button — shares CutSubmitButton's
+    geometry and height but with a card fill + brand text instead of
+    the solid gradient (used for "Continue with Free Plan"). */
+function CutOutlineButton({
+  label,
+  loading = false,
+  disabled = false,
+  onClick,
+  className = '',
+}: {
+  label: ReactNode;
+  loading?: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={`group relative flex h-14 w-full shrink-0 items-center justify-center gap-2.5 text-sm font-semibold text-brand transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+    >
+      <CutFrameLayers fill="var(--card)" stroke="color-mix(in oklch, var(--brand) 45%, transparent)" />
+      {loading && (
+        <span className="relative z-10 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
+      )}
+      <span className="relative z-10 whitespace-nowrap">{label}</span>
+    </button>
+  );
+}
+
+/** Small cut-tag badge — same shape as the floating field labels
+    (CUT_LABEL_CLIP_PATH), used for the plan "Most Popular"/"Best
+    Value" badges instead of a rounded pill. */
+function CutTag({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-1 text-[10px] font-bold ${className}`}
+      style={{ clipPath: CUT_LABEL_CLIP_PATH }}
+    >
+      {children}
+    </span>
   );
 }
 
@@ -389,12 +499,6 @@ export function OnboardingOverlay() {
 
   const usernameValid = usernameStatus === 'available';
 
-  const usernameBorder = () => {
-    if (usernameStatus === 'available') return 'border-emerald-400 ring-2 ring-emerald-400/20';
-    if (usernameStatus === 'taken' || usernameStatus === 'invalid') return 'border-destructive ring-2 ring-destructive/20';
-    if (usernameStatus === 'checking') return 'border-brand/60';
-    return 'border-input';
-  };
   const usernameHint = () => {
     switch (usernameStatus) {
       case 'checking':  return { text: 'Checking availability…',                           color: 'text-muted-foreground' };
@@ -438,8 +542,18 @@ export function OnboardingOverlay() {
   return (
     /* Full screen on mobile, centered modal on desktop */
     <div className="animate-overlay-backdrop fixed inset-0 z-50 flex bg-black/60 backdrop-blur-sm">
-      <div className="animate-overlay-sheet flex w-full flex-col bg-card overflow-hidden
-        sm:m-auto sm:max-h-[90vh] sm:w-full sm:max-w-lg sm:animate-overlay-modal sm:rounded-3xl sm:shadow-2xl">
+      <div className="pv-onboarding-shell animate-overlay-sheet relative flex w-full flex-col bg-card overflow-hidden
+        sm:m-auto sm:max-h-[90vh] sm:w-full sm:max-w-lg sm:animate-overlay-modal sm:rounded-none sm:shadow-2xl">
+
+        {/* Desktop-only cut-frame outline on the whole modal sheet */}
+        <svg
+          className="pointer-events-none absolute inset-0 z-30 hidden h-full w-full sm:block"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path d={CUT_FRAME_PATH} fill="none" stroke="oklch(0.15 0 0 / 0.85)" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
+        </svg>
 
         {/* ════════════════════ STEP 0 — WELCOME ════════════════════ */}
         {step === 0 && (
@@ -452,17 +566,14 @@ export function OnboardingOverlay() {
 
             <div className="relative flex flex-1 flex-col items-center justify-center px-6 pb-10 pt-12 sm:px-10 sm:pb-14 sm:pt-16">
 
-              {/* Logo — new uploaded image, 50px border-radius */}
+              {/* Logo */}
               <div className="relative mb-7">
                 <div className="absolute inset-0 scale-150 rounded-full bg-gradient-to-br from-brand/25 to-brand-2/15 blur-xl" />
                 <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14),0_0_0_1px_rgba(0,0,0,0.05)] overflow-hidden">
                   <img
-                    src="/pv-logo-new.png"
+                    src="/favicon.png"
                     alt="Perfectory Voice"
                     className="h-24 w-24 object-contain"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/pv-logo.png';
-                    }}
                   />
                 </div>
                 <div className="absolute inset-0 rounded-full border-2 border-brand/35 animate-ping" style={{ animationDuration: '2.4s' }} />
@@ -496,26 +607,26 @@ export function OnboardingOverlay() {
                   { icon: <SvgLightning />, label: 'Instant TTS', sub: 'Generate in seconds' },
                   { icon: <SvgShield />,    label: 'Your Account', sub: 'Saved & synced' },
                 ] as { icon: ReactNode; label: string; sub: string }[]).map(({ icon, label, sub }) => (
-                  <div
+                  <CutPanel
                     key={label}
-                    className="flex flex-col items-center gap-2 rounded-2xl border border-border/60 bg-background/70 px-2 py-4 text-center backdrop-blur-sm"
+                    fill="color-mix(in oklch, var(--card) 85%, transparent)"
+                    className="flex flex-col items-center gap-2 px-2 py-4 text-center backdrop-blur-sm"
                   >
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-soft text-brand">{icon}</div>
                     <p className="text-[11px] font-bold text-foreground">{label}</p>
                     <p className="text-[10px] leading-tight text-muted-foreground">{sub}</p>
-                  </div>
+                  </CutPanel>
                 ))}
               </div>
 
               {/* Continue button */}
-              <button
-                onClick={() => setStep(1)}
-                className="mt-8 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-brand py-4 text-base font-bold text-white shadow-[0_4px_24px_color-mix(in_oklch,var(--brand)_40%,transparent)] transition hover:opacity-90 active:scale-[0.98]"
-                style={{ animation: 'fadeSlideUp 0.7s ease 0.5s both' }}
-              >
-                Get Started
-                <ArrowRight />
-              </button>
+              <div className="mt-8 w-full" style={{ animation: 'fadeSlideUp 0.7s ease 0.5s both' }}>
+                <CutSubmitButton
+                  type="button"
+                  onClick={() => setStep(1)}
+                  label={<span className="inline-flex items-center gap-2.5">Get Started <ArrowRight /></span>}
+                />
+              </div>
 
               <p className="mt-3 text-center text-xs text-muted-foreground/60">
                 Just a few quick steps to personalise your experience
@@ -535,9 +646,10 @@ export function OnboardingOverlay() {
               {step > 1 ? (
                 <button
                   onClick={() => setStep((s) => s - 1)}
-                  className="absolute left-5 sm:left-7 flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-foreground/30 hover:text-foreground"
+                  className="group absolute left-5 sm:left-7 flex h-9 w-9 items-center justify-center text-muted-foreground transition hover:text-foreground"
                 >
-                  <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <CutFrameLayers fill="var(--card)" stroke={SOFT_STROKE} />
+                  <svg viewBox="0 0 20 20" fill="none" className="relative z-10 h-4 w-4" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M16 10H4M9 5l-5 5 5 5" />
                   </svg>
                 </button>
@@ -552,10 +664,9 @@ export function OnboardingOverlay() {
 
               {/* Logo right side */}
               <img
-                src="/pv-logo-new.png"
+                src="/favicon.png"
                 alt="Perfectory Voice"
                 className="absolute right-5 sm:right-7 h-8 w-8 rounded-xl object-contain"
-                onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/pv-logo.png'; }}
               />
             </div>
 
@@ -580,43 +691,45 @@ export function OnboardingOverlay() {
             {step === 1 && (
               <div className="px-5 pb-8 pt-5 sm:px-7">
                 <div className="space-y-3">
-                  {/* Username field */}
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Username</label>
-                    <div className={`flex items-center gap-2 rounded-2xl border bg-background px-4 py-3.5 transition-all ${usernameBorder()}`}>
-                      <span className="text-sm font-medium text-muted-foreground select-none">@</span>
-                      <input
-                        ref={inputRef}
-                        type="text"
-                        inputMode="text"
-                        autoCapitalize="none"
-                        autoCorrect="off"
-                        value={username}
-                        onChange={(e) => handleUsernameInput(e.target.value)}
-                        placeholder="your_username"
-                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/40 sm:text-base"
-                      />
-                      {usernameStatus === 'checking' && (
-                        <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
-                      )}
-                      {usernameStatus === 'available' && <SvgCheckCircle />}
-                      {(usernameStatus === 'taken' || usernameStatus === 'invalid') && <SvgXCircle />}
-                    </div>
-                    <p className={`mt-1.5 flex items-center gap-1.5 text-xs ${hint.color}`}>
-                      {usernameStatus === 'available' && <SvgCheckCircle />}
-                      {hint.text}
-                    </p>
-                  </div>
-
+                  {/* Username field — shared premium cut-frame field */}
+                  <FloatingField
+                    ref={inputRef}
+                    label="Username"
+                    icon="user"
+                    status={usernameStatus === 'available' ? 'valid' : usernameStatus === 'taken' || usernameStatus === 'invalid' ? 'error' : 'default'}
+                    type="text"
+                    inputMode="text"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    value={username}
+                    onChange={(e) => handleUsernameInput(e.target.value)}
+                    placeholder="your_username"
+                    rightSlot={
+                      <span className="relative z-20 flex shrink-0 items-center pr-4">
+                        {usernameStatus === 'checking' && (
+                          <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
+                        )}
+                        {usernameStatus === 'available' && <SvgCheckCircle />}
+                        {(usernameStatus === 'taken' || usernameStatus === 'invalid') && <SvgXCircle />}
+                      </span>
+                    }
+                    hint={
+                      <p className={`flex items-center gap-1.5 text-xs ${hint.color}`}>
+                        {usernameStatus === 'available' && <SvgCheckCircle />}
+                        {hint.text}
+                      </p>
+                    }
+                  />
                 </div>
 
-                <button
-                  onClick={() => { if (usernameValid) setStep(2); }}
-                  disabled={!usernameValid}
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-brand py-4 text-base font-bold text-white shadow-[0_4px_20px_color-mix(in_oklch,var(--brand)_35%,transparent)] transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Continue <ArrowRight />
-                </button>
+                <div className="mt-6">
+                  <CutSubmitButton
+                    type="button"
+                    onClick={() => { if (usernameValid) setStep(2); }}
+                    disabled={!usernameValid}
+                    label={<span className="inline-flex items-center gap-2">Continue <ArrowRight /></span>}
+                  />
+                </div>
               </div>
             )}
 
@@ -625,7 +738,7 @@ export function OnboardingOverlay() {
               <div className="px-5 pb-8 pt-5 sm:px-7">
                 <div className="flex flex-wrap gap-2">
                   {DISCOVERY_SOURCES.map(({ icon, label }) => (
-                    <Chip
+                    <CutChip
                       key={label}
                       icon={icon}
                       label={label}
@@ -635,13 +748,14 @@ export function OnboardingOverlay() {
                   ))}
                 </div>
 
-                <button
-                  onClick={() => { if (discovery) setStep(3); }}
-                  disabled={!discovery}
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-brand py-4 text-base font-bold text-white shadow-[0_4px_20px_color-mix(in_oklch,var(--brand)_35%,transparent)] transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Continue <ArrowRight />
-                </button>
+                <div className="mt-6">
+                  <CutSubmitButton
+                    type="button"
+                    onClick={() => { if (discovery) setStep(3); }}
+                    disabled={!discovery}
+                    label={<span className="inline-flex items-center gap-2">Continue <ArrowRight /></span>}
+                  />
+                </div>
                 <p className="mt-2 text-center text-xs text-muted-foreground">Select one option to continue</p>
               </div>
             )}
@@ -651,7 +765,7 @@ export function OnboardingOverlay() {
               <div className="px-5 pb-8 pt-5 sm:px-7">
                 <div className="flex flex-wrap gap-2">
                   {ROLES.map(({ icon, label }) => (
-                    <Chip
+                    <CutChip
                       key={label}
                       icon={icon}
                       label={label}
@@ -665,25 +779,26 @@ export function OnboardingOverlay() {
                 </div>
 
                 {role === 'Other' && (
-                  <div className="mt-3 flex items-center gap-2 rounded-2xl border border-input bg-background px-4 py-3 transition focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
-                    <SvgPen />
-                    <input
+                  <div className="mt-3">
+                    <FloatingField
+                      label="Describe your role"
+                      icon="pencil"
                       type="text"
                       value={customRole}
                       onChange={(e) => setCustomRole(e.target.value)}
                       placeholder="Describe your role…"
-                      className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/40"
                     />
                   </div>
                 )}
 
-                <button
-                  onClick={() => { if (role) setStep(4); }}
-                  disabled={!role}
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-brand py-4 text-base font-bold text-white shadow-[0_4px_20px_color-mix(in_oklch,var(--brand)_35%,transparent)] transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Continue <ArrowRight />
-                </button>
+                <div className="mt-6">
+                  <CutSubmitButton
+                    type="button"
+                    onClick={() => { if (role) setStep(4); }}
+                    disabled={!role}
+                    label={<span className="inline-flex items-center gap-2">Continue <ArrowRight /></span>}
+                  />
+                </div>
                 <p className="mt-2 text-center text-xs text-muted-foreground">Select one option to continue</p>
               </div>
             )}
@@ -698,37 +813,40 @@ export function OnboardingOverlay() {
                 ) : (
                   <>
                     {/* Plan tab selector */}
-                    <div className="flex gap-2 rounded-2xl border border-border bg-muted/40 p-1">
+                    <CutPanel fill="color-mix(in oklch, var(--muted) 55%, transparent)" className="flex gap-1.5 p-1.5">
                       {PLAN_DETAILS.map((p) => (
                         <button
                           key={p.id}
                           onClick={() => setActivePlan(p.id as typeof activePlan)}
-                          className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200 ${
-                            activePlan === p.id
-                              ? 'bg-gradient-brand text-white shadow-sm'
-                              : 'text-muted-foreground hover:text-foreground'
+                          className={`relative flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs font-semibold transition-all duration-200 ${
+                            activePlan === p.id ? 'text-white' : 'text-muted-foreground hover:text-foreground'
                           }`}
                         >
-                          {p.id === 'free' ? <SvgShield /> : p.id === 'monthly' ? <SvgStar /> : <SvgCrown />}
-                          {p.id === 'free' ? 'Free' : p.id === 'monthly' ? 'Monthly' : 'Yearly'}
+                          {activePlan === p.id && (
+                            <span aria-hidden="true" className="absolute inset-0" style={{ background: BRAND_FILL }} />
+                          )}
+                          <span className="relative z-10 flex items-center gap-1.5">
+                            {p.id === 'free' ? <SvgShield /> : p.id === 'monthly' ? <SvgStar /> : <SvgCrown />}
+                            {p.id === 'free' ? 'Free' : p.id === 'monthly' ? 'Monthly' : 'Yearly'}
+                          </span>
                         </button>
                       ))}
-                    </div>
+                    </CutPanel>
 
                     {/* Active plan card */}
-                    <div className={`mt-4 overflow-hidden rounded-2xl border-2 transition-all duration-300 ${
-                      activePlan === 'monthly' ? 'border-brand bg-gradient-soft shadow-[0_0_24px_color-mix(in_oklch,var(--brand)_15%,transparent)]' :
-                      activePlan === 'yearly'  ? 'border-brand/60 bg-gradient-soft shadow-[0_0_20px_color-mix(in_oklch,var(--brand)_10%,transparent)]' :
-                      'border-border bg-card'
-                    }`}>
+                    <CutPanel
+                      fill={activePlan === 'free' ? 'var(--card)' : 'linear-gradient(135deg, color-mix(in oklch, var(--brand-3) 10%, white) 0%, color-mix(in oklch, var(--brand) 8%, white) 100%)'}
+                      stroke={activePlan === 'monthly' ? 'var(--brand)' : activePlan === 'yearly' ? 'color-mix(in oklch, var(--brand) 60%, transparent)' : SOFT_STROKE}
+                      className="mt-4 overflow-hidden transition-all duration-300"
+                    >
                       {/* Card header */}
                       <div className="relative p-5 pb-4">
                         {activePlanDetail.badge && (
-                          <span className={`absolute right-4 top-4 rounded-full px-2.5 py-1 text-[10px] font-bold ${activePlanDetail.badgeClass}`}>
+                          <CutTag className={`absolute right-4 top-4 ${activePlanDetail.badgeClass}`}>
                             {activePlanDetail.badge}
-                          </span>
+                          </CutTag>
                         )}
-                        <p className="text-base font-bold pr-20">{activePlanDetail.name}</p>
+                        <p className="text-base font-bold pr-24">{activePlanDetail.name}</p>
                         <p className="mt-0.5 text-xs text-muted-foreground">{activePlanDetail.tagline}</p>
                         <p className="mt-3 text-3xl font-black">
                           {prices[activePlan].price}
@@ -759,38 +877,39 @@ export function OnboardingOverlay() {
                           </div>
                         ))}
                       </div>
-                    </div>
+                    </CutPanel>
 
                     {/* CTA button */}
                     {activePlan === 'monthly' && (
-                      <button
-                        onClick={() => handlePaidPlan('monthly')}
-                        disabled={saving}
-                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-brand py-4 text-base font-bold text-white shadow-[0_4px_20px_color-mix(in_oklch,var(--brand)_35%,transparent)] transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
-                      >
-                        {saving ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <SvgStar />}
-                        Get Monthly Pro — {prices.monthly.price}
-                      </button>
+                      <div className="mt-4">
+                        <CutSubmitButton
+                          type="button"
+                          onClick={() => handlePaidPlan('monthly')}
+                          loading={saving}
+                          label={<span className="inline-flex items-center gap-2"><SvgStar /> Get Monthly Pro — {prices.monthly.price}</span>}
+                          loadingLabel="Setting up your plan…"
+                        />
+                      </div>
                     )}
                     {activePlan === 'yearly' && (
-                      <button
-                        onClick={() => handlePaidPlan('yearly')}
-                        disabled={saving}
-                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-brand py-4 text-base font-bold text-white shadow-[0_4px_20px_color-mix(in_oklch,var(--brand)_35%,transparent)] transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
-                      >
-                        {saving ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <SvgCrown />}
-                        Get Yearly Pro — {prices.yearly.price}
-                      </button>
+                      <div className="mt-4">
+                        <CutSubmitButton
+                          type="button"
+                          onClick={() => handlePaidPlan('yearly')}
+                          loading={saving}
+                          label={<span className="inline-flex items-center gap-2"><SvgCrown /> Get Yearly Pro — {prices.yearly.price}</span>}
+                          loadingLabel="Setting up your plan…"
+                        />
+                      </div>
                     )}
                     {activePlan === 'free' && (
-                      <button
-                        onClick={handleFreePlan}
-                        disabled={saving}
-                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-background py-4 text-base font-bold text-foreground transition hover:border-brand/40 hover:text-brand active:scale-[0.98] disabled:opacity-60"
-                      >
-                        {saving && <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />}
-                        Continue with Free Plan
-                      </button>
+                      <div className="mt-4">
+                        <CutOutlineButton
+                          onClick={handleFreePlan}
+                          loading={saving}
+                          label="Continue with Free Plan"
+                        />
+                      </div>
                     )}
 
                     <p className="mt-3 text-center text-[11px] text-muted-foreground">
