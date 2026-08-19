@@ -116,36 +116,6 @@ function StatCard({ label, value, gradient }: { label: string; value: string | n
   );
 }
 
-/* ── Copyable DNS record box ────────────────────────── */
-
-function CopyField({ label, value }: { label: string; value: string }) {
-  const [copied, setCopied] = useState(false);
-  function copy() {
-    navigator.clipboard.writeText(value).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }
-  return (
-    <div className="space-y-1">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-      <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5">
-        <code className="min-w-0 flex-1 truncate text-xs font-mono text-foreground" title={value}>
-          {value}
-        </code>
-        <button
-          type="button"
-          onClick={copy}
-          className="flex shrink-0 items-center gap-1 rounded-lg bg-muted px-2 py-1 text-[11px] font-medium text-muted-foreground transition hover:text-foreground"
-        >
-          <Icon name={copied ? 'check' : 'copy'} size={12} />
-          {copied ? 'Copied' : 'Copy'}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ── DNS check row ───────────────────────────────────── */
 
 function DnsRow({ label, ok, detail, fixHint }: { label: string; ok: boolean; detail: string; fixHint: string }) {
@@ -233,14 +203,6 @@ export default function AdminSmtpSettings() {
     const rate = total > 0 ? Math.round((success / total) * 100) : 0;
     return { total, success, failed, rate };
   }, [logs]);
-
-  /* BIMI inbox-logo values, derived from the sending domain */
-  const bimiDomain = (dnsDomain.trim() || emailDomain(config.fromEmail) || 'yourdomain.com').toLowerCase();
-  const bimiOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://yourdomain.com';
-  const bimiLogoUrl = `${bimiOrigin}/bimi-logo.svg`;
-  const bimiRecordHost = `default._bimi.${bimiDomain}`;
-  const bimiRecordValue = `v=BIMI1; l=${bimiLogoUrl};`;
-  const dmarcEnforced = dnsResult?.dmarcPolicy === 'quarantine' || dnsResult?.dmarcPolicy === 'reject';
 
   function updateField<K extends keyof SmtpConfig>(key: K, value: SmtpConfig[K]) {
     setConfig((c) => ({ ...c, [key]: value }));
@@ -667,92 +629,7 @@ export default function AdminSmtpSettings() {
                   detail={dnsResult.mx.records?.length ? dnsResult.mx.records.join(', ') : 'No MX records found for this domain.'}
                   fixHint="Point MX records to a real mailbox provider so bounces and replies can be received."
                 />
-                <DnsRow
-                  label="Inbox logo (BIMI)"
-                  ok={dnsResult.bimi.found && dmarcEnforced}
-                  detail={
-                    dnsResult.bimi.found
-                      ? `Published at ${bimiRecordHost}${dmarcEnforced ? '' : ' — but DMARC is not enforced yet'}`
-                      : `No BIMI TXT record found at ${bimiRecordHost}`
-                  }
-                  fixHint="Publish the BIMI record and enforce DMARC below in the Inbox Logo section to show your icon instead of a letter avatar."
-                />
               </div>
-            )}
-          </SectionCard>
-
-          {/* ── BIMI inbox logo ── */}
-          <SectionCard
-            icon="image"
-            iconBg="bg-pink-500/10"
-            iconColor="text-pink-600"
-            title="Inbox Logo (BIMI)"
-            subtitle="Show your brand icon next to your emails instead of a letter avatar."
-          >
-            <div className="flex items-start gap-2 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-xs text-amber-700 dark:text-amber-400">
-              <Icon name="info" size={14} className="mt-0.5 shrink-0" />
-              Honest limitation: this is controlled by DNS, not by app code. Yahoo, Apple Mail, and Fastmail will
-              show the logo below automatically once DMARC is enforced (no fee). <strong>Gmail additionally
-              requires a paid Verified Mark Certificate</strong> (VMC, ~$1,500+/yr via DigiCert or Entrust, and
-              generally needs a registered trademark) before it will display the logo — until then Gmail keeps
-              showing the letter avatar even with a valid BIMI record.
-            </div>
-
-            <div className="flex items-center gap-4 rounded-2xl border border-border bg-background px-4 py-4">
-              <img
-                src="/bimi-logo.svg"
-                alt="Perfectory Voice inbox logo"
-                width={56}
-                height={56}
-                className="h-14 w-14 shrink-0 rounded-2xl border border-border"
-              />
-              <div className="min-w-0">
-                <p className="text-sm font-semibold">bimi-logo.svg is ready</p>
-                <p className="text-xs text-muted-foreground">
-                  A square, flat-color, script-free SVG that meets the BIMI "SVG Tiny 1.2 PS" spec — already added to
-                  your site at <code className="font-mono">/bimi-logo.svg</code>.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-xs text-muted-foreground">
-                Publish this TXT record on your sending domain&apos;s DNS (same place you added SPF/DKIM/DMARC):
-              </p>
-              <CopyField label="Host / Name" value={bimiRecordHost} />
-              <CopyField label="Value" value={bimiRecordValue} />
-              <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
-                <Icon name="info" size={13} className="mt-0.5 shrink-0" />
-                Requires DMARC at <code className="font-mono">p=quarantine</code> or{' '}
-                <code className="font-mono">p=reject</code> (not <code className="font-mono">p=none</code>) — fix
-                that in the Deliverability Checklist above first.
-              </p>
-            </div>
-
-            {dnsResult && (
-              <div className="space-y-2.5">
-                <DnsRow
-                  label="BIMI record"
-                  ok={dnsResult.bimi.found}
-                  detail={dnsResult.bimi.logoUrl || dnsResult.bimi.record || `No record found at ${bimiRecordHost}`}
-                  fixHint="Add the TXT record above at your DNS provider, then re-run the check."
-                />
-                <DnsRow
-                  label="DMARC enforcement"
-                  ok={dmarcEnforced}
-                  detail={
-                    dnsResult.dmarcPolicy
-                      ? `Current policy: p=${dnsResult.dmarcPolicy}`
-                      : 'No DMARC policy detected.'
-                  }
-                  fixHint='Change your DMARC record to "p=quarantine" or "p=reject" once you have confirmed SPF/DKIM pass for all your real mail.'
-                />
-              </div>
-            )}
-            {!dnsResult && (
-              <p className="text-xs text-muted-foreground">
-                Run the Deliverability Check above first — it also checks the BIMI record and DMARC policy.
-              </p>
             )}
           </SectionCard>
 

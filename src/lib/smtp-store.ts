@@ -181,10 +181,6 @@ export interface DnsCheckEntry {
   records?: string[];
 }
 
-export interface BimiCheckEntry extends DnsCheckEntry {
-  logoUrl?: string | null;
-}
-
 export interface DnsCheckResult {
   domain: string;
   dkimSelector: string;
@@ -192,8 +188,6 @@ export interface DnsCheckResult {
   dmarc: DnsCheckEntry;
   mx: DnsCheckEntry;
   dkim: DnsCheckEntry;
-  bimi: BimiCheckEntry;
-  dmarcPolicy: 'none' | 'quarantine' | 'reject' | null;
 }
 
 export async function checkDomainDeliverability(
