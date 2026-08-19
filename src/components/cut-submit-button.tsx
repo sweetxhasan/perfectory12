@@ -1,5 +1,56 @@
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { CUT_FRAME_PATH, CUT_FRAME_CLIP_PATH } from '@/components/cut-frame';
+
+/**
+ * Premium loading indicator for the cut-corner buttons — a dual-layer SVG
+ * spinner instead of a plain CSS border-spinner. An outer ring sweeps a
+ * brand-gradient arc (rotating), a faint full-opacity track sits underneath
+ * it for depth, and a soft pulsing core dot sits at the center for a more
+ * "alive" premium feel. Colors are drawn from the same diagonal gradient
+ * used by the button/badge fills (#ec5252 → #6e1a52).
+ */
+function CutSpinner({ size = 18 }: { size?: number }) {
+  const gradId = useId();
+  return (
+    <svg
+      className="relative z-10 shrink-0"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="0.55" stopColor="#ffffff" stopOpacity="0.85" />
+          <stop offset="1" stopColor="#ffffff" />
+        </linearGradient>
+      </defs>
+      {/* Faint full track */}
+      <circle cx="12" cy="12" r="9.5" stroke="oklch(1 0 0 / 0.22)" strokeWidth="2.4" />
+      {/* Sweeping gradient arc */}
+      <circle
+        cx="12"
+        cy="12"
+        r="9.5"
+        stroke={`url(#${gradId})`}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeDasharray="34 60"
+        style={{ transformOrigin: '12px 12px', animation: 'pv-cut-spin 0.9s linear infinite' }}
+      />
+      {/* Pulsing core */}
+      <circle
+        cx="12"
+        cy="12"
+        r="2.4"
+        fill="oklch(1 0 0 / 0.9)"
+        style={{ transformOrigin: '12px 12px', animation: 'pv-cut-spin-pulse 1.1s ease-in-out infinite' }}
+      />
+    </svg>
+  );
+}
 
 /**
  * Premium "cut-corner" submit button — reuses the exact same primary
@@ -65,7 +116,7 @@ export function CutSubmitButton({
 
       {loading ? (
         <>
-          <span className="relative z-10 h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+          <CutSpinner />
           <span className="relative z-10 whitespace-nowrap">{loadingLabel ?? label}</span>
         </>
       ) : (
