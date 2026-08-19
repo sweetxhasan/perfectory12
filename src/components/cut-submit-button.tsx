@@ -1,21 +1,22 @@
 import type { ReactNode } from 'react';
+import { CUT_FRAME_PATH, CUT_FRAME_CLIP_PATH } from '@/components/cut-frame';
 
 /**
- * Premium "cut-corner" submit button — 4 clean chamfered corners only
- * (no inward edge notches), matching the angular-cut language of the
- * input frames (see cut-frame.tsx). The fill is drawn as a clip-path
- * layer (so it hugs the exact cut shape at any width) and the border
- * is a separate SVG stroke on top, kept to a crisp 1px regardless of
- * the button's aspect ratio via `vectorEffect="non-scaling-stroke"`.
+ * Premium "cut-corner" submit button — reuses the exact same primary
+ * cut-frame shape (CUT_FRAME_PATH / CUT_FRAME_CLIP_PATH) as the input
+ * fields and the Google button, so every element on the Login/Signup
+ * forms shares one consistent cut language. The fill is drawn as a
+ * clip-path layer (so it hugs the exact cut shape at any width) and
+ * the border is a separate SVG stroke on top, kept to a crisp 1px
+ * regardless of the button's aspect ratio via
+ * `vectorEffect="non-scaling-stroke"`.
  *
- * The button is a fixed 230px wide on every device (never stretches
- * full width, never shrinks to fit its label), so it must be placed
- * inside a centered wrapper (e.g. `self-center` on a flex-column form).
+ * The button spans the full width of the form (matching the input
+ * fields' width) and shares their h-14 height, so it must be placed
+ * inside the same flex-column form as the fields.
  */
-const BUTTON_WIDTH = 230;
-const BUTTON_CUT_PATH = 'M9.7 0.7 L90.3 0.7 L99.3 9.7 L99.3 90.3 L90.3 99.3 L9.7 99.3 L0.7 90.3 L0.7 9.7 Z';
-const BUTTON_CUT_CLIP_PATH =
-  'polygon(9.7% 0.7%, 90.3% 0.7%, 99.3% 9.7%, 99.3% 90.3%, 90.3% 99.3%, 9.7% 99.3%, 0.7% 90.3%, 0.7% 9.7%)';
+const BUTTON_CUT_PATH = CUT_FRAME_PATH;
+const BUTTON_CUT_CLIP_PATH = CUT_FRAME_CLIP_PATH;
 
 export function CutSubmitButton({
   label,
@@ -39,8 +40,7 @@ export function CutSubmitButton({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`group relative inline-flex shrink-0 self-center items-center justify-center gap-2.5 py-3.5 text-sm font-semibold text-white transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
-      style={{ width: BUTTON_WIDTH }}
+      className={`group relative flex h-14 w-full shrink-0 items-center justify-center gap-2.5 text-sm font-semibold text-white transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
     >
       {/* Fill — clipped to the exact 3-cut shape, so it hugs the border precisely */}
       <span

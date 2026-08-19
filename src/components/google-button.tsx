@@ -7,8 +7,6 @@ interface GoogleButtonProps {
   disabled?: boolean;
 }
 
-const BUTTON_WIDTH = 280;
-
 function GoogleColorIcon({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="relative z-10 shrink-0">
@@ -33,23 +31,24 @@ function GoogleColorIcon({ size = 18 }: { size?: number }) {
 }
 
 /**
- * Premium "6-cut" outline-only Google button — reuses the exact border
- * geometry from the input frames (CUT_FRAME_PATH: 4 chamfered corners
- * + 2 small notch steps on the top-right and bottom-left = 6 cuts
- * total). No filled background — just a 1px cut-corner stroke painted
- * with the brand diagonal gradient (linear-gradient(-45deg, #ec5252,
- * #6e1a52)), so the page background shows through everywhere else.
- * Fixed 280px wide on every device, centered in its wrapper.
+ * Premium "6-cut" Google button — reuses the exact same primary
+ * cut-frame shape and card-tinted background as the input fields
+ * (CUT_FRAME_PATH / CUT_FRAME_CLIP_PATH, see cut-frame.tsx), so it
+ * matches the Sign Up / Log In button and the fields exactly. The
+ * border stroke is painted with the brand diagonal gradient
+ * (linear-gradient(-45deg, #ec5252, #6e1a52)) instead of a flat fill.
+ * Spans the full width of the form and shares the fields' h-14
+ * height, so it must be placed inside the same flex-column form.
  */
 export function GoogleButton({ onClick, loading = false, disabled = false }: GoogleButtonProps) {
   const busy = loading && !disabled;
   const gradId = useId();
 
   return (
-    <div
-      className="group relative mx-auto self-center shrink-0 transition-opacity"
-      style={{ width: BUTTON_WIDTH, aspectRatio: '280 / 52' }}
-    >
+    <div className="group relative h-14 w-full shrink-0 transition-opacity">
+      {/* Card-tinted fill, clipped to the exact same cut shape as the input fields */}
+      <span className="pv-cut-bg" aria-hidden="true" />
+
       {/* 6-cut border stroke, painted with the brand diagonal gradient */}
       <svg
         viewBox="0 0 100 100"
