@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'wouter';
+import { CUT_FRAME_PATH } from '@/components/cut-frame';
 
 /* ─────────────────────────────────────────────
    Animated wave icon (SVG, no emoji)
@@ -258,11 +259,29 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
     <div
       className="min-h-screen w-full flex items-center justify-center overflow-x-hidden bg-white p-0 lg:p-8"
     >
-      {/* Outer card — holds both panels */}
+      {/* Outer card — holds both panels. On desktop it swaps the rounded,
+          shadowed card for the same primary cut-corner frame used by the
+          inputs/buttons: border-radius 0, no shadow, clipped to the cut
+          shape with an SVG stroke on top. Mobile stays a plain flat sheet. */}
       <div
-        className="relative w-full max-w-6xl overflow-hidden rounded-none border-0 bg-white shadow-none backdrop-blur-xl lg:flex lg:rounded-[28px] lg:border lg:border-white/60 lg:bg-white/35 lg:shadow-[0_30px_80px_rgba(35,38,48,0.24)]"
+        className="pv-auth-shell relative w-full max-w-6xl overflow-hidden rounded-none border-0 bg-white shadow-none backdrop-blur-xl lg:flex lg:overflow-visible lg:rounded-none lg:border-0 lg:bg-white/35 lg:shadow-none"
         style={{ minHeight: 580 }}
       >
+        {/* Desktop-only cut-frame outline, same primary geometry as the inputs */}
+        <svg
+          className="pointer-events-none absolute inset-0 z-20 hidden h-full w-full lg:block"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path
+            d={CUT_FRAME_PATH}
+            fill="none"
+            stroke="oklch(0.15 0 0 / 0.85)"
+            strokeWidth="1.4"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
         {/* ── Left: form panel ── */}
         <div
           className="relative z-10 flex w-full flex-1 flex-col items-center justify-center bg-white px-5 py-8 text-center backdrop-blur-xl sm:px-10 sm:py-10 lg:max-w-[53%] lg:bg-white/65 lg:px-12"
