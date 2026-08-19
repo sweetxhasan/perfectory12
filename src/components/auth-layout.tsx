@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'wouter';
-import { CUT_FRAME_PATH } from '@/components/cut-frame';
+import { CUT_FRAME_PATH, CUT_FRAME_CLIP_PATH } from '@/components/cut-frame';
 
 /* ─────────────────────────────────────────────
    Centered logo — favicon.png + wordmark
@@ -14,6 +14,45 @@ export function AuthLogo() {
         className="h-14 w-14 rounded-2xl object-contain transition-transform duration-200 group-hover:scale-105"
       />
     </Link>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Shared glass surface for the visual panel — same
+   primary cut-corner geometry as the inputs/buttons
+   (CUT_FRAME_PATH / CUT_FRAME_CLIP_PATH), radius 0,
+   with a light frosted fill + hairline stroke tuned
+   for the dark studio background. Used by the feature
+   chips and the bottom "sample" audio card.
+───────────────────────────────────────────── */
+function CutGlassPanel({
+  className = '',
+  fill = 'oklch(1 0 0 / 0.07)',
+  stroke = 'oklch(1 0 0 / 0.16)',
+  children,
+}: {
+  className?: string;
+  fill?: string;
+  stroke?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className={`relative ${className}`}>
+      <span
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{ clipPath: CUT_FRAME_CLIP_PATH, background: fill, backdropFilter: 'blur(10px)' }}
+      />
+      <svg
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path d={CUT_FRAME_PATH} fill="none" stroke={stroke} strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
+      </svg>
+      <div className="relative z-10">{children}</div>
+    </div>
   );
 }
 
@@ -103,61 +142,51 @@ function VoiceVisualPanel() {
             { icon: <SvgGlobeIcon />, label: '3 Languages' },
             { icon: <SvgBoltIcon />, label: 'Instant Generation' },
           ].map(({ icon, label }) => (
-            <div
-              key={label}
-              className="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-white/80"
-              style={{
-                background: 'oklch(1 0 0 / 0.07)',
-                border: '1px solid oklch(1 0 0 / 0.12)',
-                backdropFilter: 'blur(8px)',
-              }}
-            >
-              <span className="opacity-80">{icon}</span>
-              {label}
-            </div>
+            <CutGlassPanel key={label} className="rounded-none">
+              <div className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white/80">
+                <span className="opacity-80">{icon}</span>
+                {label}
+              </div>
+            </CutGlassPanel>
           ))}
         </div>
       </div>
 
-      {/* Bottom floating card */}
-      <div className="relative z-10 mx-8 mb-8">
-        <div
-          className="flex items-center gap-4 rounded-2xl p-4"
-          style={{
-            background: 'oklch(1 0 0 / 0.06)',
-            border: '1px solid oklch(1 0 0 / 0.10)',
-            backdropFilter: 'blur(12px)',
-          }}
-        >
-          {/* Mini waveform */}
-          <div className="flex shrink-0 items-end gap-[2px]" style={{ height: 28 }}>
-            {[10,18,22,14,24,18,12,22,16,20].map((h, i) => (
-              <span
-                key={i}
-                style={{
-                  width: 3, height: h, borderRadius: 2,
-                  background: 'linear-gradient(to top, oklch(0.60 0.18 22), oklch(0.80 0.16 350))',
-                  animationName: 'pvBar',
-                  animationDuration: `${0.5 + (i % 4) * 0.15}s`,
-                  animationTimingFunction: 'ease-in-out',
-                  animationIterationCount: 'infinite',
-                  animationDirection: 'alternate',
-                  animationDelay: `${(i * 0.09) % 0.6}s`,
-                }}
-              />
-            ))}
+      {/* Bottom floating card — narrowed a touch (wider side margins) and
+          switched to the same radius-0 primary cut-frame as the chips. */}
+      <div className="relative z-10 mx-11 mb-8 lg:mx-12">
+        <CutGlassPanel className="rounded-none" fill="oklch(1 0 0 / 0.06)" stroke="oklch(1 0 0 / 0.14)">
+          <div className="flex items-center gap-4 p-4">
+            {/* Mini waveform */}
+            <div className="flex shrink-0 items-end gap-[2px]" style={{ height: 28 }}>
+              {[10,18,22,14,24,18,12,22,16,20].map((h, i) => (
+                <span
+                  key={i}
+                  style={{
+                    width: 3, height: h, borderRadius: 2,
+                    background: 'linear-gradient(to top, oklch(0.60 0.18 22), oklch(0.80 0.16 350))',
+                    animationName: 'pvBar',
+                    animationDuration: `${0.5 + (i % 4) * 0.15}s`,
+                    animationTimingFunction: 'ease-in-out',
+                    animationIterationCount: 'infinite',
+                    animationDirection: 'alternate',
+                    animationDelay: `${(i * 0.09) % 0.6}s`,
+                  }}
+                />
+              ))}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-white/90 truncate">Sample: English · Natural</p>
+              <p className="mt-0.5 text-[10px] text-white/40">Generating in real-time…</p>
+            </div>
+            <div
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+              style={{ background: 'linear-gradient(135deg, oklch(0.26 0.10 335), oklch(0.60 0.18 22))' }}
+            >
+              <SvgPlayIcon />
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-white/90 truncate">Sample: English · Natural</p>
-            <p className="mt-0.5 text-[10px] text-white/40">Generating in real-time…</p>
-          </div>
-          <div
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-            style={{ background: 'linear-gradient(135deg, oklch(0.26 0.10 335), oklch(0.60 0.18 22))' }}
-          >
-            <SvgPlayIcon />
-          </div>
-        </div>
+        </CutGlassPanel>
       </div>
 
       {/* CSS animation keyframes */}
