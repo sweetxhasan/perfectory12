@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, type FormEvent, type KeyboardEvent } from 
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth-context';
 import { friendlyAuthError } from '@/lib/auth-errors';
-import { AuthLayout, SparkleIcon } from '@/components/auth-layout';
+import { AuthLayout } from '@/components/auth-layout';
 import { SEOHead } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
 import { GoogleOneTap } from '@/components/google-one-tap';
@@ -562,7 +562,7 @@ export default function SignupPage() {
       <SEOHead {...PAGE_SEO.signup} />
       <GoogleOneTap />
       <AuthLayout
-        title={<>Create your account <SparkleIcon /></>}
+        title="Create your account"
         subtitle="Sign up to claim free credits daily"
       >
         {/* Error banner */}

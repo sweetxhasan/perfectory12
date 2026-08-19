@@ -3,46 +3,6 @@ import { Link } from 'wouter';
 import { CUT_FRAME_PATH } from '@/components/cut-frame';
 
 /* ─────────────────────────────────────────────
-   Animated wave icon (SVG, no emoji)
-───────────────────────────────────────────── */
-export function WaveIcon({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 28 28" fill="none" aria-hidden
-      style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
-      <style>{`
-        @keyframes pvWave2{0%,60%,100%{transform:rotate(0deg)}10%{transform:rotate(-18deg)}25%{transform:rotate(14deg)}40%{transform:rotate(-12deg)}}
-        .pvWg2{animation:pvWave2 2.4s ease-in-out infinite;transform-origin:55% 78%}
-      `}</style>
-      <g className="pvWg2">
-        <path fill="#9b1f6e" d="M10 21V11a1.8 1.8 0 0 1 3.6 0v5h.3V9a1.8 1.8 0 0 1 3.6 0v7h.3V11a1.8 1.8 0 0 1 3.6 0v5h.3v-2.7a1.8 1.8 0 0 1 3.6 0v2.7C25.3 19.2 22 23 17.5 23h-.5c-2.7 0-5.5-2.7-7-2Z" />
-        <path fill="#c44b8a" d="M10 21c-.5-.9-2.9-2.4-2.9-4.5a1.8 1.8 0 0 1 3.1-1.3l1.5 1.5v4.3Z" />
-      </g>
-    </svg>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   Animated sparkle icon (SVG, no emoji)
-───────────────────────────────────────────── */
-export function SparkleIcon({ size = 26 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden
-      style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
-      <style>{`
-        @keyframes spkRot2{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        @keyframes spkPulse2{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.75)}}
-        .spkM2{animation:spkRot2 4s linear infinite;transform-origin:16px 16px}
-        .spkS12{animation:spkPulse2 1.5s ease-in-out infinite;transform-origin:25px 8px}
-        .spkS22{animation:spkPulse2 2s ease-in-out .6s infinite;transform-origin:8px 24px}
-      `}</style>
-      <path className="spkM2" d="M16 3l2 11 11 2-11 2-2 11-2-11-11-2 11-2Z" fill="#c44b8a" />
-      <path className="spkS12" d="M25 7l.8 3.5 3.5.8-3.5.8L25 16l-.8-3.9-3.5-.8 3.5-.8Z" fill="#e06aa0" />
-      <path className="spkS22" d="M8 22l.7 3 3 .7-3 .7L8 30l-.7-3.6-3-.7 3-.7Z" fill="#d05a90" />
-    </svg>
-  );
-}
-
-/* ─────────────────────────────────────────────
    Centered logo — favicon.png + wordmark
 ───────────────────────────────────────────── */
 export function AuthLogo() {

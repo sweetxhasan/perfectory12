@@ -8,7 +8,7 @@ import {
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/lib/auth-context';
 import { friendlyAuthError } from '@/lib/auth-errors';
-import { AuthLayout, WaveIcon } from '@/components/auth-layout';
+import { AuthLayout } from '@/components/auth-layout';
 import { SEOHead } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
 import { GoogleOneTap } from '@/components/google-one-tap';
@@ -106,7 +106,7 @@ export default function LoginPage() {
       <SEOHead {...PAGE_SEO.login} />
       <GoogleOneTap />
       <AuthLayout
-        title={<>Welcome back <WaveIcon /></>}
+        title="Welcome back"
         subtitle="Sign in to your Perfectory Voice account"
       >
         {/* Error banner */}
