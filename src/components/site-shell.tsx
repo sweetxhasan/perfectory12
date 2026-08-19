@@ -41,6 +41,7 @@ const adminNavBase: NavItem[] = [
   { label: 'Voices', href: '/admin/voices', icon: 'soundwave' },
   { label: 'API Setting', href: '/admin/api', icon: 'code' },
   { label: 'Payments', href: '/admin/payments', icon: 'credit-card' },
+  { label: 'SMTP Server', href: '/admin/smtp', icon: 'mail' },
   { label: 'Settings', href: '/admin/settings', icon: 'settings' },
 ];
 

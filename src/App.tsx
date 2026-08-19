@@ -62,6 +62,7 @@ import AdminVoices from '@/pages/admin/Voices';
 import AdminApiSettings from '@/pages/admin/ApiSettings';
 import AdminPayments from '@/pages/admin/Payments';
 import AdminSettings from '@/pages/admin/Settings';
+import AdminSmtpSettings from '@/pages/admin/SmtpSettings';
 import AdminChat from '@/pages/admin/Chat';
 import BuyPlan from '@/pages/BuyPlan';
 import BuyPlanCheckout from '@/pages/BuyPlanCheckout';
@@ -107,6 +108,7 @@ function Router() {
       <Route path="/admin/api" component={AdminApiSettings} />
       <Route path="/admin/payments" component={AdminPayments} />
       <Route path="/admin/settings" component={AdminSettings} />
+      <Route path="/admin/smtp" component={AdminSmtpSettings} />
       <Route path="/admin/chat/:chatId" component={AdminChat} />
       <Route path="/admin/chat" component={AdminChat} />
       <Route path="/live/chat/:chatId" component={LiveChat} />
