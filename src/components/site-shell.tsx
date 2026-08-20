@@ -5,6 +5,7 @@ import { isAnyAdmin } from '@/lib/admin';
 import { VerifiedBadge } from './verified-badge';
 import { BrandLogo } from './brand-logo';
 import { Icon, type IconName } from './icon';
+import { CutFrame, CutPanel, cutClipPath } from './cut-ui';
 import { subscribeUserConversations, subscribeAdminConversations, setPresence } from '@/lib/chat';
 import {
   subscribeNotifications,
@@ -193,10 +194,11 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition hover:border-brand-2 hover:text-brand-2 lg:hidden"
+              className="group relative flex h-10 w-10 items-center justify-center text-foreground transition hover:text-brand-2 lg:hidden"
               aria-label="Open menu"
             >
-              <Icon name="menu" size={20} />
+              <CutFrame variant="outline" cut={9} />
+              <Icon name="menu" size={19} className="relative z-10" />
             </button>
             <BrandLogo />
           </div>
@@ -212,10 +214,11 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 const active = pathname === item.href;
                 return (
                   <Link key={item.href} href={item.href}
-                    className={`relative flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm transition ${active ? 'bg-gradient-soft text-brand border border-border' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'}`}>
-                    {item.label}
+                    className={`group relative flex items-center gap-2 px-3.5 py-2 text-sm font-medium transition ${active ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+                    <CutFrame variant={active ? 'primary' : 'ghost'} cut={9} />
+                    <span className="relative z-10">{item.label}</span>
                     {item.badge && item.badge > 0 && (
-                      <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gradient-brand px-1 text-[10px] font-bold text-primary-foreground">
+                      <span className="relative z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gradient-brand px-1 text-[10px] font-bold text-primary-foreground">
                         {item.badge > 99 ? '99+' : item.badge}
                       </span>
                     )}
@@ -250,19 +253,21 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     }}
                     aria-label={unreadCount > 0 ? `${unreadCount} unread notifications` : 'Notifications'}
                     aria-expanded={notificationOpen}
-                    className="relative flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition hover:border-brand-2 hover:text-brand-2 md:w-auto md:gap-2 md:px-3"
+                    className="group relative flex h-10 w-10 items-center justify-center text-muted-foreground transition hover:text-brand-2 md:w-auto md:gap-2 md:px-3"
                   >
-                    <Icon name="bell" size={18} className={unreadCount > 0 ? 'text-brand-2' : ''} />
-                    <span className="hidden text-sm md:inline">Notifications</span>
+                    <CutFrame variant="outline" cut={9} />
+                    <Icon name="bell" size={18} className={`relative z-10 ${unreadCount > 0 ? 'text-brand-2' : ''}`} />
+                    <span className="relative z-10 hidden text-sm md:inline">Notifications</span>
                     {unreadCount > 0 && (
-                      <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-background bg-gradient-brand px-1 text-[9px] font-bold leading-none text-primary-foreground shadow-sm">
+                      <span className="absolute -right-1 -top-1 z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-background bg-gradient-brand px-1 text-[9px] font-bold leading-none text-primary-foreground shadow-sm">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
                   </button>
 
                   {notificationOpen && (
-                    <div className="fixed left-4 right-4 top-[4.5rem] z-30 max-h-[calc(100dvh-6rem)] w-auto overflow-hidden rounded-2xl border border-border bg-popover shadow-xl float-up md:absolute md:left-auto md:right-0 md:top-12 md:max-h-none md:w-[min(22rem,calc(100vw-2rem))]">
+                    <div className="fixed left-4 right-4 top-[4.5rem] z-30 w-auto float-up md:absolute md:left-auto md:right-0 md:top-12 md:w-[min(22rem,calc(100vw-2rem))]">
+                    <CutPanel cut={16} tone="popover" className="shadow-xl" contentClassName="max-h-[calc(100dvh-6rem)] overflow-hidden md:max-h-none">
 
                       {/* ── Header ── */}
                       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
@@ -341,19 +346,22 @@ export function SiteShell({ children }: { children: ReactNode }) {
                           </div>
                         )}
                       </div>
+                    </CutPanel>
                     </div>
                   )}
                 </div>
 
                 {/* Credits pill */}
-                <Link href="/credits" className="hidden items-center gap-1.5 rounded-full border border-border bg-gradient-soft px-3 py-1.5 text-sm transition hover:border-brand-2 hover:shadow-[0_0_10px_rgba(56,189,248,0.18)] sm:flex">
-                  <Icon name="bolt" size={15} className="text-brand-2" />
-                  <span className="font-medium">{profile.credits}</span>
-                  <span className="text-muted-foreground">credits</span>
+                <Link href="/credits" className="group relative hidden items-center gap-1.5 px-3 py-1.5 text-sm transition sm:flex">
+                  <CutFrame variant="outline" cut={9} />
+                  <Icon name="bolt" size={15} className="relative z-10 text-brand-2" />
+                  <span className="relative z-10 font-medium">{profile.credits}</span>
+                  <span className="relative z-10 text-muted-foreground">credits</span>
                 </Link>
-                <Link href="/credits" className="flex items-center gap-1 rounded-full border border-border bg-gradient-soft px-2.5 py-1.5 text-sm transition hover:border-brand-2 sm:hidden">
-                  <Icon name="bolt" size={14} className="text-brand-2" />
-                  <span className="font-medium leading-none">{profile.credits}</span>
+                <Link href="/credits" className="group relative flex items-center gap-1 px-2.5 py-1.5 text-sm transition sm:hidden">
+                  <CutFrame variant="outline" cut={9} />
+                  <Icon name="bolt" size={14} className="relative z-10 text-brand-2" />
+                  <span className="relative z-10 font-medium leading-none">{profile.credits}</span>
                 </Link>
 
                 {/* Avatar / menu button */}
@@ -362,14 +370,16 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     setMenuOpen((v) => !v);
                     setNotificationOpen(false);
                   }}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition hover:border-brand-2 sm:w-auto sm:gap-2 sm:rounded-full sm:pl-1.5 sm:pr-2.5">
-                    <Avatar profile={profile} size="sm" />
-                    <span className="hidden max-w-24 truncate text-sm sm:inline">{profile.name}</span>
-                    {admin && <span className="hidden lg:inline-block"><VerifiedBadge size={14} /></span>}
+                    className="group relative flex h-10 w-10 items-center justify-center transition sm:w-auto sm:gap-2 sm:pl-1.5 sm:pr-2.5">
+                    <CutFrame variant="outline" cut={9} />
+                    <span className="relative z-10"><Avatar profile={profile} size="sm" /></span>
+                    <span className="relative z-10 hidden max-w-24 truncate text-sm sm:inline">{profile.name}</span>
+                    {admin && <span className="relative z-10 hidden lg:inline-block"><VerifiedBadge size={14} /></span>}
                   </button>
 
                   {menuOpen && (
-                    <div className="absolute right-0 top-12 z-20 w-60 overflow-hidden rounded-2xl border border-border bg-popover shadow-xl float-up">
+                    <div className="absolute right-0 top-12 z-20 w-60 float-up">
+                    <CutPanel cut={16} tone="popover" className="shadow-xl">
                       {/* User card */}
                       <div className="flex items-center gap-2.5 border-b border-border px-3 py-3">
                         <Avatar profile={profile} size="sm" />
@@ -401,15 +411,22 @@ export function SiteShell({ children }: { children: ReactNode }) {
                           <Icon name="logout" size={18} /> Sign out
                         </button>
                       </div>
+                    </CutPanel>
                     </div>
                   )}
                 </div>
               </>
             ) : !loading && (
               <>
-                <Link href="/login" className="hidden rounded-xl border border-border bg-card px-4 py-2 text-sm transition hover:border-brand-2 sm:inline-flex">Login</Link>
-                <Link href="/signup" className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm text-primary-foreground ring-glow transition hover:opacity-95">
-                  Get Started <Icon name="arrow-right" size={16} />
+                <Link href="/login" className="group relative hidden px-4 py-2 text-sm font-medium transition sm:inline-flex">
+                  <CutFrame variant="outline" cut={10} />
+                  <span className="relative z-10">Login</span>
+                </Link>
+                <Link href="/signup" className="group relative inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary-foreground transition active:scale-[0.97]">
+                  <CutFrame variant="primary" cut={10} />
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    Get Started <Icon name="arrow-right" size={16} />
+                  </span>
                 </Link>
               </>
             )}
@@ -426,8 +443,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
               <div className="mb-5 flex items-center justify-between">
                 <BrandLogo />
                 <button type="button" onClick={() => setSidebarOpen(false)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border" aria-label="Close menu">
-                  <Icon name="close" size={18} />
+                  className="group relative flex h-9 w-9 items-center justify-center text-foreground transition hover:text-brand-2" aria-label="Close menu">
+                  <CutFrame variant="outline" cut={8} />
+                  <Icon name="close" size={18} className="relative z-10" />
                 </button>
               </div>
               <SidebarNav nav={nav} pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
@@ -449,7 +467,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6 sm:px-6">
         {/* Desktop sidebar */}
         <aside className="sticky top-20 hidden h-[calc(100dvh-6rem)] w-60 shrink-0 overflow-y-auto lg:block">
-          <div className="flex h-full flex-col rounded-3xl border border-border bg-card/60 p-3">
+          <CutPanel cut={22} tone="card" className="h-full" contentClassName="flex h-full flex-col p-3">
             {loading ? (
               /* Skeleton sidebar nav rows */
               <div className="flex flex-col gap-1.5 p-1">
@@ -472,7 +490,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 <SidebarQuickLinks pathname={pathname} />
               </>
             )}
-          </div>
+          </CutPanel>
         </aside>
 
         <main className="min-w-0 flex-1">{children}</main>
