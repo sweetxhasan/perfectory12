@@ -639,7 +639,7 @@ function SidebarUserCard({
   );
 }
 
-/* ����─ Bottom quick-links: About · Contact · Privacy ───���─ */
+/* ����─ Bottom quick-links: About · Contact · Privacy ───�����─ */
 const quickLinks: NavItem[] = [
   { label: 'About',   href: '/about',   icon: 'users'  },
   { label: 'Contact', href: '/contact', icon: 'chat'   },
@@ -889,7 +889,7 @@ function SiteFooter() {
                   duplicate={duplicate}
                   onStatusClick={() => setErrMsg('')}
                 />
-                <CutButton type="submit" variant="primary" disabled={status === 'loading'} aria-label="Subscribe to newsletter" className="shrink-0 px-3 py-3 text-xs text-primary-foreground sm:px-4 sm:text-sm">
+                <CutButton type="submit" variant="primary" disabled={status === 'loading'} aria-label="Subscribe to newsletter" className="min-h-14 shrink-0 px-3 py-3 text-xs text-primary-foreground sm:px-4 sm:text-sm">
                   {status === 'loading' ? 'Checking...' : 'Subscribe'}
                 </CutButton>
               </form>
