@@ -811,7 +811,7 @@ function NewsletterEmailField({ value, onChange, duplicate, onStatusClick }: {
         placeholder="your@email.com"
         autoComplete="email"
         aria-label="Newsletter email address"
-        className="relative z-10 min-w-0 flex-1 bg-transparent px-3.5 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground/55"
+        className="relative z-10 min-w-0 flex-1 bg-transparent px-2.5 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground/55 sm:px-3.5"
       />
       {duplicate === 'checking' ? (
         <span className="relative z-10 pr-4" aria-label="Checking email">
@@ -882,14 +882,14 @@ function SiteFooter() {
                 <span>Thank you for subscribing.</span>
               </CutPanel>
             ) : (
-              <form onSubmit={handleSubscribe} className="mt-3 flex flex-col gap-3 sm:flex-row">
+              <form onSubmit={handleSubscribe} className="mt-3 flex w-full min-w-0 items-center gap-2">
                 <NewsletterEmailField
                   value={email}
                   onChange={(value) => { setEmail(value); setErrMsg(''); setStatus('idle'); }}
                   duplicate={duplicate}
                   onStatusClick={() => setErrMsg('')}
                 />
-                <CutButton type="submit" variant="primary" disabled={status === 'loading'} aria-label="Subscribe to newsletter" className="shrink-0 px-5 py-3 text-primary-foreground">
+                <CutButton type="submit" variant="primary" disabled={status === 'loading'} aria-label="Subscribe to newsletter" className="shrink-0 px-3 py-3 text-xs text-primary-foreground sm:px-4 sm:text-sm">
                   {status === 'loading' ? 'Checking...' : 'Subscribe'}
                 </CutButton>
               </form>
