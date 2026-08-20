@@ -326,12 +326,12 @@ export default function HomePage() {
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link href="/signup">
-              <CutButton variant="outline" className="text-foreground">
+              <CutButton variant="light" className="text-foreground">
                 <Icon name="user" size={18} /> Create free account
               </CutButton>
             </Link>
             <Link href="/generator">
-              <CutButton variant="outline" className="text-foreground">
+              <CutButton variant="outline" className="text-primary-foreground">
                 Try the generator <Icon name="arrow-right" size={18} />
               </CutButton>
             </Link>

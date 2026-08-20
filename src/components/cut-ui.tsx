@@ -14,7 +14,7 @@ export function cutClipPath() {
 
 export const CUT_BORDER = 1.4;
 
-export type CutVariant = 'primary' | 'outline' | 'ghost';
+export type CutVariant = 'primary' | 'outline' | 'ghost' | 'light';
 
 export function CutButton({
   children,
@@ -79,6 +79,15 @@ export function CutFrame({
   active?: boolean;
   className?: string;
 }) {
+  if (variant === 'light') {
+    return (
+      <span aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
+        <span className="absolute inset-0 bg-background" style={{ clipPath: CUT_FRAME_CLIP_PATH }} />
+        <CutFrameStrokes stroke="oklch(1 0 0 / 0.9)" strokeWidth={1} innerStroke="oklch(0.15 0 0 / 0.12)" />
+      </span>
+    );
+  }
+
   if (variant === 'primary' || active) {
     return (
       <span aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
