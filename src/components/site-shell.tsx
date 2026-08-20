@@ -23,13 +23,13 @@ interface NavItem { label: string; href: string; icon: IconName; badge?: number 
 
 const guestNav: NavItem[] = [
   { label: 'Home', href: '/', icon: 'home' },
-  { label: 'Voice Generator', href: '/generator', icon: 'microphone' },
+  { label: 'Generate Voice', href: '/generator', icon: 'microphone' },
   { label: 'Plans', href: '/plans', icon: 'crown' },
 ];
 
 const userNavBase: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
-  { label: 'Voice Generator', href: '/generator', icon: 'microphone' },
+  { label: 'Generate Voice', href: '/generator', icon: 'microphone' },
   { label: 'Plans', href: '/plans', icon: 'crown' },
 ];
 
@@ -636,7 +636,7 @@ function SidebarUserCard({
   );
 }
 
-/* ── Bottom quick-links: About · Contact · Privacy ───── */
+/* ��─ Bottom quick-links: About · Contact · Privacy ───── */
 const quickLinks: NavItem[] = [
   { label: 'About',   href: '/about',   icon: 'users'  },
   { label: 'Contact', href: '/contact', icon: 'chat'   },
