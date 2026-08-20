@@ -27,7 +27,7 @@ interface AuthContextType {
   loading: boolean;
   accountDisabled: boolean;
   signInEmail: (email: string, password: string) => Promise<UserProfile | null>;
-  signInGoogle: () => Promise<void>;
+  signInGoogle: (onAccountSelected?: () => void) => Promise<void>;
   signInCredential: (idToken: string) => Promise<void>;
   signUpEmail: (params: SignUpParams) => Promise<void>;
   logout: () => Promise<void>;
@@ -102,8 +102,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return p;
   }
 
-  async function signInGoogle() {
+  /**
+   * `onAccountSelected` fires the instant the Google account picker closes
+   * with a chosen account (signInWithPopup resolved) — before the
+   * Firestore profile upsert that follows. Login/Signup use it to hand the
+   * "loading" look off from the Google button to the main submit button
+   * for this final step.
+   */
+  async function signInGoogle(onAccountSelected?: () => void) {
     const cred = await signInWithPopup(auth, googleProvider);
+    onAccountSelected?.();
     const avatarUrl = cred.user.photoURL ?? generateAvatarUrl(cred.user.displayName ?? 'User', 'male');
     // Google already verifies the email address, so new profiles are marked verified immediately.
     const p = await upsertProfile(

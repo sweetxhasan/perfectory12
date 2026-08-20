@@ -191,11 +191,14 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Submit */}
+          {/* Submit — also reflects the Google flow: once the account
+              picker closes and control returns to the app, this button
+              takes over showing the loading spinner while sign-in
+              finishes and the redirect happens. */}
           <CutSubmitButton
             className="mt-1"
-            loading={loading}
-            disabled={!formValid}
+            loading={loading || googleLoading}
+            disabled={!formValid || googleLoading}
             label="Log In"
             loadingLabel="Signing in…"
           />
@@ -208,8 +211,9 @@ export default function LoginPage() {
           <span className="h-px flex-1 bg-gray-200" />
         </div>
 
-        {/* Google */}
-        <GoogleButton onClick={onGoogle} loading={googleLoading} disabled={loading} />
+        {/* Google — its own spinner only covers the account-picker wait;
+            the moment it resolves, the submit button above takes over. */}
+        <GoogleButton onClick={onGoogle} loading={googleLoading} disabled={loading || googleLoading} />
 
         <p className="mt-5 text-center text-sm text-gray-500">
           Don't have an account?{' '}
