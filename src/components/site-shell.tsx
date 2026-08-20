@@ -611,11 +611,14 @@ function SidebarUserCard({
               {profile.name}
               {admin && <VerifiedBadge size={14} />}
             </p>
-            <p className="text-xs text-muted-foreground">Available credits</p>
-            <p className="mt-1 text-2xl text-gradient">{profile.credits}</p>
-            <Link href="/plans" onClick={onNavigate} className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-brand-2 hover:underline">
-              Get more <Icon name="arrow-right" size={13} />
-            </Link>
+            <div className="mt-2.5 flex items-center justify-between gap-2 text-left">
+              <p className="text-xs text-muted-foreground">
+                Available credits <span className="ml-1 text-base font-semibold text-gradient">{profile.credits}</span>
+              </p>
+              <Link href="/plans" onClick={onNavigate} className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-brand-2 hover:underline">
+                Get more <Icon name="arrow-right" size={13} />
+              </Link>
+            </div>
           </>
         ) : (
           <div className="flex items-center gap-2">
