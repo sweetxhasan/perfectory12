@@ -6,7 +6,6 @@ import { VerifiedBadge } from './verified-badge';
 import { BrandLogo } from './brand-logo';
 import { Icon, type IconName } from './icon';
 import { CutButton, CutFrame, CutPanel, cutClipPath } from './cut-ui';
-import { PremiumTooltip } from './premium-tooltip';
 import { isNewsletterSubscribed } from '@/lib/user-store';
 import { subscribeUserConversations, subscribeAdminConversations, setPresence } from '@/lib/chat';
 import {
@@ -639,7 +638,7 @@ function SidebarUserCard({
   );
 }
 
-/* ����─ Bottom quick-links: About · Contact · Privacy ───�����─ */
+/* ����─ Bottom quick-links: About · Contact · Privacy ───�������─ */
 const quickLinks: NavItem[] = [
   { label: 'About',   href: '/about',   icon: 'users'  },
   { label: 'Contact', href: '/contact', icon: 'chat'   },
@@ -788,20 +787,12 @@ function Avatar({ profile, size, className = '' }: { profile: { photoURL: string
 
 type NewsletterDuplicateState = 'idle' | 'checking' | 'used' | 'free';
 
-function NewsletterEmailField({ value, onChange, duplicate, onStatusClick }: {
+function NewsletterEmailField({ value, onChange }: {
   value: string;
   onChange: (value: string) => void;
-  duplicate: NewsletterDuplicateState;
-  onStatusClick: () => void;
 }) {
-  const trimmed = value.trim();
-  const formatValid = trimmed !== '' && /^[^\s@]+@gmail\.com$/i.test(trimmed);
-  const isFormatError = trimmed !== '' && !formatValid;
-  const isUsed = formatValid && duplicate === 'used';
-  const isValid = formatValid && duplicate === 'free';
-  const statusLabel = isUsed ? 'This email is already subscribed.' : isFormatError ? 'Only Gmail addresses are supported.' : 'Email is valid.';
   return (
-    <div className={`relative flex h-10 min-h-10 min-w-0 flex-1 items-center overflow-hidden sm:h-14 sm:min-h-14 ${isValid ? 'text-emerald-600' : isFormatError || isUsed ? 'text-destructive' : 'text-muted-foreground'}`}>
+    <div className="relative flex h-10 min-h-10 min-w-0 flex-1 items-center overflow-hidden sm:h-14 sm:min-h-14">
       <CutFrame />
       <span className="relative z-10 pl-4"><Icon name="mail" size={18} /></span>
       <input
@@ -813,19 +804,6 @@ function NewsletterEmailField({ value, onChange, duplicate, onStatusClick }: {
         aria-label="Newsletter email address"
         className="relative z-10 min-w-0 flex-1 bg-transparent px-2.5 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground/55 sm:px-3.5"
       />
-      {duplicate === 'checking' ? (
-        <span className="relative z-10 pr-4" aria-label="Checking email">
-          <Icon name="loader" size={16} className="animate-spin" />
-        </span>
-      ) : (isFormatError || isUsed || isValid) ? (
-        <PremiumTooltip content={statusLabel} variant={isValid ? 'valid' : 'invalid'}>
-          {({ toggle }) => (
-            <button type="button" onClick={() => { onStatusClick(); toggle(); }} aria-label={statusLabel} className="relative z-10 mr-3 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand">
-              <Icon name={isValid ? 'check' : 'alert-circle'} size={17} />
-            </button>
-          )}
-        </PremiumTooltip>
-      ) : null}
     </div>
   );
 }
@@ -886,15 +864,17 @@ function SiteFooter() {
                 <NewsletterEmailField
                   value={email}
                   onChange={(value) => { setEmail(value); setErrMsg(''); setStatus('idle'); }}
-                  duplicate={duplicate}
-                  onStatusClick={() => setErrMsg('')}
                 />
                 <CutButton type="submit" variant="primary" disabled={status === 'loading'} aria-label="Subscribe to newsletter" className="h-10 min-h-10 shrink-0 px-2.5 py-2 text-[11px] text-primary-foreground sm:h-14 sm:min-h-14 sm:px-4 sm:py-3 sm:text-sm">
                   {status === 'loading' ? 'Checking...' : 'Subscribe'}
                 </CutButton>
               </form>
             )}
-            {errMsg && <p className="mt-1.5 text-xs text-destructive">{errMsg}</p>}
+            {errMsg && (
+              <CutPanel tone="soft" className="mt-2" contentClassName="px-3 py-2 text-xs text-destructive" role="alert">
+                {errMsg}
+              </CutPanel>
+            )}
           </div>
         </div>
         <div className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-8">
