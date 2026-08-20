@@ -533,26 +533,27 @@ function AdminMenuDropdown({
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
-        className={`flex w-full items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium transition ${
+        className={`group relative flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium transition ${
           adminNav.some(item => pathname.startsWith(item.href))
-            ? 'bg-gradient-brand text-primary-foreground ring-glow'
-            : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+            ? 'text-primary-foreground'
+            : 'text-muted-foreground hover:text-foreground'
         }`}
       >
-        <Icon name="shield" size={18} />
-        <span className="flex-1 text-left">Admin Menu</span>
-        <VerifiedBadge size={14} className="mr-0.5" />
+        <CutFrame variant={adminNav.some(item => pathname.startsWith(item.href)) ? 'primary' : 'ghost'} cut={9} />
+        <Icon name="shield" size={18} className="relative z-10" />
+        <span className="relative z-10 flex-1 text-left">Admin Menu</span>
+        <span className="relative z-10"><VerifiedBadge size={14} className="mr-0.5" /></span>
         {totalAdminBadge > 0 && (
-          <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+          <span className="relative z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
             {totalAdminBadge > 99 ? '99+' : totalAdminBadge}
           </span>
         )}
-        <Icon name={open ? 'chevron-up' : 'chevron-down'} size={15} />
+        <Icon name={open ? 'chevron-up' : 'chevron-down'} size={15} className="relative z-10" />
       </button>
 
       {/* Dropdown items */}
       {open && (
-        <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-brand/30 pl-3">
+        <div className="ml-3 mt-1.5 space-y-1 border-l-2 border-brand/30 pl-3">
           {adminNav.map(item => {
             const active = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
@@ -560,16 +561,15 @@ function AdminMenuDropdown({
                 key={item.href}
                 href={item.href}
                 onClick={onNavigate}
-                className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs transition ${
-                  active
-                    ? 'bg-brand/10 text-brand font-medium'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                className={`group relative flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition ${
+                  active ? 'text-brand' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Icon name={item.icon} size={15} />
-                <span className="flex-1">{item.label}</span>
+                <CutFrame variant={active ? 'outline' : 'ghost'} cut={7} />
+                <Icon name={item.icon} size={15} className="relative z-10" />
+                <span className="relative z-10 flex-1">{item.label}</span>
                 {item.badge && item.badge > 0 && (
-                  <span className="flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-gradient-brand px-1 text-[9px] font-bold text-primary-foreground">
+                  <span className="relative z-10 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-gradient-brand px-1 text-[9px] font-bold text-primary-foreground">
                     {item.badge > 99 ? '99+' : item.badge}
                   </span>
                 )}
@@ -594,37 +594,40 @@ function SidebarUserCard({
   className?: string;
 }) {
   return (
-    <div className={`${className} rounded-[50px] bg-gradient-soft p-4 text-center`}>
-      {loading ? (
-        <div className="flex flex-col items-center gap-2.5">
-          <Sk className="h-14 w-14 rounded-full" />
-          <Sk className="h-3.5 w-24 rounded-full" />
-          <Sk className="h-3 w-16 rounded-full" />
-          <Sk className="h-8 w-12 rounded-xl" />
-          <Sk className="h-3 w-20 rounded-full" />
-        </div>
-      ) : user && profile ? (
-        <>
-          <Avatar profile={profile} size="lg" className="mx-auto mb-2" />
-          <p className="flex items-center justify-center gap-1 truncate text-sm font-medium">
-            {profile.name}
-            {admin && <VerifiedBadge size={14} />}
-          </p>
-          <p className="text-xs text-muted-foreground">Available credits</p>
-          <p className="mt-1 text-2xl text-gradient">{profile.credits}</p>
-          <Link href="/plans" onClick={onNavigate} className="mt-2 inline-flex items-center gap-1 text-xs text-brand-2 hover:underline">
-            Get more <Icon name="arrow-right" size={13} />
-          </Link>
-        </>
-      ) : (
-        <>
-          <Icon name="crown" size={22} className="mx-auto text-brand-2" />
-          <p className="mt-2 text-xs text-muted-foreground">Sign up and get 10 free credits</p>
-          <Link href="/signup" onClick={onNavigate} className="mt-2 inline-block rounded-[50px] bg-gradient-brand px-4 py-1.5 text-xs text-primary-foreground">
-            Get started
-          </Link>
-        </>
-      )}
+    <div className={className}>
+      <CutPanel cut={18} tone="soft" contentClassName="p-4 text-center">
+        {loading ? (
+          <div className="flex flex-col items-center gap-2.5">
+            <Sk className="h-14 w-14 rounded-full" />
+            <Sk className="h-3.5 w-24 rounded-full" />
+            <Sk className="h-3 w-16 rounded-full" />
+            <Sk className="h-8 w-12 rounded-xl" />
+            <Sk className="h-3 w-20 rounded-full" />
+          </div>
+        ) : user && profile ? (
+          <>
+            <Avatar profile={profile} size="lg" className="mx-auto mb-2" />
+            <p className="flex items-center justify-center gap-1 truncate text-sm font-medium">
+              {profile.name}
+              {admin && <VerifiedBadge size={14} />}
+            </p>
+            <p className="text-xs text-muted-foreground">Available credits</p>
+            <p className="mt-1 text-2xl text-gradient">{profile.credits}</p>
+            <Link href="/plans" onClick={onNavigate} className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-brand-2 hover:underline">
+              Get more <Icon name="arrow-right" size={13} />
+            </Link>
+          </>
+        ) : (
+          <>
+            <Icon name="crown" size={22} className="mx-auto text-brand-2" />
+            <p className="mt-2 text-xs text-muted-foreground">Sign up and get 10 free credits</p>
+            <Link href="/signup" onClick={onNavigate} className="group relative mt-3 inline-flex items-center px-4 py-1.5 text-xs font-semibold text-primary-foreground transition active:scale-[0.97]">
+              <CutFrame variant="primary" cut={7} />
+              <span className="relative z-10">Get started</span>
+            </Link>
+          </>
+        )}
+      </CutPanel>
     </div>
   );
 }
@@ -649,7 +652,7 @@ function SidebarQuickLinks({ pathname, onNavigate }: { pathname: string; onNavig
       </div>
 
       {/* Compact vertical list — all screen sizes */}
-      <div className="flex flex-col gap-0.5">
+      <div className="flex flex-col gap-1">
         {quickLinks.map((l) => {
           const active = pathname === l.href;
           return (
@@ -657,16 +660,14 @@ function SidebarQuickLinks({ pathname, onNavigate }: { pathname: string; onNavig
               key={l.href}
               href={l.href}
               onClick={onNavigate}
-              className={`group flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs transition
-                ${active
-                  ? 'bg-brand/10 text-brand font-medium'
-                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
+              className={`group relative flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition
+                ${active ? 'text-brand' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-lg transition
-                ${active ? 'bg-brand/20 text-brand' : 'text-muted-foreground/70 group-hover:text-foreground'}`}>
+              <CutFrame variant={active ? 'outline' : 'ghost'} cut={7} />
+              <span className="relative z-10 flex h-5 w-5 shrink-0 items-center justify-center">
                 <Icon name={l.icon} size={13} />
               </span>
-              {l.label}
+              <span className="relative z-10">{l.label}</span>
             </Link>
           );
         })}
@@ -678,16 +679,17 @@ function SidebarQuickLinks({ pathname, onNavigate }: { pathname: string; onNavig
 /* ── Regular sidebar nav ─────────────────────────────── */
 function SidebarNav({ nav, pathname, onNavigate }: { nav: NavItem[]; pathname: string; onNavigate?: () => void }) {
   return (
-    <nav className="flex flex-col gap-1">
+    <nav className="flex flex-col gap-1.5">
       {nav.map((item) => {
         const active = pathname === item.href;
         return (
           <Link key={item.href} href={item.href} onClick={onNavigate}
-            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition ${active ? 'bg-gradient-brand text-primary-foreground ring-glow' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}>
-            <Icon name={item.icon} size={19} />
-            <span className="flex-1">{item.label}</span>
+            className={`group relative flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium transition ${active ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+            <CutFrame variant={active ? 'primary' : 'ghost'} cut={9} />
+            <Icon name={item.icon} size={19} className="relative z-10" />
+            <span className="relative z-10 flex-1">{item.label}</span>
             {item.badge && item.badge > 0 && (
-              <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gradient-brand px-1 text-[10px] font-bold text-primary-foreground">
+              <span className="relative z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gradient-brand px-1 text-[10px] font-bold text-primary-foreground">
                 {item.badge > 99 ? '99+' : item.badge}
               </span>
             )}
