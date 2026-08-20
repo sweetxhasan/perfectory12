@@ -439,16 +439,15 @@ export function SiteShell({ children }: { children: ReactNode }) {
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} aria-hidden="true" />
-          <aside className="absolute left-0 top-0 h-full w-72 border-r border-border bg-background shadow-2xl overflow-y-auto">
-            <div className="p-4">
-              <div className="mb-5 flex items-center justify-between">
-                <BrandLogo />
-                <button type="button" onClick={() => setSidebarOpen(false)}
-                  className="group relative flex h-9 w-9 items-center justify-center text-foreground transition hover:text-brand-2" aria-label="Close menu">
-                  <CutFrame variant="outline" cut={8} />
-                  <Icon name="close" size={18} className="relative z-10" />
-                </button>
-              </div>
+  <button type="button" onClick={() => setSidebarOpen(false)}
+  className="group absolute left-72 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-background text-foreground shadow-lg transition hover:text-brand-2" aria-label="Close menu">
+  <Icon name="close" size={18} className="relative z-10" />
+  </button>
+  <aside className="absolute left-0 top-0 h-full w-72 border-r border-border bg-background shadow-2xl overflow-y-auto">
+  <div className="p-4">
+  <div className="mb-5 flex items-center justify-between">
+  <BrandLogo />
+  </div>
               <SidebarNav nav={nav} pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
               {admin && (
                 <AdminMenuDropdown adminNav={adminNav} pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
@@ -636,7 +635,7 @@ function SidebarUserCard({
   );
 }
 
-/* ��─ Bottom quick-links: About · Contact · Privacy ───── */
+/* ����─ Bottom quick-links: About · Contact · Privacy ───── */
 const quickLinks: NavItem[] = [
   { label: 'About',   href: '/about',   icon: 'users'  },
   { label: 'Contact', href: '/contact', icon: 'chat'   },
