@@ -141,6 +141,17 @@ export async function isEmailUsed(email: string): Promise<boolean> {
   return false;
 }
 
+/** Checks newsletter subscriptions using Gmail dot-trick normalization. */
+export async function isNewsletterSubscribed(email: string): Promise<boolean> {
+  if (!email) return false;
+  const canonical = normalizeGmailEmail(email);
+  const snap = await getDocs(collection(db, 'perfectory_newsletter'));
+  return snap.docs.some((d) => {
+    const data = d.data() as { email?: string; canonicalEmail?: string };
+    return (data.canonicalEmail ?? (data.email ? normalizeGmailEmail(data.email) : '')) === canonical;
+  });
+}
+
 /* ── CRUD ─────────────────────────────────────────────── */
 export async function getProfile(uid: string): Promise<UserProfile | null> {
   const snap = await getDoc(doc(db, USERS, uid));

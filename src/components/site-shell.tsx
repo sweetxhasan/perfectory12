@@ -5,7 +5,9 @@ import { isAnyAdmin } from '@/lib/admin';
 import { VerifiedBadge } from './verified-badge';
 import { BrandLogo } from './brand-logo';
 import { Icon, type IconName } from './icon';
-import { CutFrame, CutPanel, cutClipPath } from './cut-ui';
+import { CutButton, CutFrame, CutPanel, cutClipPath } from './cut-ui';
+import { PremiumTooltip } from './premium-tooltip';
+import { isNewsletterSubscribed } from '@/lib/user-store';
 import { subscribeUserConversations, subscribeAdminConversations, setPresence } from '@/lib/chat';
 import {
   subscribeNotifications,
@@ -784,33 +786,81 @@ function Avatar({ profile, size, className = '' }: { profile: { photoURL: string
   );
 }
 
+type NewsletterDuplicateState = 'idle' | 'checking' | 'used' | 'free';
+
+function NewsletterEmailField({ value, onChange, duplicate, onStatusClick }: {
+  value: string;
+  onChange: (value: string) => void;
+  duplicate: NewsletterDuplicateState;
+  onStatusClick: () => void;
+}) {
+  const trimmed = value.trim();
+  const formatValid = trimmed !== '' && /^[^\s@]+@gmail\.com$/i.test(trimmed);
+  const isFormatError = trimmed !== '' && !formatValid;
+  const isUsed = formatValid && duplicate === 'used';
+  const isValid = formatValid && duplicate === 'free';
+  const statusLabel = isUsed ? 'This email is already subscribed.' : isFormatError ? 'Only Gmail addresses are supported.' : 'Email is valid.';
+  return (
+    <div className={`relative flex min-h-14 min-w-0 flex-1 items-center ${isValid ? 'text-emerald-600' : isFormatError || isUsed ? 'text-destructive' : 'text-muted-foreground'}`}>
+      <CutFrame />
+      <span className="relative z-10 pl-4"><Icon name="mail" size={18} /></span>
+      <input
+        type="email"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="your@email.com"
+        autoComplete="email"
+        aria-label="Newsletter email address"
+        className="relative z-10 min-w-0 flex-1 bg-transparent px-3.5 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground/55"
+      />
+      {duplicate === 'checking' ? (
+        <span className="relative z-10 pr-4" aria-label="Checking email">
+          <Icon name="loader" size={16} className="animate-spin" />
+        </span>
+      ) : (isFormatError || isUsed || isValid) ? (
+        <PremiumTooltip content={statusLabel} variant={isValid ? 'valid' : 'invalid'}>
+          {({ toggle }) => (
+            <button type="button" onClick={() => { onStatusClick(); toggle(); }} aria-label={statusLabel} className="relative z-10 mr-3 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand">
+              <Icon name={isValid ? 'check' : 'alert-circle'} size={17} />
+            </button>
+          )}
+        </PremiumTooltip>
+      ) : null}
+    </div>
+  );
+}
+
 function SiteFooter() {
   const [email, setEmail] = useState('');
+  const [duplicate, setDuplicate] = useState<NewsletterDuplicateState>('idle');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errMsg, setErrMsg] = useState('');
+
+  useEffect(() => {
+    const trimmed = email.trim();
+    const valid = /^[^\s@]+@gmail\.com$/i.test(trimmed);
+    if (!valid) { setDuplicate('idle'); return; }
+    setDuplicate('checking');
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      isNewsletterSubscribed(trimmed).then((used) => { if (!cancelled) setDuplicate(used ? 'used' : 'free'); }).catch(() => { if (!cancelled) setDuplicate('free'); });
+    }, 450);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [email]);
 
   async function handleSubscribe(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = email.trim().toLowerCase();
-    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setErrMsg('Please enter a valid email address.');
-      return;
-    }
-    setStatus('loading');
-    setErrMsg('');
+    if (!/^[^\s@]+@gmail\.com$/i.test(trimmed)) { setErrMsg('Please enter a valid Gmail address.'); return; }
+    if (duplicate === 'used') { setErrMsg('This email is already subscribed.'); return; }
+    if (duplicate !== 'free') { setErrMsg('Please wait while we verify your email.'); return; }
+    setStatus('loading'); setErrMsg('');
     try {
       const { db } = await import('../lib/firebase');
       const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-      await addDoc(collection(db, 'perfectory_newsletter'), {
-        email: trimmed,
-        subscribedAt: serverTimestamp(),
-      });
-      setStatus('success');
-      setEmail('');
-    } catch {
-      setStatus('error');
-      setErrMsg('Something went wrong. Please try again.');
-    }
+      await addDoc(collection(db, 'perfectory_newsletter'), { email: trimmed, canonicalEmail: trimmed.replace(/^(.*?)@gmail\\.com$/i, (_, local) => `${local.replace(/\\./g, '')}@gmail.com`), subscribedAt: serverTimestamp() });
+      setStatus('success'); setEmail('');
+    } catch { setStatus('error'); setErrMsg('Something went wrong. Please try again.'); }
   }
 
   return (
@@ -829,20 +879,19 @@ function SiteFooter() {
             {status === 'success' ? (
               <div className="mt-3 flex items-center gap-2 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-600">
                 <Icon name="check" size={16} />
-                <span>Thank you for subscribing! 🎉</span>
+                <span>Thank you for subscribing.</span>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="mt-3 flex gap-2">
-                <input
-                  type="email" value={email}
-                  onChange={e => { setEmail(e.target.value); setErrMsg(''); setStatus('idle'); }}
-                  placeholder="your@email.com"
-                  className="flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-brand transition placeholder:text-muted-foreground/50"
+              <form onSubmit={handleSubscribe} className="mt-3 flex flex-col gap-3 sm:flex-row">
+                <NewsletterEmailField
+                  value={email}
+                  onChange={(value) => { setEmail(value); setErrMsg(''); setStatus('idle'); }}
+                  duplicate={duplicate}
+                  onStatusClick={() => setErrMsg('')}
                 />
-                <button type="submit" disabled={status === 'loading'}
-                  className="rounded-xl bg-gradient-brand px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-60">
-                  {status === 'loading' ? '...' : 'Subscribe'}
-                </button>
+                <CutButton type="submit" variant="primary" disabled={status === 'loading'} className="shrink-0 px-5 py-3 text-primary-foreground">
+                  {status === 'loading' ? 'Checking...' : 'Subscribe'}
+                </CutButton>
               </form>
             )}
             {errMsg && <p className="mt-1.5 text-xs text-destructive">{errMsg}</p>}
