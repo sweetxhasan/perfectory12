@@ -36,7 +36,7 @@ export function CutIconBox({ children, className = '', tone = 'soft' }: { childr
 
 /** Shared double-stroke SVG overlay — identical to the Login/Signup <CutFrame>. */
 function CutFrameStrokes({
-  stroke = 'var(--border)',
+  stroke = 'url(#cut-brand-gradient)',
   strokeWidth = 1.4,
   innerStroke = 'oklch(0.15 0 0 / 0.08)',
   className = '',
@@ -53,6 +53,12 @@ function CutFrameStrokes({
       preserveAspectRatio="none"
       aria-hidden="true"
     >
+      <defs>
+        <linearGradient id="cut-brand-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#6e1a52" />
+          <stop offset="100%" stopColor="#ec5252" />
+        </linearGradient>
+      </defs>
       <path d={CUT_FRAME_PATH} fill="none" stroke={stroke} strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
       <path d={CUT_FRAME_INNER_PATH} fill="none" stroke={innerStroke} strokeWidth={0.6} vectorEffect="non-scaling-stroke" />
     </svg>
@@ -99,7 +105,7 @@ export function CutFrame({
           className="absolute inset-0 -translate-x-full bg-white/15 transition-transform duration-500 group-hover:translate-x-full"
           style={{ clipPath: CUT_FRAME_CLIP_PATH }}
         />
-        <CutFrameStrokes stroke="oklch(1 0 0 / 0.32)" strokeWidth={1} innerStroke="oklch(1 0 0 / 0.12)" />
+        <CutFrameStrokes stroke="url(#cut-brand-gradient)" strokeWidth={1} innerStroke="url(#cut-brand-gradient)" />
       </span>
     );
   }
