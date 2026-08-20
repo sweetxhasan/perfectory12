@@ -302,9 +302,19 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
             <AuthLogo />
           </div>
 
-          {/* Heading */}
+          {/* Heading — shared by Signup, Login & ForgotPassword since they
+              all render through this one AuthLayout title slot. */}
           <div className="mb-7 w-full">
-            <h1 className="flex flex-wrap items-center justify-center gap-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-[1.65rem]">
+            <h1
+              className="flex flex-wrap items-center justify-center gap-2 text-2xl font-bold tracking-tight sm:text-[1.65rem]"
+              style={{
+                background: 'linear-gradient(-45deg, #ec5252, #6e1a52)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}
+            >
               {title}
             </h1>
             {subtitle && (
