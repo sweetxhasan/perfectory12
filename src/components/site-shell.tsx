@@ -785,8 +785,6 @@ function Avatar({ profile, size, className = '' }: { profile: { photoURL: string
   );
 }
 
-type NewsletterDuplicateState = 'idle' | 'checking' | 'used' | 'free';
-
 function NewsletterEmailField({ value, onChange }: {
   value: string;
   onChange: (value: string) => void;
@@ -810,30 +808,20 @@ function NewsletterEmailField({ value, onChange }: {
 
 function SiteFooter() {
   const [email, setEmail] = useState('');
-  const [duplicate, setDuplicate] = useState<NewsletterDuplicateState>('idle');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errMsg, setErrMsg] = useState('');
-
-  useEffect(() => {
-    const trimmed = email.trim();
-    const valid = /^[^\s@]+@gmail\.com$/i.test(trimmed);
-    if (!valid) { setDuplicate('idle'); return; }
-    setDuplicate('checking');
-    let cancelled = false;
-    const timer = setTimeout(() => {
-      isNewsletterSubscribed(trimmed).then((used) => { if (!cancelled) setDuplicate(used ? 'used' : 'free'); }).catch(() => { if (!cancelled) setDuplicate('free'); });
-    }, 450);
-    return () => { cancelled = true; clearTimeout(timer); };
-  }, [email]);
 
   async function handleSubscribe(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = email.trim().toLowerCase();
-    if (!/^[^\s@]+@gmail\.com$/i.test(trimmed)) { setErrMsg('Please enter a valid Gmail address.'); return; }
-    if (duplicate === 'used') { setErrMsg('This email is already subscribed.'); return; }
-    if (duplicate !== 'free') { setErrMsg('Please wait while we verify your email.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) { setErrMsg('Please enter a valid email address.'); return; }
     setStatus('loading'); setErrMsg('');
     try {
+      if (await isNewsletterSubscribed(trimmed)) {
+        setStatus('error');
+        setErrMsg('This email is already subscribed.');
+        return;
+      }
       const { db } = await import('../lib/firebase');
       const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
       await addDoc(collection(db, 'perfectory_newsletter'), { email: trimmed, canonicalEmail: trimmed.replace(/^(.*?)@gmail\\.com$/i, (_, local) => `${local.replace(/\\./g, '')}@gmail.com`), subscribedAt: serverTimestamp() });
