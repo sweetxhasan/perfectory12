@@ -407,8 +407,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
                         )}
                         <div className="my-1 border-t border-border" />
                         <button type="button" onClick={handleLogout}
-                          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-destructive transition hover:bg-destructive/10">
-                          <Icon name="logout" size={18} /> Sign out
+                          className="flex w-full items-center justify-between gap-2.5 rounded-xl px-3 py-2 text-sm text-destructive transition hover:bg-destructive/10">
+                          <span className="flex-1 text-left">Sign out</span>
+                          <Icon name="logout" size={18} className="shrink-0" />
                         </button>
                       </div>
                     </CutPanel>
@@ -566,13 +567,13 @@ function AdminMenuDropdown({
                 }`}
               >
                 <CutFrame variant={active ? 'outline' : 'ghost'} cut={7} />
-                <Icon name={item.icon} size={15} className="relative z-10" />
                 <span className="relative z-10 flex-1">{item.label}</span>
                 {item.badge && item.badge > 0 && (
                   <span className="relative z-10 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-gradient-brand px-1 text-[9px] font-bold text-primary-foreground">
                     {item.badge > 99 ? '99+' : item.badge}
                   </span>
                 )}
+                <Icon name={item.icon} size={15} className="relative z-10 shrink-0" />
               </Link>
             );
           })}
@@ -667,10 +668,10 @@ function SidebarQuickLinks({ pathname, onNavigate }: { pathname: string; onNavig
                 ${active ? 'text-brand' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <CutFrame variant={active ? 'outline' : 'ghost'} cut={7} />
+              <span className="relative z-10 flex-1">{l.label}</span>
               <span className="relative z-10 flex h-5 w-5 shrink-0 items-center justify-center">
                 <Icon name={l.icon} size={13} />
               </span>
-              <span className="relative z-10">{l.label}</span>
             </Link>
           );
         })}
@@ -689,13 +690,13 @@ function SidebarNav({ nav, pathname, onNavigate }: { nav: NavItem[]; pathname: s
           <Link key={item.href} href={item.href} onClick={onNavigate}
             className={`group relative flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium transition ${active ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
             <CutFrame variant={active ? 'primary' : 'ghost'} cut={9} />
-            <Icon name={item.icon} size={19} className="relative z-10" />
             <span className="relative z-10 flex-1">{item.label}</span>
             {item.badge && item.badge > 0 && (
               <span className="relative z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gradient-brand px-1 text-[10px] font-bold text-primary-foreground">
                 {item.badge > 99 ? '99+' : item.badge}
               </span>
             )}
+            <Icon name={item.icon} size={19} className="relative z-10 shrink-0" />
           </Link>
         );
       })}
@@ -705,9 +706,9 @@ function SidebarNav({ nav, pathname, onNavigate }: { nav: NavItem[]; pathname: s
 
 function MenuLink({ href, icon, children, onClick }: { href: string; icon: IconName; children: ReactNode; onClick: () => void }) {
   return (
-    <Link href={href} onClick={onClick} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-secondary">
-      <Icon name={icon} size={18} className="text-muted-foreground" />
-      {children}
+    <Link href={href} onClick={onClick} className="flex items-center justify-between gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-secondary">
+      <span className="flex-1">{children}</span>
+      <Icon name={icon} size={18} className="shrink-0 text-muted-foreground" />
     </Link>
   );
 }
