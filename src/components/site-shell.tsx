@@ -439,11 +439,12 @@ export function SiteShell({ children }: { children: ReactNode }) {
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} aria-hidden="true" />
-  <button type="button" onClick={() => setSidebarOpen(false)}
-  className="group absolute left-72 top-4 z-10 flex h-9 w-9 items-center justify-center text-foreground shadow-lg transition hover:text-brand-2" aria-label="Close menu">
-  <CutFrame variant="outline" />
-  <Icon name="close" size={18} className="relative z-10" />
-  </button>
+                <button type="button" onClick={() => setSidebarOpen(false)}
+                  className="group absolute left-72 top-4 z-10 flex h-9 items-center gap-1.5 px-3 text-foreground shadow-lg transition hover:text-brand-2" aria-label="Close menu">
+                  <CutFrame variant="outline" />
+                  <Icon name="close" size={14} className="relative z-10" />
+                  <span className="relative z-10 text-xs font-semibold">Close</span>
+                </button>
   <aside className="absolute left-0 top-0 h-full w-72 border-r border-border bg-background shadow-2xl overflow-y-auto">
   <div className="p-4">
   <div className="mb-5 flex items-center justify-between">
