@@ -55,6 +55,12 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [errorType, setErrorType] = useState<'generic' | 'wrong-password'>('generic');
 
+  /* Submit stays dimmed/disabled until both fields are actually filled in
+     with a plausible email — no duplicate/account lookup needed here since
+     login just verifies credentials against Firebase on submit. */
+  const emailFormatValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const formValid = emailFormatValid && password.length > 0;
+
   useEffect(() => {
     if (authLoading || !user) return;
     // Unverified accounts (created but never confirmed the OTP) get sent
@@ -189,6 +195,7 @@ export default function LoginPage() {
           <CutSubmitButton
             className="mt-1"
             loading={loading}
+            disabled={!formValid}
             label="Log In"
             loadingLabel="Signing in…"
           />

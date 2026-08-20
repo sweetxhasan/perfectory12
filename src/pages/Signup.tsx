@@ -15,7 +15,7 @@ import { CutIconBadge } from '@/components/cut-icon-badge';
 import { PremiumTooltip } from '@/components/premium-tooltip';
 import { Icon } from '@/components/icon';
 import { isPhoneUsed, isEmailUsed } from '@/lib/user-store';
-import { PasswordField, getStrength } from '@/components/password-field';
+import { PasswordField, getStrength, passwordMeetsPolicy } from '@/components/password-field';
 
 const NAME_MIN = 3;
 const NAME_MAX = 20;
@@ -47,10 +47,13 @@ interface PhoneFieldProps {
   value: string;   // raw digits, max 10
   onChange: (v: string) => void;
   touched: boolean;
+  /** Reports true only once the number is well-formed AND confirmed not
+   *  already registered — lets the parent gate the submit button on it. */
+  onValidChange: (valid: boolean) => void;
 }
 type DuplicateState = 'idle' | 'checking' | 'used' | 'free';
 
-function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
+function PhoneField({ value, onChange, touched, onValidChange }: PhoneFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const validation = touched && value.length > 0 ? validatePhone(value) : { valid: false };
   const isError = touched && value.length > 0 && !validation.valid && !!validation.error;
@@ -62,6 +65,11 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
   /* A duplicate number is still an error state — border/label must turn
      red, never stay green, even though the format itself is valid. */
   const statusCls = isValid && !isDuplicate ? 'is-valid' : isError || isDuplicate ? 'is-error' : '';
+
+  useEffect(() => {
+    onValidChange(isValid && dup === 'free');
+  }, [isValid, dup, onValidChange]);
+
   useEffect(() => {
     if (!isValid) {
       setDup('idle');
@@ -198,10 +206,13 @@ function PhoneField({ value, onChange, touched }: PhoneFieldProps) {
 interface EmailFieldProps {
   value: string;
   onChange: (v: string) => void;
+  /** Reports true only once the address is a Gmail-format match AND
+   *  confirmed not already registered — lets the parent gate submit. */
+  onValidChange: (valid: boolean) => void;
 }
 type EmailDuplicateState = 'idle' | 'checking' | 'used' | 'free';
 
-function EmailField({ value, onChange }: EmailFieldProps) {
+function EmailField({ value, onChange, onValidChange }: EmailFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const trimmed = value.trim();
   const formatValid = trimmed !== '' && /^[^\s@]+@gmail\.com$/i.test(trimmed);
@@ -212,6 +223,10 @@ function EmailField({ value, onChange }: EmailFieldProps) {
   const isDuplicate = formatValid && dup === 'used';
   const isValid = formatValid && dup === 'free';
   const statusCls = isValid ? 'is-valid' : isFormatError || isDuplicate ? 'is-error' : '';
+
+  useEffect(() => {
+    onValidChange(isValid);
+  }, [isValid, onValidChange]);
 
   useEffect(() => {
     if (!formatValid) {
@@ -368,6 +383,11 @@ export default function SignupPage() {
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [password, setPassword] = useState('');
   const [keyboardOpen, setKeyboardOpen] = useState(false);
+  /* Mirrors EmailField/PhoneField's own live format + duplicate checks so
+     the submit button can stay disabled until every field is genuinely
+     usable, not just non-empty. */
+  const [emailValid, setEmailValid] = useState(false);
+  const [phoneValid, setPhoneValid] = useState(false);
 
   useEffect(() => {
     const viewport = window.visualViewport;
@@ -401,6 +421,13 @@ export default function SignupPage() {
 
   const nameTrimmedLen = name.trim().length;
   const nameLiveStatus: FieldStatus = name === '' ? 'default' : nameTrimmedLen < NAME_MIN ? 'error' : 'valid';
+  const nameValid = nameTrimmedLen >= NAME_MIN && nameTrimmedLen <= NAME_MAX;
+  const passwordValid = passwordMeetsPolicy(password);
+
+  /* Every field must be genuinely valid (not just filled) before the
+     submit button lights up — mirrors the same "checked, not just typed"
+     gating already used on the forgot-password email step. */
+  const formValid = nameValid && emailValid && phoneValid && passwordValid && termsAccepted;
   const nameAtMax = name.length >= NAME_MAX;
 
   function validateName(v: string) {
@@ -527,7 +554,7 @@ export default function SignupPage() {
           />
 
           {/* Email — Gmail only, dot-trick-aware duplicate check */}
-          <EmailField value={email} onChange={setEmail} />
+          <EmailField value={email} onChange={setEmail} onValidChange={setEmailValid} />
 
           {/* Phone */}
           <PhoneField
@@ -537,6 +564,7 @@ export default function SignupPage() {
               if (!phoneTouched && v.length > 0) setPhoneTouched(true);
             }}
             touched={phoneTouched}
+            onValidChange={setPhoneValid}
           />
 
           {/* Password */}
@@ -554,9 +582,12 @@ export default function SignupPage() {
             )}
           </div>
 
-          {/* Submit */}
+          {/* Submit — stays dimmed/disabled until every field above is
+              genuinely valid (checked, not just filled), so users can't
+              submit and get bounced back with an error. */}
           <CutSubmitButton
             loading={loading}
+            disabled={!formValid}
             label="Sign Up"
             loadingLabel="Creating account…"
           />
