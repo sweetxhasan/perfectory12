@@ -38,7 +38,7 @@ export function CutIconBox({ children, className = '', tone = 'soft' }: { childr
 function CutFrameStrokes({
   stroke = 'url(#cut-brand-gradient)',
   strokeWidth = 1.4,
-  innerStroke = 'url(#cut-brand-gradient)',
+  innerStroke = 'oklch(0.15 0 0 / 0.08)',
   className = '',
 }: {
   stroke?: string;
@@ -89,7 +89,7 @@ export function CutFrame({
     return (
       <span aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
         <span className="absolute inset-0 bg-background" style={{ clipPath: CUT_FRAME_CLIP_PATH }} />
-        <CutFrameStrokes stroke="oklch(1 0 0 / 0.9)" strokeWidth={1} innerStroke="url(#cut-brand-gradient)" />
+        <CutFrameStrokes stroke="oklch(1 0 0 / 0.9)" strokeWidth={1} innerStroke="oklch(0.15 0 0 / 0.12)" />
       </span>
     );
   }
@@ -122,7 +122,6 @@ export function CutFrame({
         />
         <CutFrameStrokes
           stroke="transparent"
-          innerStroke="url(#cut-brand-gradient)"
           className="opacity-0 transition-opacity duration-200 group-hover:opacity-100 [&_path:first-child]:transition-[stroke] [&_path:first-child]:duration-200 group-hover:[&_path:first-child]:stroke-[var(--border)]"
         />
       </span>
