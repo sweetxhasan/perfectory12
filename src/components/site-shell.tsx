@@ -618,14 +618,14 @@ function SidebarUserCard({
             </Link>
           </>
         ) : (
-          <>
-            <Icon name="crown" size={22} className="mx-auto text-brand-2" />
-            <p className="mt-2 text-xs text-muted-foreground">Sign up and get 10 free credits</p>
-            <Link href="/signup" onClick={onNavigate} className="group relative mt-3 inline-flex items-center px-4 py-1.5 text-xs font-semibold text-primary-foreground transition active:scale-[0.97]">
-              <CutFrame variant="primary" cut={7} />
-              <span className="relative z-10">Get started</span>
+          <div className="flex items-center gap-2">
+            <Icon name="crown" size={16} className="shrink-0 text-brand-2" />
+            <p className="flex-1 text-left text-[11px] leading-tight text-muted-foreground">Sign up and get 10 free credits</p>
+            <Link href="/signup" onClick={onNavigate} className="group relative inline-flex shrink-0 items-center px-3 py-1.5 text-[11px] font-semibold text-primary-foreground transition active:scale-[0.97]">
+              <CutFrame variant="primary" cut={6} />
+              <span className="relative z-10 whitespace-nowrap">Get started</span>
             </Link>
-          </>
+          </div>
         )}
       </CutPanel>
     </div>
