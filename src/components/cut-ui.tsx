@@ -31,7 +31,7 @@ export function CutButton({
 }
 
 export function CutIconBox({ children, className = '', tone = 'soft' }: { children: ReactNode; className?: string; tone?: 'soft' | 'brand' | 'card' }) {
-  return <CutPanel tone={tone} className={`size-14 ${className}`} contentClassName="flex items-center justify-center text-brand">{children}</CutPanel>;
+  return <CutPanel tone={tone} className={`size-14 ${className}`} contentClassName="flex items-center justify-center text-primary-foreground">{children}</CutPanel>;
 }
 
 /** Shared double-stroke SVG overlay — identical to the Login/Signup <CutFrame>. */
@@ -116,7 +116,7 @@ export function CutFrame({
   return (
     <span aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
       <span
-        className="absolute inset-0 bg-card transition-colors duration-200 group-hover:bg-secondary/70"
+        className="absolute inset-0 bg-transparent transition-colors duration-200 group-hover:bg-transparent"
         style={{ clipPath: CUT_FRAME_CLIP_PATH }}
       />
       <CutFrameStrokes className="[&_path:first-child]:transition-[stroke] [&_path:first-child]:duration-200 group-hover:[&_path:first-child]:stroke-[var(--brand-2)]" />
