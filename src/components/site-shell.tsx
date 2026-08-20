@@ -801,7 +801,7 @@ function NewsletterEmailField({ value, onChange, duplicate, onStatusClick }: {
   const isValid = formatValid && duplicate === 'free';
   const statusLabel = isUsed ? 'This email is already subscribed.' : isFormatError ? 'Only Gmail addresses are supported.' : 'Email is valid.';
   return (
-    <div className={`relative flex min-h-14 min-w-0 flex-1 items-center overflow-hidden ${isValid ? 'text-emerald-600' : isFormatError || isUsed ? 'text-destructive' : 'text-muted-foreground'}`}>
+    <div className={`relative flex h-10 min-h-10 min-w-0 flex-1 items-center overflow-hidden sm:h-14 sm:min-h-14 ${isValid ? 'text-emerald-600' : isFormatError || isUsed ? 'text-destructive' : 'text-muted-foreground'}`}>
       <CutFrame />
       <span className="relative z-10 pl-4"><Icon name="mail" size={18} /></span>
       <input
@@ -889,7 +889,7 @@ function SiteFooter() {
                   duplicate={duplicate}
                   onStatusClick={() => setErrMsg('')}
                 />
-                <CutButton type="submit" variant="primary" disabled={status === 'loading'} aria-label="Subscribe to newsletter" className="min-h-14 shrink-0 px-3 py-3 text-xs text-primary-foreground sm:px-4 sm:text-sm">
+                <CutButton type="submit" variant="primary" disabled={status === 'loading'} aria-label="Subscribe to newsletter" className="h-10 min-h-10 shrink-0 px-2.5 py-2 text-[11px] text-primary-foreground sm:h-14 sm:min-h-14 sm:px-4 sm:py-3 sm:text-sm">
                   {status === 'loading' ? 'Checking...' : 'Subscribe'}
                 </CutButton>
               </form>
