@@ -639,7 +639,7 @@ function SidebarUserCard({
   );
 }
 
-/* ����─ Bottom quick-links: About · Contact · Privacy ───── */
+/* ����─ Bottom quick-links: About · Contact · Privacy ───���─ */
 const quickLinks: NavItem[] = [
   { label: 'About',   href: '/about',   icon: 'users'  },
   { label: 'Contact', href: '/contact', icon: 'chat'   },
@@ -801,7 +801,7 @@ function NewsletterEmailField({ value, onChange, duplicate, onStatusClick }: {
   const isValid = formatValid && duplicate === 'free';
   const statusLabel = isUsed ? 'This email is already subscribed.' : isFormatError ? 'Only Gmail addresses are supported.' : 'Email is valid.';
   return (
-    <div className={`relative flex min-h-14 min-w-0 flex-1 items-center ${isValid ? 'text-emerald-600' : isFormatError || isUsed ? 'text-destructive' : 'text-muted-foreground'}`}>
+    <div className={`relative flex min-h-14 min-w-0 flex-1 items-center overflow-hidden ${isValid ? 'text-emerald-600' : isFormatError || isUsed ? 'text-destructive' : 'text-muted-foreground'}`}>
       <CutFrame />
       <span className="relative z-10 pl-4"><Icon name="mail" size={18} /></span>
       <input
@@ -877,10 +877,10 @@ function SiteFooter() {
             <h4 className="text-sm font-semibold">Newsletter</h4>
             <p className="mt-1 text-xs text-muted-foreground">Get updates, tips and new feature announcements.</p>
             {status === 'success' ? (
-              <div className="mt-3 flex items-center gap-2 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-600">
+              <CutPanel tone="soft" className="mt-3" contentClassName="flex items-center gap-2 px-4 py-3 text-sm text-emerald-600">
                 <Icon name="check" size={16} />
                 <span>Thank you for subscribing.</span>
-              </div>
+              </CutPanel>
             ) : (
               <form onSubmit={handleSubscribe} className="mt-3 flex flex-col gap-3 sm:flex-row">
                 <NewsletterEmailField
@@ -889,7 +889,7 @@ function SiteFooter() {
                   duplicate={duplicate}
                   onStatusClick={() => setErrMsg('')}
                 />
-                <CutButton type="submit" variant="primary" disabled={status === 'loading'} className="shrink-0 px-5 py-3 text-primary-foreground">
+                <CutButton type="submit" variant="primary" disabled={status === 'loading'} aria-label="Subscribe to newsletter" className="shrink-0 px-5 py-3 text-primary-foreground">
                   {status === 'loading' ? 'Checking...' : 'Subscribe'}
                 </CutButton>
               </form>
