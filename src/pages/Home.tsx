@@ -133,8 +133,7 @@ function VoiceStudioCard() {
         </div>
 
         {/* Text input area */}
-        <div className="relative min-h-[72px] overflow-hidden rounded-xl border px-4 py-3"
-          style={{ borderColor: `${v.accent}30`, background: `${v.accent}06` }}>
+        <CutPanel tone="card" className="relative min-h-[72px] overflow-hidden" contentClassName="px-4 py-3" style={{ background: `${v.accent}06` }}>
           {/* Corner label */}
           <span className="absolute right-3 top-2 text-[9px] font-bold uppercase tracking-widest"
             style={{ color: v.accent, opacity: 0.5 }}>Input</span>
@@ -143,7 +142,7 @@ function VoiceStudioCard() {
             <span className="ml-0.5 inline-block h-[15px] w-[2px] align-middle rounded-sm animate-[pv-blink_.7s_step-end_infinite]"
               style={{ background: v.accent }} />
           </p>
-        </div>
+        </CutPanel>
 
         {/* Converting progress bar */}
         {isConverting && (
@@ -164,8 +163,7 @@ function VoiceStudioCard() {
 
         {/* Waveform */}
         {(isPlaying || stage === 'done') && (
-          <div className="pv-fadein relative overflow-hidden rounded-xl border px-4 py-3"
-            style={{ borderColor: `${v.accent}30`, background: `${v.accent}06` }}>
+          <CutPanel tone="card" className="pv-fadein relative overflow-hidden" contentClassName="px-4 py-3" style={{ background: `${v.accent}06` }}>
             <div className="mb-2 flex items-center justify-between">
               <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">Waveform Output</span>
               {isPlaying && (
@@ -205,7 +203,7 @@ function VoiceStudioCard() {
                   }} />
               </div>
             )}
-          </div>
+          </CutPanel>
         )}
 
         {/* Voice metadata row */}
