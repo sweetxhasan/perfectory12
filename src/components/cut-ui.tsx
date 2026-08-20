@@ -25,7 +25,7 @@ export function CutButton({
   return (
     <button {...props} className={`group relative inline-flex items-center justify-center gap-2 overflow-hidden px-5 py-3 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60 ${className}`}>
       <CutFrame variant={variant} />
-      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+      <span className={`relative z-10 inline-flex items-center gap-2 ${variant === 'primary' ? 'text-primary-foreground' : ''}`}>{children}</span>
     </button>
   );
 }

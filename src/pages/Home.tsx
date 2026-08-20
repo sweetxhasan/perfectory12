@@ -124,7 +124,7 @@ function VoiceStudioCard() {
           {VOICES.map((vv, i) => (
             <CutButton key={vv.lang} type="button" onClick={() => setIdx(i)}
               variant={i === idx ? 'primary' : 'outline'}
-              className="px-3 py-2 text-[11px]"
+              className={`px-3 py-2 text-[11px] ${i === idx ? 'text-primary-foreground' : 'text-muted-foreground'}`}
               style={i === idx ? { boxShadow: `0 0 10px ${vv.accent}30` } : { opacity: 0.65 }}>
               <span>{vv.flag}</span>
               {vv.native}
@@ -292,7 +292,7 @@ export default function HomePage() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
             <CutPanel key={f.title} tone="card" className="group transition hover:-translate-y-1 hover:ring-glow" contentClassName="p-6 text-center">
-              <CutIconBox className="mx-auto transition group-hover:text-primary-foreground" tone="soft"><Icon name={f.icon} size={24} /></CutIconBox>
+              <CutIconBox className="mx-auto text-primary-foreground transition group-hover:scale-105" tone="brand"><Icon name={f.icon} size={24} /></CutIconBox>
               <h3 className="mt-4 text-lg text-gradient">{f.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
             </CutPanel>
@@ -331,7 +331,7 @@ export default function HomePage() {
               </CutButton>
             </Link>
             <Link href="/generator">
-              <CutButton variant="ghost" className="text-primary-foreground">
+              <CutButton variant="outline" className="text-foreground">
                 Try the generator <Icon name="arrow-right" size={18} />
               </CutButton>
             </Link>
