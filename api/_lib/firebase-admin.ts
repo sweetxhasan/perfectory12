@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { initializeApp, getApps, getApp, cert, type App, type ServiceAccount } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
 
@@ -9,25 +11,53 @@ import { getAuth, type Auth } from 'firebase-admin/auth';
  * avoids the Admin SDK — see api/_lib/admin-auth.ts and
  * api/_lib/firebase-server.ts for why. This file is the single exception.
  *
- * Configured via the FIREBASE_SERVICE_ACCOUNT_KEY environment variable,
- * holding the full service-account JSON (as downloaded from Firebase
- * Console → Project settings → Service accounts → Generate new private
- * key). If it's missing or invalid, `isAdminConfigured()` reports false
- * and every caller degrades gracefully (503) instead of throwing.
+ * Credentials are loaded from a local, git-ignored JSON file
+ * (api/_lib/firebase-service-account.json — the exact file downloaded from
+ * Firebase Console → Project settings → Service accounts → Generate new
+ * private key). That file is listed in .gitignore so it is never pushed to
+ * GitHub or committed anywhere. As a fallback (e.g. for deployments where
+ * the file isn't present), the FIREBASE_SERVICE_ACCOUNT_KEY environment
+ * variable is also supported. If neither is available or valid,
+ * `isAdminConfigured()` reports false and every caller degrades
+ * gracefully (503) instead of throwing.
  */
 
 const APP_NAME = 'firebase-admin';
+const SERVICE_ACCOUNT_FILE = join(__dirname, 'firebase-service-account.json');
 
-function parseServiceAccount(): ServiceAccount | null {
+function isValidServiceAccount(value: unknown): value is ServiceAccount {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    !!(value as Record<string, unknown>).project_id &&
+    !!(value as Record<string, unknown>).client_email &&
+    !!(value as Record<string, unknown>).private_key
+  );
+}
+
+function readServiceAccountFile(): ServiceAccount | null {
+  try {
+    const raw = readFileSync(SERVICE_ACCOUNT_FILE, 'utf-8');
+    const parsed = JSON.parse(raw);
+    return isValidServiceAccount(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function readServiceAccountEnv(): ServiceAccount | null {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
   if (!raw || !raw.trim()) return null;
   try {
     const parsed = JSON.parse(raw);
-    if (!parsed.project_id || !parsed.client_email || !parsed.private_key) return null;
-    return parsed as ServiceAccount;
+    return isValidServiceAccount(parsed) ? parsed : null;
   } catch {
     return null;
   }
+}
+
+function parseServiceAccount(): ServiceAccount | null {
+  return readServiceAccountFile() ?? readServiceAccountEnv();
 }
 
 let cachedApp: App | null | undefined;

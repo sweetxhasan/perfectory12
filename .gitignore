@@ -9,6 +9,9 @@ __v0_jsx-dev-runtime.ts
 # Environment variables
 .env*.local
 
+# Secrets - never commit service account credentials
+api/_lib/firebase-service-account.json
+
 # Common ignores
 node_modules
 .next/
