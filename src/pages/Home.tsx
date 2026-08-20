@@ -4,7 +4,6 @@ import { SiteShell } from '@/components/site-shell';
 import { GoogleOneTap } from '@/components/google-one-tap';
 import { LineBg } from '@/components/line-bg';
 import { Icon, type IconName } from '@/components/icon';
-import { GradientButton, OutlineButton } from '@/components/primitives';
 import { CutButton, CutIconBox, CutPanel } from '@/components/cut-ui';
 import { SEOHead, SCHEMA_WEBAPP, SCHEMA_WEBSITE, SCHEMA_ORGANIZATION } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
@@ -123,14 +122,13 @@ function VoiceStudioCard() {
         {/* Language switcher pills */}
         <div className="flex gap-2">
           {VOICES.map((vv, i) => (
-            <button key={vv.lang} onClick={() => setIdx(i)}
-              className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold transition-all duration-300"
-              style={i === idx
-                ? { borderColor: vv.accent, background: `${vv.accent}18`, color: vv.accent, boxShadow: `0 0 10px ${vv.accent}30` }
-                : { borderColor: 'var(--border)', color: 'var(--muted-foreground)', opacity: 0.55 }}>
+            <CutButton key={vv.lang} type="button" onClick={() => setIdx(i)}
+              variant={i === idx ? 'primary' : 'outline'}
+              className="px-3 py-2 text-[11px]"
+              style={i === idx ? { boxShadow: `0 0 10px ${vv.accent}30` } : { opacity: 0.65 }}>
               <span>{vv.flag}</span>
               {vv.native}
-            </button>
+            </CutButton>
           ))}
         </div>
 
@@ -226,11 +224,10 @@ function VoiceStudioCard() {
           </div>
 
           <Link href="/generator">
-            <button className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-[11px] font-bold text-white shadow transition hover:opacity-90 active:scale-95"
-              style={{ background: `linear-gradient(-45deg,${v.accent},${v.accent}cc)`, boxShadow: `0 4px 14px ${v.accent}44` }}>
+            <CutButton variant="primary" className="px-3.5 py-2 text-[11px] text-primary-foreground" style={{ boxShadow: `0 4px 14px ${v.accent}44` }}>
               Try Free
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
+              <Icon name="arrow-right" size={14} />
+            </CutButton>
   </Link>
   </div>
   </div>
@@ -265,10 +262,14 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
               <Link href="/generator">
-                <GradientButton icon="arrow-right" iconRight>Start Generating</GradientButton>
+                <CutButton variant="primary" className="text-primary-foreground">
+                  Start Generating <Icon name="arrow-right" size={18} />
+                </CutButton>
               </Link>
               <Link href="/plans">
-                <OutlineButton icon="crown">View Plans</OutlineButton>
+                <CutButton variant="outline">
+                  <Icon name="crown" size={18} /> View Plans
+                </CutButton>
               </Link>
             </div>
           </div>
