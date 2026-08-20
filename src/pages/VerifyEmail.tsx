@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ClipboardEvent, type KeyboardEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth-context';
 import { AuthLayout } from '@/components/auth-layout';
@@ -9,6 +9,7 @@ import { CutSubmitButton } from '@/components/cut-submit-button';
 import { Icon } from '@/components/icon';
 import { updateUserProfile } from '@/lib/user-store';
 import { requestSignupCode, confirmSignupCode } from '@/lib/email-verify';
+import { CutOtpInput } from '@/components/otp-input';
 
 const CODE_LENGTH = 6;
 
@@ -25,13 +26,12 @@ export default function VerifyEmailPage() {
   const { user, profile, loading, logout, refreshProfile } = useAuth();
   const [, setLocation] = useLocation();
 
-  const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''));
+  const [code, setCode] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
   const [resending, setResending] = useState(false);
   const [sentOnce, setSentOnce] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const isVerified = profile?.emailVerified !== false;
 
@@ -69,69 +69,6 @@ export default function VerifyEmailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, user, isVerified, email, sentOnce]);
 
-  useEffect(() => {
-    if (!loading && user && !isVerified) setTimeout(() => inputRefs.current[0]?.focus(), 50);
-  }, [loading, user, isVerified]);
-
-  const code = digits.join('');
-
-  function setDigitAt(index: number, value: string) {
-    setDigits((prev) => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
-    });
-  }
-
-  function handleChange(index: number, raw: string) {
-    const value = raw.replace(/\D/g, '').slice(-1);
-    setDigitAt(index, value);
-    if (error) setError('');
-    if (value && index < CODE_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  }
-
-  function handleKeyDown(index: number, e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Backspace') {
-      // Deleting is a single keypress per digit: clear whatever the
-      // current box holds and immediately hop back one box, so holding
-      // Backspace erases the whole code without ever clicking into
-      // another input.
-      e.preventDefault();
-      if (digits[index]) {
-        setDigitAt(index, '');
-        if (index > 0) inputRefs.current[index - 1]?.focus();
-      } else if (index > 0) {
-        inputRefs.current[index - 1]?.focus();
-        setDigitAt(index - 1, '');
-      }
-      if (error) setError('');
-    } else if (e.key === 'ArrowLeft' && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    } else if (e.key === 'ArrowRight' && index < CODE_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  }
-
-  function handlePaste(e: ClipboardEvent<HTMLInputElement>) {
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
-    if (!pasted) return;
-    e.preventDefault();
-    // Always fill starting from the very first box, no matter which box
-    // the paste landed in.
-    setDigits(() => {
-      const next = Array(CODE_LENGTH).fill('');
-      for (let i = 0; i < CODE_LENGTH && i < pasted.length; i++) {
-        next[i] = pasted[i];
-      }
-      return next;
-    });
-    const lastFilled = Math.min(pasted.length, CODE_LENGTH) - 1;
-    inputRefs.current[Math.max(lastFilled, 0)]?.focus();
-    if (error) setError('');
-  }
-
   async function handleVerify() {
     if (code.length !== CODE_LENGTH || !user) {
       setError('Please enter the full 6-digit code.');
@@ -151,8 +88,7 @@ export default function VerifyEmailPage() {
       setLocation('/dashboard');
     } catch (err) {
       setError((err as Error).message || 'Invalid code. Please try again.');
-      setDigits(Array(CODE_LENGTH).fill(''));
-      inputRefs.current[0]?.focus();
+      setCode('');
     } finally {
       setVerifying(false);
     }
@@ -194,26 +130,14 @@ export default function VerifyEmailPage() {
           </p>
 
           {/* Code inputs */}
-          <div className="mt-6 flex justify-center gap-2 sm:gap-2.5">
-            {digits.map((d, i) => (
-              <div key={i} className="pv-cut-field relative h-12 w-10 sm:h-14 sm:w-12">
-                <div className="pv-cut-bg" />
-                <CutFrame />
-                <input
-                  ref={(el) => { inputRefs.current[i] = el; }}
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete={i === 0 ? 'one-time-code' : 'off'}
-                  maxLength={1}
-                  value={d}
-                  onChange={(e) => handleChange(i, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(i, e)}
-                  onPaste={handlePaste}
-                  aria-label={`Digit ${i + 1} of ${CODE_LENGTH}`}
-                  className="relative z-20 h-full w-full bg-transparent text-center text-lg font-bold text-foreground outline-none sm:text-xl"
-                />
-              </div>
-            ))}
+          <div className="mt-6 w-full">
+            <CutOtpInput
+              length={CODE_LENGTH}
+              value={code}
+              onChange={(next) => { setCode(next); if (error) setError(''); }}
+              autoFocus
+              ariaLabel="Verification code"
+            />
           </div>
 
           {/* Error container */}

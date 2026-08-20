@@ -216,6 +216,17 @@
   box-shadow: 0 0 0 4px color-mix(in oklch, var(--brand-2) 10%, transparent);
 }
 
+/* OTP slots: input-otp renders one shared, visually-hidden input rather
+   than nesting a real <input> inside each box, so :focus-within never
+   fires per-slot — this mirrors that same focus look, driven by the
+   library's own isActive flag instead. */
+.pv-cut-field.pv-otp-slot-active .pv-cut-frame { stroke: var(--brand-2); stroke-width: 1.6; }
+.pv-cut-field.pv-otp-slot-active .pv-cut-frame-inner { stroke: color-mix(in oklch, var(--brand-2) 20%, transparent); }
+.pv-cut-field.pv-otp-slot-active .pv-cut-bg {
+  background: color-mix(in oklch, var(--card) 100%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--brand-2) 10%, transparent);
+}
+
 .pv-cut-field.is-valid .pv-cut-frame { stroke: oklch(0.72 0.17 152); }
 .pv-cut-field.is-valid .pv-cut-frame-inner { stroke: color-mix(in oklch, oklch(0.72 0.17 152) 22%, transparent); }
 .pv-field-wrap.is-valid .pv-cut-label { color: oklch(0.6 0.15 152) !important; }
@@ -507,6 +518,13 @@
   transform-origin: center;
   animation: pulse-bar 1.1s ease-in-out infinite;
 }
+
+/* ── OTP fake caret ────────────────────────────────────────────────── */
+@keyframes pv-otp-caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.pv-otp-caret { animation: pv-otp-caret-blink 1.1s step-end infinite; }
 
 /* ── Shake ─────────────────────────────────────────────────────────── */
 @keyframes shake {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'wouter';
 import { isEmailUsed } from '@/lib/user-store';
 import { requestResetCode, confirmResetCode, submitNewPassword } from '@/lib/password-reset';
@@ -10,6 +10,7 @@ import { PremiumTooltip } from '@/components/premium-tooltip';
 import { Icon } from '@/components/icon';
 import { FloatingField } from '@/components/floating-field';
 import { PasswordField, passwordMeetsPolicy } from '@/components/password-field';
+import { CutOtpInput } from '@/components/otp-input';
 
 const CODE_LENGTH = 6;
 
@@ -248,90 +249,6 @@ function ResetEmailField({
   );
 }
 
-/**
- * 6-box OTP code input — same cut-frame boxes, paste-fills-from-first-box,
- * and backspace-hops-back behavior as VerifyEmail's signup code entry.
- */
-function OtpCodeInputs({
-  digits,
-  onDigitsChange,
-  autoFocus,
-}: {
-  digits: string[];
-  onDigitsChange: (next: string[]) => void;
-  autoFocus?: boolean;
-}) {
-  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
-
-  useEffect(() => {
-    if (autoFocus) setTimeout(() => inputRefs.current[0]?.focus(), 50);
-  }, [autoFocus]);
-
-  function setDigitAt(index: number, value: string) {
-    const next = [...digits];
-    next[index] = value;
-    onDigitsChange(next);
-  }
-
-  function handleChange(index: number, raw: string) {
-    const value = raw.replace(/\D/g, '').slice(-1);
-    setDigitAt(index, value);
-    if (value && index < CODE_LENGTH - 1) inputRefs.current[index + 1]?.focus();
-  }
-
-  function handleKeyDown(index: number, e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Backspace') {
-      e.preventDefault();
-      if (digits[index]) {
-        setDigitAt(index, '');
-        if (index > 0) inputRefs.current[index - 1]?.focus();
-      } else if (index > 0) {
-        inputRefs.current[index - 1]?.focus();
-        setDigitAt(index - 1, '');
-      }
-    } else if (e.key === 'ArrowLeft' && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    } else if (e.key === 'ArrowRight' && index < CODE_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  }
-
-  function handlePaste(e: ClipboardEvent<HTMLInputElement>) {
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
-    if (!pasted) return;
-    e.preventDefault();
-    const next = Array(CODE_LENGTH).fill('');
-    for (let i = 0; i < CODE_LENGTH && i < pasted.length; i++) next[i] = pasted[i];
-    onDigitsChange(next);
-    const lastFilled = Math.min(pasted.length, CODE_LENGTH) - 1;
-    inputRefs.current[Math.max(lastFilled, 0)]?.focus();
-  }
-
-  return (
-    <div className="flex justify-center gap-2 sm:gap-2.5">
-      {digits.map((d, i) => (
-        <div key={i} className="pv-cut-field relative h-12 w-10 sm:h-14 sm:w-12">
-          <div className="pv-cut-bg" />
-          <CutFrame />
-          <input
-            ref={(el) => { inputRefs.current[i] = el; }}
-            type="text"
-            inputMode="numeric"
-            autoComplete={i === 0 ? 'one-time-code' : 'off'}
-            maxLength={1}
-            value={d}
-            onChange={(e) => handleChange(i, e.target.value)}
-            onKeyDown={(e) => handleKeyDown(i, e)}
-            onPaste={handlePaste}
-            aria-label={`Digit ${i + 1} of ${CODE_LENGTH}`}
-            className="relative z-20 h-full w-full bg-transparent text-center text-lg font-bold text-foreground outline-none sm:text-xl"
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /** Plain "confirm password" field — no strength meter, just a live match check against the new password. */
 function ConfirmPasswordField({
   value,
@@ -388,7 +305,7 @@ type Step = 'email' | 'code' | 'password' | 'done';
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
-  const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''));
+  const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -402,8 +319,6 @@ export default function ForgotPasswordPage() {
    *  "no account found" tooltip remounts and auto-opens again even if it
    *  had already auto-closed from an earlier keystroke check. */
   const [notFoundSignal, setNotFoundSignal] = useState(0);
-
-  const code = digits.join('');
 
   async function onSubmitEmail(e: FormEvent) {
     e.preventDefault();
@@ -422,7 +337,7 @@ export default function ForgotPasswordPage() {
         return;
       }
       await requestResetCode(trimmed);
-      setDigits(Array(CODE_LENGTH).fill(''));
+      setCode('');
       setStep('code');
     } catch (err) {
       setError((err as Error).message || 'We could not send the reset code. Please try again.');
@@ -436,7 +351,7 @@ export default function ForgotPasswordPage() {
     setError('');
     try {
       await requestResetCode(email.trim());
-      setDigits(Array(CODE_LENGTH).fill(''));
+      setCode('');
     } catch (err) {
       setError((err as Error).message || 'Failed to resend the code.');
     } finally {
@@ -456,7 +371,7 @@ export default function ForgotPasswordPage() {
       setStep('password');
     } catch (err) {
       setError((err as Error).message || 'Invalid code. Please try again.');
-      setDigits(Array(CODE_LENGTH).fill(''));
+      setCode('');
     } finally {
       setLoading(false);
     }
@@ -526,7 +441,13 @@ export default function ForgotPasswordPage() {
             </p>
 
             <div className="mt-6 w-full">
-              <OtpCodeInputs digits={digits} onDigitsChange={(next) => { setDigits(next); if (error) setError(''); }} autoFocus />
+              <CutOtpInput
+                length={CODE_LENGTH}
+                value={code}
+                onChange={(next) => { setCode(next); if (error) setError(''); }}
+                autoFocus
+                ariaLabel="Reset code"
+              />
             </div>
 
             <div className="mt-6 w-full">
