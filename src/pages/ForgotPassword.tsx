@@ -109,10 +109,14 @@ function ResetEmailField({
   value,
   onChange,
   notFoundSignal,
+  onCheckChange,
 }: {
   value: string;
   onChange: (v: string) => void;
   notFoundSignal: number;
+  /** Reports the live lookup state up to the parent so it can gate the
+   *  "Send reset code" submit button until the account is confirmed. */
+  onCheckChange: (check: CheckState) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const trimmed = value.trim();
@@ -123,6 +127,10 @@ function ResetEmailField({
   const notFound = formatValid && check === 'not_found';
   const isValid = formatValid && check === 'exists';
   const statusCls = isValid ? 'is-valid' : isFormatError || notFound ? 'is-error' : '';
+
+  useEffect(() => {
+    onCheckChange(formatValid ? check : 'idle');
+  }, [formatValid, check, onCheckChange]);
 
   useEffect(() => {
     if (!formatValid) {
@@ -387,6 +395,9 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError] = useState('');
+  /** Mirrors ResetEmailField's live account lookup — the "Send reset code"
+   *  button stays disabled (dimmed) until this reaches 'exists'. */
+  const [emailCheck, setEmailCheck] = useState<CheckState>('idle');
   /** Bumped whenever a Send click is blocked by a missing account, so the
    *  "no account found" tooltip remounts and auto-opens again even if it
    *  had already auto-closed from an earlier keystroke check. */
@@ -564,12 +575,12 @@ export default function ForgotPasswordPage() {
         <ResetCard>
           {error && <ErrorBanner message={error} />}
           <form onSubmit={onSubmitEmail} className="flex flex-col gap-5">
-            <ResetEmailField value={email} onChange={setEmail} notFoundSignal={notFoundSignal} />
+            <ResetEmailField value={email} onChange={setEmail} notFoundSignal={notFoundSignal} onCheckChange={setEmailCheck} />
             <CutSubmitButton
               label="Send reset code"
               loadingLabel="Checking your account..."
               loading={loading}
-              disabled={loading}
+              disabled={loading || emailCheck !== 'exists'}
             />
           </form>
 

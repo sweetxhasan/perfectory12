@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { initializeApp, getApps, getApp, cert, type App, type ServiceAccount } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
 
@@ -23,7 +24,11 @@ import { getAuth, type Auth } from 'firebase-admin/auth';
  */
 
 const APP_NAME = 'firebase-admin';
-const SERVICE_ACCOUNT_FILE = join(__dirname, 'firebase-service-account.json');
+// This project runs as native ESM ("type": "module" in package.json), so the
+// CommonJS __dirname global doesn't exist here — derive the equivalent from
+// import.meta.url instead.
+const CURRENT_DIR = dirname(fileURLToPath(import.meta.url));
+const SERVICE_ACCOUNT_FILE = join(CURRENT_DIR, 'firebase-service-account.json');
 
 function isValidServiceAccount(value: unknown): value is ServiceAccount {
   return (
