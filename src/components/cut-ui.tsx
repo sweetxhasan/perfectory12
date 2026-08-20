@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
 import { CUT_FRAME_PATH, CUT_FRAME_INNER_PATH, CUT_FRAME_CLIP_PATH } from './cut-frame';
 
 /**
@@ -15,6 +15,24 @@ export function cutClipPath() {
 export const CUT_BORDER = 1.4;
 
 export type CutVariant = 'primary' | 'outline' | 'ghost';
+
+export function CutButton({
+  children,
+  variant = 'outline',
+  className = '',
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: CutVariant }) {
+  return (
+    <button {...props} className={`group relative inline-flex items-center justify-center gap-2 overflow-hidden px-5 py-3 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60 ${className}`}>
+      <CutFrame variant={variant} />
+      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+    </button>
+  );
+}
+
+export function CutIconBox({ children, className = '', tone = 'soft' }: { children: ReactNode; className?: string; tone?: 'soft' | 'brand' | 'card' }) {
+  return <CutPanel tone={tone} className={`size-14 ${className}`} contentClassName="flex items-center justify-center text-brand">{children}</CutPanel>;
+}
 
 /** Shared double-stroke SVG overlay — identical to the Login/Signup <CutFrame>. */
 function CutFrameStrokes({

@@ -4,7 +4,8 @@ import { SiteShell } from '@/components/site-shell';
 import { GoogleOneTap } from '@/components/google-one-tap';
 import { LineBg } from '@/components/line-bg';
 import { Icon, type IconName } from '@/components/icon';
-import { GradientButton, OutlineButton, Panel, SectionBadge } from '@/components/primitives';
+import { GradientButton, OutlineButton } from '@/components/primitives';
+import { CutButton, CutIconBox, CutPanel } from '@/components/cut-ui';
 import { SEOHead, SCHEMA_WEBAPP, SCHEMA_WEBSITE, SCHEMA_ORGANIZATION } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
 
@@ -86,8 +87,8 @@ function VoiceStudioCard() {
   const isConverting = stage === 'converting';
 
   return (
-    <div className="mt-7 w-full overflow-hidden rounded-2xl border bg-card"
-      style={{ borderColor: `${v.accent}55` }}>
+    <CutPanel tone="card" className="mt-7 w-full overflow-hidden" contentClassName="bg-card/95">
+      <div className="border-b border-border/70" style={{ borderColor: `${v.accent}30` }}>
 
       <style>{`
         @keyframes pv-blink{0%,100%{opacity:1}50%{opacity:0}}
@@ -230,12 +231,14 @@ function VoiceStudioCard() {
               Try Free
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
-          </Link>
-        </div>
-      </div>
-    </div>
+  </Link>
+  </div>
+  </div>
+  </div>
+  </CutPanel>
   );
-}
+  }
+
 
 export default function HomePage() {
   return (
@@ -245,7 +248,7 @@ export default function HomePage() {
         schema={[SCHEMA_WEBAPP, SCHEMA_WEBSITE, SCHEMA_ORGANIZATION]}
       />
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-4xl border border-border bg-card">
+      <CutPanel tone="card" className="relative overflow-hidden" contentClassName="bg-card/90">
         <LineBg />
         <div className="relative grid items-center gap-8 p-6 sm:p-10 lg:grid-cols-2 lg:p-14">
           <div className="float-up text-center lg:text-left">
@@ -275,7 +278,7 @@ export default function HomePage() {
             <VoiceStudioCard />
           </div>
         </div>
-      </section>
+      </CutPanel>
 
       {/* Features */}
       <section className="mt-8">
@@ -287,36 +290,34 @@ export default function HomePage() {
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
-            <Panel key={f.title} className="group p-6 text-center transition hover:-translate-y-1 hover:ring-glow">
-              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-soft text-brand transition group-hover:bg-gradient-brand group-hover:text-primary-foreground">
-                <Icon name={f.icon} size={24} />
-              </span>
+            <CutPanel key={f.title} tone="card" className="group transition hover:-translate-y-1 hover:ring-glow" contentClassName="p-6 text-center">
+              <CutIconBox className="mx-auto transition group-hover:text-primary-foreground" tone="soft"><Icon name={f.icon} size={24} /></CutIconBox>
               <h3 className="mt-4 text-lg text-gradient">{f.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
-            </Panel>
+            </CutPanel>
           ))}
         </div>
       </section>
 
       {/* How it works */}
-      <section className="mt-10 overflow-hidden rounded-4xl border border-border bg-gradient-soft p-6 sm:p-10">
+      <CutPanel tone="soft" className="mt-10 overflow-hidden" contentClassName="p-6 sm:p-10">
         <div className="text-center">
 
           <h2 className="mt-4 text-balance text-3xl sm:text-4xl">Three simple steps</h2>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {steps.map((s) => (
-            <div key={s.n} className="relative rounded-3xl border border-border bg-card p-6 text-center">
+            <CutPanel key={s.n} tone="card" className="relative" contentClassName="p-6 text-center">
               <span className="text-4xl text-gradient">{s.n}</span>
               <h3 className="mt-3 text-lg">{s.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
-            </div>
+            </CutPanel>
           ))}
         </div>
-      </section>
+      </CutPanel>
 
       {/* CTA */}
-      <section className="relative mt-10 overflow-hidden rounded-4xl bg-gradient-brand p-8 text-center text-primary-foreground sm:p-14">
+      <CutPanel tone="brand" className="relative mt-10 overflow-hidden" contentClassName="p-8 text-center text-primary-foreground sm:p-14">
         <div className="relative">
           <h2 className="text-balance text-3xl sm:text-4xl">Ready to give your text a voice?</h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-primary-foreground/85">
@@ -324,18 +325,18 @@ export default function HomePage() {
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link href="/signup">
-              <button className="inline-flex items-center gap-2 rounded-2xl bg-background px-6 py-3 text-sm text-foreground transition hover:opacity-95 active:scale-[0.98]">
+              <CutButton variant="outline" className="text-foreground">
                 <Icon name="user" size={18} /> Create free account
-              </button>
+              </CutButton>
             </Link>
             <Link href="/generator">
-              <button className="inline-flex items-center gap-2 rounded-2xl border border-primary-foreground/40 px-6 py-3 text-sm transition hover:bg-primary-foreground/10">
+              <CutButton variant="ghost" className="text-primary-foreground">
                 Try the generator <Icon name="arrow-right" size={18} />
-              </button>
+              </CutButton>
             </Link>
           </div>
         </div>
-      </section>
+      </CutPanel>
       <GoogleOneTap />
     </SiteShell>
   );
