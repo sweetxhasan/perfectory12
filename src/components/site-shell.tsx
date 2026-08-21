@@ -281,13 +281,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
                         {notifications.length > 0 && (
                           confirmDeleteAll ? (
                             /* Inline compact confirm — replaces the button */
-                            <CutPanel tone="soft" className="shrink-0" contentClassName="flex items-center gap-1 px-2 py-1">
+                            <CutPanel tone="soft" className="shrink-0" contentClassName="flex items-center gap-0.5 px-1.5 py-0.5">
                               <span className="mr-0.5 text-[10px] font-medium text-destructive/80">Sure?</span>
                               <CutButton
                                 type="button"
                                 onClick={handleDeleteAll}
                                 variant="primary"
-                                className="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-2 py-0.5 text-[10px] text-primary-foreground"
+                                className="h-7 min-h-7 px-1.5 py-0 text-[10px] text-primary-foreground [background:linear-gradient(-45deg,#ec5252,#6e1a52)]"
                               >
                                 Yes
                               </CutButton>
@@ -295,7 +295,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                                 type="button"
                                 onClick={() => setConfirmDeleteAll(false)}
                                 variant="ghost"
-                                className="px-2 py-0.5 text-[10px] text-muted-foreground"
+                                className="h-7 min-h-7 px-1.5 py-0 text-[10px] text-muted-foreground"
                               >
                                 No
                               </CutButton>

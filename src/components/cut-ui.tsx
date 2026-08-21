@@ -98,7 +98,7 @@ export function CutFrame({
     return (
       <span aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
         <span
-          className="absolute inset-0 bg-gradient-brand shadow-[0_8px_22px_-10px_oklch(0.42_0.16_350_/_0.5)]"
+          className="absolute inset-0 bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] shadow-[0_8px_22px_-10px_oklch(0.42_0.16_350_/_0.5)]"
           style={{ clipPath: CUT_FRAME_CLIP_PATH }}
         />
         <span
