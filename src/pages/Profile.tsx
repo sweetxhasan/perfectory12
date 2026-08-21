@@ -136,7 +136,7 @@ function SendNoticeOverlay({ targetName, targetUid, onClose }: { targetName: str
             </CutButton>
             <CutButton type="button" onClick={handleSend} variant="primary"
               disabled={sending || done || !title.trim() || !body.trim()}
-              className="flex-1 py-2.5 text-sm font-semibold text-white disabled:opacity-50" style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)' }}>
+              className="flex-1 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
               {sending
                 ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                 : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>}
@@ -425,7 +425,7 @@ export default function PublicProfilePage({ params }: { params: { username: stri
                 {isOwner && (
                   <>
                     <Link href="/profile/edit">
-                      <CutButton variant="primary" className="px-5 py-2.5 text-sm font-medium text-white" style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)' }}>
+                      <CutButton variant="primary" className="px-5 py-2.5 text-sm font-medium text-white">
                         <Icon name="pencil" size={15} />
                         Edit Profile
                       </CutButton>
@@ -453,7 +453,6 @@ export default function PublicProfilePage({ params }: { params: { username: stri
                       onClick={() => setShowNoticeOverlay(true)}
                       variant="primary"
                       className="px-5 py-2.5 text-sm font-semibold text-white"
-                      style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)' }}
                     >
                       <span className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

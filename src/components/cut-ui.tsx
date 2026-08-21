@@ -105,7 +105,7 @@ export function CutFrame({
           className="absolute inset-0 -translate-x-full bg-white/15 transition-transform duration-500 group-hover:translate-x-full"
           style={{ clipPath: CUT_FRAME_CLIP_PATH }}
         />
-        <CutFrameStrokes stroke="url(#cut-brand-gradient)" strokeWidth={1} innerStroke="url(#cut-brand-gradient)" />
+        <CutFrameStrokes stroke="oklch(1 0 0 / 0.32)" strokeWidth={1} innerStroke="oklch(1 0 0 / 0.16)" />
       </span>
     );
   }
