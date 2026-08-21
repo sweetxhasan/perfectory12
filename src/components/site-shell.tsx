@@ -755,7 +755,7 @@ function NotificationRow({ notification, onDelete }: { notification: AppNotifica
   </button>
   </div>
         </div>
-        <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{notification.description}</p>
+        <p className="text-[11px] leading-relaxed text-muted-foreground">{notification.description}</p>
         <div className="mt-2 flex items-center justify-between gap-2">
           <span className="text-[10px] text-muted-foreground/70">
             {formatNotificationTime(notification.createdAt)}
