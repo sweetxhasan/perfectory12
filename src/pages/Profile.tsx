@@ -37,8 +37,7 @@ function SendNoticeOverlay({ targetName, targetUid, onClose }: { targetName: str
       style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative w-full max-w-md overflow-hidden rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl"
-        style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+      <CutPanel tone="popover" className="relative w-full max-w-md overflow-hidden shadow-2xl" contentClassName="bg-card">
 
         {/* Gradient top bar */}
         <div className="h-1 w-full" style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)' }} />
@@ -67,7 +66,7 @@ function SendNoticeOverlay({ targetName, targetUid, onClose }: { targetName: str
             </div>
           </div>
           <button type="button" onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-destructive hover:bg-destructive/10 hover:text-destructive">
+            className="relative flex size-8 items-center justify-center text-muted-foreground transition hover:text-destructive">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
@@ -76,7 +75,7 @@ function SendNoticeOverlay({ targetName, targetUid, onClose }: { targetName: str
         <div className="px-5 pb-5 pt-3 space-y-3">
 
           {/* Title field */}
-          <div className={`relative rounded-2xl border transition-all duration-200 bg-secondary/50 ${titleFocused ? 'border-brand shadow-[0_0_0_3px_rgba(236,82,82,0.12)]' : 'border-border'}`}>
+          <CutPanel tone="soft" className={`relative ${titleFocused ? 'ring-2 ring-brand/20' : ''}`} contentClassName="bg-secondary/50">
             <div className="px-4 pt-3 pb-2">
               <label className={`block text-[10px] font-semibold uppercase tracking-widest transition-colors ${titleFocused ? '' : 'text-muted-foreground'}`}
                 style={titleFocused ? { color: '#ec5252' } : {}}>
@@ -96,10 +95,10 @@ function SendNoticeOverlay({ targetName, targetUid, onClose }: { targetName: str
             {title.length > 0 && (
               <span className="absolute right-3 top-3 text-[10px] tabular-nums text-muted-foreground/50">{title.length}/60</span>
             )}
-          </div>
+          </CutPanel>
 
           {/* Body field */}
-          <div className={`relative rounded-2xl border transition-all duration-200 bg-secondary/50 ${bodyFocused ? 'border-brand shadow-[0_0_0_3px_rgba(236,82,82,0.12)]' : 'border-border'}`}>
+          <CutPanel tone="soft" className={`relative ${bodyFocused ? 'ring-2 ring-brand/20' : ''}`} contentClassName="bg-secondary/50">
             <div className="px-4 pt-3 pb-2">
               <label className={`block text-[10px] font-semibold uppercase tracking-widest transition-colors ${bodyFocused ? '' : 'text-muted-foreground'}`}
                 style={bodyFocused ? { color: '#ec5252' } : {}}>
@@ -120,34 +119,32 @@ function SendNoticeOverlay({ targetName, targetUid, onClose }: { targetName: str
               <span className="text-[10px] text-muted-foreground/50">Markdown not supported</span>
               <span className="text-[10px] tabular-nums text-muted-foreground/50">{body.length}/400</span>
             </div>
-          </div>
+          </CutPanel>
 
           {/* Done state */}
           {done && (
-            <div className="flex items-center gap-2 rounded-2xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm font-medium text-green-600">
+            <CutPanel tone="soft" contentClassName="flex items-center gap-2 bg-green-500/10 px-4 py-3 text-sm font-medium text-green-600">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
               Notice sent successfully!
-            </div>
+            </CutPanel>
           )}
 
           {/* Actions */}
           <div className="flex gap-2.5 pt-1">
-            <button type="button" onClick={onClose}
-              className="flex-1 rounded-2xl border border-border bg-secondary py-2.5 text-sm font-medium text-muted-foreground transition hover:text-foreground">
+            <CutButton type="button" onClick={onClose} variant="outline" className="flex-1 bg-secondary py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground">
               Cancel
-            </button>
-            <button type="button" onClick={handleSend}
+            </CutButton>
+            <CutButton type="button" onClick={handleSend} variant="primary"
               disabled={sending || done || !title.trim() || !body.trim()}
-              className="flex flex-1 items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
-              style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)', boxShadow: '0 4px 18px rgba(236,82,82,0.3)' }}>
+              className="flex-1 py-2.5 text-sm font-semibold text-white disabled:opacity-50" style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)' }}>
               {sending
                 ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                 : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>}
               {sending ? 'Sending…' : 'Send Notice'}
-            </button>
+            </CutButton>
           </div>
         </div>
-      </div>
+      </CutPanel>
     </div>
   );
 }
@@ -216,7 +213,10 @@ export default function PublicProfilePage({ params }: { params: { username: stri
 
   /* ── Shimmer helper ── */
   const Sk = ({ className = '', style }: { className?: string; style?: CSSProperties }) => (
-    <div className={`animate-shimmer rounded-2xl ${className}`} style={style} />
+    <span className={`relative isolate inline-flex overflow-hidden ${className}`}>
+      <CutFrame />
+      <span className="relative z-10 block h-full w-full animate-shimmer" style={style} />
+    </span>
   );
 
   /* ── Loading skeleton ── */
@@ -224,7 +224,7 @@ export default function PublicProfilePage({ params }: { params: { username: stri
     <SiteShell>
       <div className="mx-auto max-w-2xl space-y-5">
         {/* Profile card skeleton */}
-        <div className="overflow-hidden rounded-3xl border border-border bg-card">
+        <CutPanel tone="card" className="overflow-hidden" contentClassName="bg-card">
           {/* Cover */}
           <Sk className="h-40 w-full rounded-none sm:h-52" />
 
@@ -257,10 +257,10 @@ export default function PublicProfilePage({ params }: { params: { username: stri
               <Sk className="h-10 w-32 rounded-2xl" />
             </div>
           </div>
-        </div>
+        </CutPanel>
 
         {/* Voices section skeleton */}
-        <div className="overflow-hidden rounded-3xl border border-border bg-card">
+        <CutPanel tone="card" className="overflow-hidden" contentClassName="bg-card">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-6 py-4">
             <div className="flex items-center gap-2.5">
@@ -281,7 +281,7 @@ export default function PublicProfilePage({ params }: { params: { username: stri
               <Sk className="h-7 w-7 shrink-0 rounded-xl" />
             </div>
           ))}
-        </div>
+        </CutPanel>
       </div>
     </SiteShell>
   );
@@ -291,14 +291,14 @@ export default function PublicProfilePage({ params }: { params: { username: stri
     <SiteShell>
       <div className="flex min-h-[60vh] items-center justify-center px-4">
         <div className="flex max-w-sm flex-col items-center gap-5 text-center">
-          <span className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-soft text-brand">
+          <CutPanel tone="soft" className="size-20" contentClassName="flex items-center justify-center text-brand">
             <Icon name="user" size={34} />
-          </span>
+          </CutPanel>
           <div>
             <h1 className="text-2xl">Profile not found</h1>
             <p className="mt-2 text-sm text-muted-foreground">No user exists with the username <span className="font-medium text-foreground">@{username}</span>.</p>
           </div>
-          <Link href="/"><OutlineButton icon="home">Back home</OutlineButton></Link>
+          <Link href="/"><CutButton variant="outline"><Icon name="home" size={15} /> Back home</CutButton></Link>
         </div>
       </div>
     </SiteShell>
@@ -309,9 +309,9 @@ export default function PublicProfilePage({ params }: { params: { username: stri
     <SiteShell>
       <div className="flex min-h-[60vh] items-center justify-center px-4">
         <div className="flex max-w-sm flex-col items-center gap-5 text-center">
-          <span className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-soft text-brand">
+          <CutPanel tone="soft" className="size-20" contentClassName="flex items-center justify-center text-brand">
             <Icon name="lock" size={30} />
-          </span>
+          </CutPanel>
           <div>
             <h1 className="text-2xl">Private profile</h1>
             <p className="mt-2 text-sm text-muted-foreground">{profile?.name} has chosen to keep their profile private.</p>
@@ -334,7 +334,7 @@ export default function PublicProfilePage({ params }: { params: { username: stri
       <div className="mx-auto max-w-2xl">
 
         {/* ── Profile card ── */}
-        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+        <CutPanel tone="card" className="overflow-hidden shadow-sm" contentClassName="bg-card">
 
           {/* Cover */}
           <div className="relative h-40 sm:h-52">
@@ -352,16 +352,18 @@ export default function PublicProfilePage({ params }: { params: { username: stri
             {/* Avatar — overlapping cover */}
             <div className="-mt-16 sm:-mt-20">
               {profile.photoURL ? (
-                <img
-                  src={profile.photoURL}
-                  alt={profile.name}
-                  crossOrigin="anonymous"
-                  className="h-28 w-28 rounded-full border-4 border-card object-cover shadow-xl sm:h-36 sm:w-36"
-                />
+                <CutPanel tone="card" className="size-28 rounded-full sm:size-36" contentClassName="h-full w-full rounded-full border-4 border-card bg-card shadow-xl">
+                  <img
+                    src={profile.photoURL}
+                    alt={profile.name}
+                    crossOrigin="anonymous"
+                    className="h-full w-full rounded-full object-cover"
+                  />
+                </CutPanel>
               ) : (
-                <span className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-card bg-gradient-brand text-4xl font-semibold text-primary-foreground shadow-xl sm:h-36 sm:w-36 sm:text-5xl">
+                <CutPanel tone="brand" className="size-28 rounded-full sm:size-36" contentClassName="flex h-full w-full items-center justify-center rounded-full border-4 border-card text-4xl font-semibold text-primary-foreground shadow-xl sm:text-5xl">
                   {profile.name.charAt(0).toUpperCase()}
-                </span>
+                </CutPanel>
               )}
             </div>
 
@@ -376,10 +378,10 @@ export default function PublicProfilePage({ params }: { params: { username: stri
 
             {/* Plan badge */}
             <div className="mt-3">
-              <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${plan.color}`}>
+              <CutPanel tone="soft" className="inline-flex" contentClassName={`flex items-center gap-1.5 px-3 py-1 text-xs font-medium ${plan.color}`}>
                 <Icon name={plan.icon} size={12} />
                 {plan.label}
-              </span>
+              </CutPanel>
             </div>
 
             {/* Bio */}
@@ -423,18 +425,17 @@ export default function PublicProfilePage({ params }: { params: { username: stri
                 {isOwner && (
                   <>
                     <Link href="/profile/edit">
-                      <button className="inline-flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-medium text-white shadow-[0_2px_12px_rgba(236,82,82,0.4)] transition hover:opacity-90 hover:shadow-[0_4px_20px_rgba(236,82,82,0.5)] active:scale-95"
-                        style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)' }}>
+                      <CutButton variant="primary" className="px-5 py-2.5 text-sm font-medium text-white" style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)' }}>
                         <Icon name="pencil" size={15} />
                         Edit Profile
-                      </button>
+                      </CutButton>
                     </Link>
                     {profile.plan === 'free' && (
                       <Link href="/plans">
-                        <button className="inline-flex items-center gap-2 rounded-2xl bg-gradient-brand px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-[0_2px_12px_rgba(236,82,82,0.4)] transition hover:opacity-90 hover:shadow-[0_4px_20px_rgba(236,82,82,0.5)] active:scale-95">
+                        <CutButton variant="primary" className="px-5 py-2.5 text-sm font-medium">
                           <Icon name="crown" size={15} />
                           Update Plan
-                        </button>
+                        </CutButton>
                       </Link>
                     )}
                   </>
@@ -442,16 +443,17 @@ export default function PublicProfilePage({ params }: { params: { username: stri
                 {canAdminEdit && (
                   <>
                     <Link href={`/profile/${profile.username}/edit`}>
-                      <button className="inline-flex items-center gap-2 rounded-2xl bg-gradient-brand px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-[0_2px_12px_rgba(236,82,82,0.4)] transition hover:opacity-90 active:scale-95">
+                      <CutButton variant="primary" className="px-5 py-2.5 text-sm font-medium">
                         <Icon name="shield" size={15} />
                         Edit Profile
-                      </button>
+                      </CutButton>
                     </Link>
-                    <button
+                    <CutButton
                       type="button"
                       onClick={() => setShowNoticeOverlay(true)}
-                      className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:scale-105 hover:shadow-xl active:scale-95"
-                      style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)', boxShadow: '0 3px 14px rgba(236,82,82,0.4)' }}
+                      variant="primary"
+                      className="px-5 py-2.5 text-sm font-semibold text-white"
+                      style={{ background: 'linear-gradient(-45deg,#ec5252,#6e1a52)' }}
                     >
                       <span className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-full" />
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -459,22 +461,22 @@ export default function PublicProfilePage({ params }: { params: { username: stri
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                       </svg>
                       Send Notice
-                    </button>
+                    </CutButton>
                   </>
                 )}
               </div>
             )}
           </div>
-        </div>
+        </CutPanel>
 
         {/* ── My Voices ── */}
-        <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+        <CutPanel tone="card" className="mt-6 overflow-hidden shadow-sm" contentClassName="bg-card">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-6 py-4">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-soft text-brand">
+              <CutPanel tone="soft" className="size-8" contentClassName="flex items-center justify-center text-brand">
                 <Icon name="soundwave" size={17} />
-              </span>
+              </CutPanel>
               <h2 className="text-base font-semibold">
                 {isOwner ? 'My Voices' : `${profile.name}'s Voices`}
               </h2>
@@ -486,10 +488,10 @@ export default function PublicProfilePage({ params }: { params: { username: stri
             </div>
             {isOwner && (
               <Link href="/generator">
-                <button className="flex items-center gap-1.5 rounded-xl border border-border bg-secondary px-3 py-1.5 text-xs font-medium transition hover:border-brand-2 hover:text-brand-2 active:scale-95">
+                <CutButton variant="outline" className="px-3 py-1.5 text-xs font-medium">
                   <Icon name="plus" size={13} />
                   New
-                </button>
+                </CutButton>
               </Link>
             )}
           </div>
@@ -500,21 +502,21 @@ export default function PublicProfilePage({ params }: { params: { username: stri
             isOwner={isOwner}
             ownerName={profile.name}
           />
-        </div>
+        </CutPanel>
 
         {/* ── CTA for visitors ── */}
         {!isOwner && (
-          <div className="mt-5 flex flex-col items-center gap-3 rounded-3xl border border-border bg-gradient-soft p-8 text-center">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-brand text-primary-foreground shadow-md">
+          <CutPanel tone="soft" className="mt-5" contentClassName="flex flex-col items-center gap-3 p-8 text-center">
+            <CutPanel tone="brand" className="size-12" contentClassName="flex items-center justify-center text-primary-foreground shadow-md">
               <Icon name="microphone" size={22} />
-            </span>
+            </CutPanel>
             <p className="text-sm text-muted-foreground">
               {profile.name} creates voice with <span className="font-medium text-foreground">Perfectory Voice</span>. Try it yourself!
             </p>
             <Link href="/generator">
-              <GradientButton icon="soundwave">Try the voice generator</GradientButton>
+              <CutButton variant="primary"><Icon name="soundwave" size={15} /> Try the voice generator</CutButton>
             </Link>
-          </div>
+          </CutPanel>
         )}
 
       </div>
