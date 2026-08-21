@@ -6,7 +6,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Icon } from '@/components/icon';
-import { GradientButton } from '@/components/primitives';
+import { CutButton, CutPanel } from '@/components/cut-ui';
 import { deleteGeneration, type Generation } from '@/lib/user-store';
 import type { Timestamp } from 'firebase/firestore';
 
@@ -225,9 +225,9 @@ export function VoiceHistoryList({ generations, isOwner, ownerName }: Props) {
   if (generations.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 px-6 py-14 text-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-soft text-brand">
+        <CutPanel tone="soft" className="size-14" contentClassName="flex items-center justify-center text-brand">
           <Icon name="microphone" size={26} />
-        </span>
+        </CutPanel>
         <div>
           <p className="text-sm font-medium">No voices yet</p>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -238,7 +238,7 @@ export function VoiceHistoryList({ generations, isOwner, ownerName }: Props) {
         </div>
         {isOwner && (
           <Link href="/generator">
-            <GradientButton icon="soundwave">Generate a voice</GradientButton>
+            <CutButton variant="primary"><Icon name="soundwave" /> Generate a voice</CutButton>
           </Link>
         )}
       </div>
@@ -273,28 +273,25 @@ export function VoiceHistoryList({ generations, isOwner, ownerName }: Props) {
               className="group flex items-center gap-3 px-4 py-3.5 transition hover:bg-secondary/40 sm:gap-4 sm:px-5"
             >
               {/* Index */}
-              <span className="hidden h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-soft text-xs font-semibold text-brand sm:flex">
+              <CutPanel tone="soft" className="hidden size-7 shrink-0 sm:block" contentClassName="flex items-center justify-center text-xs font-semibold text-brand">
                 {i + 1}
-              </span>
+              </CutPanel>
 
               {/* Play / Pause */}
-              <button
+              <CutButton
                 type="button"
+                variant={isPlaying ? 'primary' : 'outline'}
                 title={isPlaying ? 'Pause' : 'Play voice'}
                 onClick={() => togglePlay(g)}
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border transition active:scale-95
-                  ${isPlaying
-                    ? 'border-brand-2 bg-brand-2/10 text-brand-2'
-                    : 'border-border bg-card text-muted-foreground hover:border-brand-2 hover:text-brand-2 group-hover:border-brand-2/50'}`}
+                className={`size-10 shrink-0 p-0 ${isPlaying ? 'text-primary-foreground' : 'text-muted-foreground'}`}
               >
                 <Icon name={isPlaying ? 'pause' : 'play'} size={16} />
-              </button>
+              </CutButton>
 
               {/* Waveform icon */}
-              <span className={`hidden h-9 w-9 shrink-0 items-center justify-center rounded-2xl border transition sm:flex
-                ${isPlaying ? 'border-brand-2 bg-brand-2/10 text-brand-2' : 'border-border bg-card text-muted-foreground'}`}>
+              <CutPanel tone={isPlaying ? 'brand' : 'card'} className="hidden size-9 shrink-0 sm:block" contentClassName={`flex items-center justify-center ${isPlaying ? 'text-primary-foreground' : 'text-muted-foreground'}`}>
                 <Icon name="soundwave" size={17} className={isPlaying ? 'animate-pulse' : ''} />
-              </span>
+              </CutPanel>
 
               {/* Text + meta */}
               <div className="min-w-0 flex-1">
@@ -321,28 +318,30 @@ export function VoiceHistoryList({ generations, isOwner, ownerName }: Props) {
               </span>
 
               {/* Download */}
-              <button
+              <CutButton
                 type="button"
+                variant="outline"
                 title="Download MP3"
                 onClick={() => handleDownload(g)}
                 disabled={isDownloading}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground transition hover:border-brand-2 hover:text-brand-2 active:scale-95 disabled:opacity-50"
+                className="size-9 shrink-0 p-0 text-muted-foreground disabled:opacity-50"
               >
                 {isDownloading ? (
                   <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand-2/30 border-t-brand-2" />
                 ) : (
                   <Icon name="download" size={15} />
                 )}
-              </button>
+              </CutButton>
 
               {/* Delete */}
               {isOwner && (
-                <button
+                <CutButton
                   type="button"
+                  variant="outline"
                   title="Delete voice"
                   onClick={() => setConfirmId(g.id)}
                   disabled={isDeleting}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground transition hover:border-red-500 hover:bg-red-500/8 hover:text-red-500 active:scale-95 disabled:opacity-40"
+                  className="size-9 shrink-0 p-0 text-muted-foreground hover:text-red-500 disabled:opacity-40"
                 >
                   {isDeleting ? (
                     <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-red-400/30 border-t-red-500" />
@@ -354,7 +353,7 @@ export function VoiceHistoryList({ generations, isOwner, ownerName }: Props) {
                       <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
                     </svg>
                   )}
-                </button>
+                </CutButton>
               )}
             </li>
           );

@@ -208,7 +208,9 @@ function DashboardContent() {
 
       <div className="mt-8 flex items-center justify-between">
         <h2 className="text-xl">Recent generations</h2>
-        <Link href="/generator" className="text-sm text-brand-2 hover:underline">Create new →</Link>
+        <Link href="/generator">
+          <CutButton variant="outline" className="px-3 py-2 text-xs text-brand-2">Create new <Icon name="arrow-right" size={14} /></CutButton>
+        </Link>
       </div>
 
       <CutPanel tone="card" className="mt-4 overflow-hidden" contentClassName="bg-card">
