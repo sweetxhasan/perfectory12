@@ -411,8 +411,8 @@ export default function PublicProfilePage({ params }: { params: { username: stri
                     {profile.phone}
                     {(isOwner || iAmAdmin) && (
                       profile.phonePublic
-                        ? <span className="ml-0.5 rounded-full border border-green-500/30 bg-green-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-green-600">Public</span>
-                        : <span className="ml-0.5 rounded-full bg-border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Private</span>
+                        ? <CutPanel tone="soft" className="ml-0.5 inline-flex" contentClassName="bg-green-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-green-600">Public</CutPanel>
+                        : <CutPanel tone="soft" className="ml-0.5 inline-flex" contentClassName="bg-border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Private</CutPanel>
                     )}
                   </a>
                 )}
