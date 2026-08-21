@@ -736,7 +736,7 @@ function NotificationRow({ notification, onDelete }: { notification: AppNotifica
   </CutPanel>
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-xs font-semibold leading-snug">{notification.title}</p>
+          <p className="text-xs font-semibold leading-none">{notification.title}</p>
           <div className="flex shrink-0 items-center gap-1.5">
             {isUnread && (
               <span className="h-1.5 w-1.5 rounded-full bg-brand-2 mt-0.5" aria-label="Unread" />
@@ -746,7 +746,7 @@ function NotificationRow({ notification, onDelete }: { notification: AppNotifica
   type="button"
   onClick={(e) => { e.stopPropagation(); onDelete(); }}
   title="Delete notification"
-  className="flex size-7 items-center justify-center rounded-lg text-muted-foreground/40 transition hover:bg-destructive/10 hover:text-destructive group-hover:text-muted-foreground/70"
+  className="flex size-5 items-center justify-center rounded-lg text-muted-foreground/40 transition hover:bg-destructive/10 hover:text-destructive group-hover:text-muted-foreground/70"
   aria-label="Delete notification"
   >
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
