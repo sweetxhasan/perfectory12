@@ -301,18 +301,17 @@ export function SiteShell({ children }: { children: ReactNode }) {
                               </CutButton>
                             </CutPanel>
                           ) : (
-                            <CutButton
+                            <button
                               type="button"
                               onClick={() => setConfirmDeleteAll(true)}
                               title="Delete all notifications"
-                              variant="outline"
-                              className="shrink-0 gap-1 px-2 py-1 text-[10px] font-medium text-muted-foreground hover:text-destructive"
+                              className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-medium text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
                               </svg>
                               Delete all
-                            </CutButton>
+                            </button>
                           )
                         )}
                       </div>
@@ -743,18 +742,17 @@ function NotificationRow({ notification, onDelete }: { notification: AppNotifica
               <span className="h-1.5 w-1.5 rounded-full bg-brand-2 mt-0.5" aria-label="Unread" />
             )}
             {/* Delete button — always visible at low opacity, full on hover */}
-<CutButton
+<button
   type="button"
   onClick={(e) => { e.stopPropagation(); onDelete(); }}
   title="Delete notification"
-  variant="outline"
-  className="size-7 p-0 text-muted-foreground/50 hover:text-destructive group-hover:text-muted-foreground/80"
+  className="flex size-7 items-center justify-center rounded-lg text-muted-foreground/40 transition hover:bg-destructive/10 hover:text-destructive group-hover:text-muted-foreground/70"
   aria-label="Delete notification"
   >
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
   </svg>
-  </CutButton>
+  </button>
   </div>
         </div>
         <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{notification.description}</p>
