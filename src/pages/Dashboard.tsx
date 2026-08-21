@@ -4,7 +4,7 @@ import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
 import { SEOHead } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
-import { CutButton, CutIconBox, CutPanel } from '@/components/cut-ui';
+import { CutButton, CutFrame, CutIconBox, CutPanel } from '@/components/cut-ui';
 import { Icon } from '@/components/icon';
 import { useAuth } from '@/lib/auth-context';
 import { subscribeGenerations, type Generation } from '@/lib/user-store';
@@ -13,7 +13,12 @@ import { OnboardingOverlay } from '@/components/onboarding-overlay';
 
 /* ── Shimmer helper ─────────────────────────────────────── */
 function Sk({ className = '', style }: { className?: string; style?: CSSProperties }) {
-  return <div className={`animate-shimmer rounded-2xl ${className}`} style={style} />;
+  return (
+    <span className={`relative isolate inline-flex overflow-hidden ${className}`}>
+      <CutFrame />
+      <span className="relative z-10 block h-full w-full animate-shimmer" style={style} />
+    </span>
+  );
 }
 
 /* ── Dashboard skeleton matching the real layout ─────── */
