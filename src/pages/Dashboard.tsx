@@ -4,7 +4,7 @@ import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
 import { SEOHead } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
-import { Panel, SectionBadge, GradientButton } from '@/components/primitives';
+import { CutButton, CutIconBox, CutPanel } from '@/components/cut-ui';
 import { Icon } from '@/components/icon';
 import { useAuth } from '@/lib/auth-context';
 import { subscribeGenerations, type Generation } from '@/lib/user-store';
@@ -19,9 +19,9 @@ function Sk({ className = '', style }: { className?: string; style?: CSSProperti
 /* ── Dashboard skeleton matching the real layout ─────── */
 function DashboardSkeleton() {
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col gap-5">
       {/* Hero panel */}
-      <div className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+      <CutPanel tone="card" contentClassName="p-6 sm:p-8">
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
           <div className="space-y-3">
             <Sk className="h-5 w-24 rounded-full" />
@@ -30,19 +30,19 @@ function DashboardSkeleton() {
           </div>
           <Sk className="h-11 w-36 rounded-2xl" />
         </div>
-      </div>
+      </CutPanel>
 
       {/* 3 stat cards */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center gap-4 rounded-3xl border border-border bg-card p-5">
+          <CutPanel key={i} tone="card" contentClassName="flex items-center gap-4 p-5">
             <Sk className="h-12 w-12 shrink-0 rounded-2xl" />
             <div className="flex-1 space-y-2">
               <Sk className="h-3 w-20 rounded-full" />
               <Sk className="h-7 w-10 rounded-lg" />
             </div>
             <Sk className="h-9 w-24 shrink-0 rounded-2xl" />
-          </div>
+          </CutPanel>
         ))}
       </div>
 
@@ -53,7 +53,7 @@ function DashboardSkeleton() {
       </div>
 
       {/* Recent generations list */}
-      <div className="overflow-hidden rounded-3xl border border-border bg-card">
+      <CutPanel tone="card" className="overflow-hidden" contentClassName="bg-card">
         {[0, 1, 2, 3, 4].map((i) => (
           <div
             key={i}
@@ -68,7 +68,7 @@ function DashboardSkeleton() {
             <Sk className="h-7 w-7 shrink-0 rounded-xl" />
           </div>
         ))}
-      </div>
+      </CutPanel>
     </div>
   );
 }
@@ -115,7 +115,7 @@ function DashboardContent() {
 
   return (
     <div>
-      <Panel className="relative overflow-hidden p-6 sm:p-8">
+      <CutPanel tone="card" className="relative overflow-hidden" contentClassName="p-6 sm:p-8">
         <div className="relative flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
           <div>
 
@@ -124,77 +124,73 @@ function DashboardContent() {
             </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">Ready to create something great today?</p>
           </div>
-          <Link
-            href="/generator"
-            className="group inline-flex items-center gap-2 rounded-2xl border border-brand/50 bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-5 py-3 text-sm font-medium text-primary-foreground transition hover:brightness-110 active:scale-[0.98]"
-          >
-            <Icon name="plus" size={18} className="transition group-hover:scale-110" />
-            <span>Create Voice</span>
+          <Link href="/generator">
+            <CutButton variant="primary">
+              <Icon name="plus" size={18} />
+              <span>Create Voice</span>
+            </CutButton>
           </Link>
         </div>
-      </Panel>
+      </CutPanel>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
         {/* Credits card */}
-        <Panel className="flex items-center gap-4 p-5">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-soft text-brand">
+        <CutPanel tone="card" contentClassName="flex items-center gap-4 p-5">
+          <CutPanel tone="soft" className="size-12 shrink-0" contentClassName="flex items-center justify-center text-brand">
             <Icon name="bolt" size={24} />
-          </span>
+          </CutPanel>
           <div className="min-w-0 flex-1">
             <p className="text-sm text-muted-foreground">Credits left</p>
             <p className="text-2xl">{profile.credits}</p>
           </div>
-          <Link href="/credits"
-            className="group flex shrink-0 items-center gap-1.5 rounded-2xl border border-brand/30 bg-gradient-soft px-3 py-2 text-xs font-medium text-brand transition hover:border-brand hover:bg-brand/10 hover:shadow-[0_0_12px_rgba(99,102,241,0.25)] active:scale-95">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand text-primary-foreground transition group-hover:scale-110">
-              <Icon name="chart" size={12} />
-            </span>
-            See Usage
+          <Link href="/credits">
+            <CutButton variant="outline" className="shrink-0 px-3 py-2 text-xs text-brand">
+              <Icon name="chart" size={14} /> See Usage
+            </CutButton>
           </Link>
-        </Panel>
+        </CutPanel>
 
         {/* Plan card */}
-        <Panel className="flex items-center gap-4 p-5">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-soft text-brand">
+        <CutPanel tone="card" contentClassName="flex items-center gap-4 p-5">
+          <CutPanel tone="soft" className="size-12 shrink-0" contentClassName="flex items-center justify-center text-brand">
             <Icon name="crown" size={24} />
-          </span>
+          </CutPanel>
           <div className="min-w-0 flex-1">
             <p className="text-sm text-muted-foreground">Current plan</p>
             <p className="text-2xl">{planLabels[profile.plan] || 'Free'}</p>
           </div>
           {isYearly ? (
-            <span className="flex shrink-0 items-center gap-1.5 rounded-2xl border border-brand-2/20 bg-gradient-soft px-3 py-2 text-xs font-medium text-brand-2/50 opacity-60 cursor-default select-none">
-              <Icon name="crown" size={13} />
-              Plan Max
-            </span>
+            <CutButton variant="outline" disabled className="shrink-0 px-3 py-2 text-xs text-brand-2/50 opacity-60">
+              <Icon name="crown" size={13} /> Plan Max
+            </CutButton>
           ) : (
-            <Link href="/plans"
-              className="group flex shrink-0 items-center gap-1.5 rounded-2xl bg-gradient-brand px-3 py-2 text-xs font-medium text-primary-foreground shadow-[0_2px_10px_rgba(99,102,241,0.35)] transition hover:opacity-90 hover:shadow-[0_4px_16px_rgba(99,102,241,0.45)] active:scale-95">
-              <Icon name="crown" size={13} />
-              Update Plan
+            <Link href="/plans">
+              <CutButton variant="primary" className="shrink-0 px-3 py-2 text-xs">
+                <Icon name="crown" size={13} /> Update Plan
+              </CutButton>
             </Link>
           )}
-        </Panel>
+        </CutPanel>
 
         {/* Generations card */}
-        <Panel className="flex items-center gap-4 p-5">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-soft text-brand">
+        <CutPanel tone="card" contentClassName="flex items-center gap-4 p-5">
+          <CutPanel tone="soft" className="size-12 shrink-0" contentClassName="flex items-center justify-center text-brand">
             <Icon name="soundwave" size={24} />
-          </span>
+          </CutPanel>
           <div className="min-w-0 flex-1">
             <p className="text-sm text-muted-foreground">Generations</p>
             <p className="text-2xl">{history.length}</p>
           </div>
-          <Link href="/generator"
-            className="group flex shrink-0 items-center gap-1.5 rounded-2xl border border-border bg-card px-3 py-2 text-xs font-medium text-foreground transition hover:border-brand-2 hover:text-brand-2 hover:shadow-[0_0_12px_rgba(56,189,248,0.2)] active:scale-95">
-            <Icon name="plus" size={13} className="transition group-hover:text-brand-2" />
-            Generate
+          <Link href="/generator">
+            <CutButton variant="outline" className="shrink-0 px-3 py-2 text-xs text-foreground">
+              <Icon name="plus" size={13} /> Generate
+            </CutButton>
           </Link>
-        </Panel>
+        </CutPanel>
       </div>
 
       {profile.credits <= 3 && (
-        <Panel gradientBorder className="mt-5 flex flex-col items-center justify-between gap-4 p-5 sm:flex-row">
+        <CutPanel tone="soft" className="mt-5" contentClassName="flex flex-col items-center justify-between gap-4 p-5 sm:flex-row">
           <div className="flex items-center gap-3">
             <Icon name="crown" size={26} className="text-brand-2" />
             <div>
@@ -202,8 +198,12 @@ function DashboardContent() {
               <p className="text-xs text-muted-foreground">Upgrade your plan to keep generating.</p>
             </div>
           </div>
-          <Link href="/plans"><GradientButton icon="crown">Upgrade plan</GradientButton></Link>
-        </Panel>
+          <Link href="/plans">
+            <CutButton variant="primary" className="px-4 py-2 text-xs">
+              <Icon name="crown" size={14} /> Upgrade plan
+            </CutButton>
+          </Link>
+        </CutPanel>
       )}
 
       <div className="mt-8 flex items-center justify-between">
@@ -211,9 +211,9 @@ function DashboardContent() {
         <Link href="/generator" className="text-sm text-brand-2 hover:underline">Create new →</Link>
       </div>
 
-      <Panel className="mt-4 overflow-hidden">
+      <CutPanel tone="card" className="mt-4 overflow-hidden" contentClassName="bg-card">
         <VoiceHistoryList generations={history} isOwner />
-      </Panel>
+      </CutPanel>
     </div>
   );
 }
