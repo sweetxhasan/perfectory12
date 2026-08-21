@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Link } from 'wouter';
 import { SiteShell } from '@/components/site-shell';
-import { GradientButton, OutlineButton } from '@/components/primitives';
+import { CutButton, CutFrame, CutPanel } from '@/components/cut-ui';
 import { Icon } from '@/components/icon';
 import { VerifiedBadge } from '@/components/verified-badge';
 import { useAuth } from '@/lib/auth-context';
