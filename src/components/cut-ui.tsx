@@ -78,18 +78,20 @@ export function CutFrame({
   variant = 'outline',
   active = false,
   className = '',
+  stroke,
 }: {
   variant?: CutVariant;
   /** @deprecated no longer configurable — geometry is fixed to CUT_FRAME_PATH */
   cut?: number;
   active?: boolean;
   className?: string;
+  stroke?: string;
 }) {
   if (variant === 'light') {
     return (
       <span aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
         <span className="absolute inset-0 bg-background" style={{ clipPath: CUT_FRAME_CLIP_PATH }} />
-        <CutFrameStrokes stroke="oklch(1 0 0 / 0.9)" strokeWidth={1} innerStroke="oklch(0.15 0 0 / 0.12)" />
+        <CutFrameStrokes stroke={stroke ?? 'oklch(1 0 0 / 0.9)'} strokeWidth={1} innerStroke={stroke ? `${stroke}55` : 'oklch(0.15 0 0 / 0.12)'} />
       </span>
     );
   }
