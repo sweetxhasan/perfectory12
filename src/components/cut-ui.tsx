@@ -154,14 +154,16 @@ export function CutPanel({
   contentClassName = '',
   style,
   children,
+  stroke,
 }: {
-  /** @deprecated no longer configurable — geometry is fixed to CUT_FRAME_PATH */
+  /** @deprecated no longer configurable — geometry is fixed to CUT_FRAME_CLIP_PATH */
   cut?: number;
   tone?: 'card' | 'soft' | 'brand' | 'popover';
   className?: string;
   contentClassName?: string;
   style?: CSSProperties;
   children?: ReactNode;
+  stroke?: string;
 }) {
   const fill =
     tone === 'soft' ? 'bg-gradient-soft'
@@ -172,7 +174,7 @@ export function CutPanel({
   return (
     <div className={`relative isolate ${className}`} style={{ clipPath: CUT_FRAME_CLIP_PATH, ...style }}>
       <div className={`relative z-10 h-full w-full ${fill} ${contentClassName}`}>{children}</div>
-      <CutFrameStrokes className="z-20" />
+      <CutFrameStrokes stroke={stroke} innerStroke={stroke ? `${stroke}55` : undefined} className="z-20" />
     </div>
   );
 }
