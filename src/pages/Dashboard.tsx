@@ -209,7 +209,7 @@ function DashboardContent() {
       <div className="mt-8 flex items-center justify-between">
         <h2 className="text-xl">Recent generations</h2>
         <Link href="/generator">
-          <CutButton variant="outline" className="px-3 py-2 text-xs text-brand-2">Create new <Icon name="arrow-right" size={14} /></CutButton>
+          <CutButton variant="outline" className="px-2 py-1.5 text-[11px] text-brand-2">Create new <Icon name="arrow-right" size={12} /></CutButton>
         </Link>
       </div>
 
