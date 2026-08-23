@@ -210,8 +210,9 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                     key={t}
                     type="button"
                     variant={tab === t ? 'primary' : 'light'}
+                    stroke="url(#cut-brand-gradient)"
                     onClick={() => { setTab(t); setErr(''); }}
-                    className="w-max px-4 py-2 text-xs font-semibold uppercase tracking-wide text-foreground sm:px-5"
+                    className="w-[140px] px-3 py-2 text-sm font-semibold normal-case tracking-normal text-foreground"
                   >
                     {t === 'upload' ? 'Upload' : 'Photo Link'}
                   </CutButton>

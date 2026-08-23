@@ -20,11 +20,12 @@ export function CutButton({
   children,
   variant = 'outline',
   className = '',
+  stroke,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: CutVariant }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: CutVariant; stroke?: string }) {
   return (
     <button {...props} className={`group relative isolate inline-flex items-center justify-center gap-2 overflow-hidden px-5 py-3 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60 ${className}`}>
-      <CutFrame variant={variant} />
+      <CutFrame variant={variant} stroke={stroke} />
       <span className={`relative z-10 inline-flex items-center gap-2 ${variant === 'primary' ? 'text-primary-foreground' : ''}`}>{children}</span>
     </button>
   );
