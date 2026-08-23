@@ -201,18 +201,18 @@ function OverlayShell({
     const raw = e.touches[0].clientY - dragStartY.current;
     if (raw <= 0) return;
     lastDelta.current = raw;
-    if (sheetRef.current)    sheetRef.current.style.transform  = `translate(-50%, calc(-50% + ${raw}px))`;
+    if (sheetRef.current)    sheetRef.current.style.transform  = `translateY(${raw}px)`;
     if (backdropRef.current) backdropRef.current.style.opacity = String(BACKDROP_BASE * (1 - Math.min(raw / DISMISS_PX, 1)));
   }
   function onDragEnd() {
     if (!dragging.current) return;
     dragging.current = false;
     if (lastDelta.current >= DISMISS_PX) {
-      if (sheetRef.current)    { sheetRef.current.style.transition = 'transform 0.25s cubic-bezier(0.4,0,1,1)'; sheetRef.current.style.transform = 'translate(-50%, 115%)'; }
+      if (sheetRef.current)    { sheetRef.current.style.transition = 'transform 0.25s cubic-bezier(0.4,0,1,1)'; sheetRef.current.style.transform = 'translateY(115%)'; }
       if (backdropRef.current) { backdropRef.current.style.transition = 'opacity 0.25s ease'; backdropRef.current.style.opacity = '0'; }
       setTimeout(onClose, 240);
     } else {
-      if (sheetRef.current)    { sheetRef.current.style.transition = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)'; sheetRef.current.style.transform = 'translate(-50%, -50%)'; }
+      if (sheetRef.current)    { sheetRef.current.style.transition = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)'; sheetRef.current.style.transform = 'translateY(0)'; }
       if (backdropRef.current) { backdropRef.current.style.transition = 'opacity 0.3s ease'; backdropRef.current.style.opacity = String(BACKDROP_BASE); }
     }
   }
@@ -220,7 +220,7 @@ function OverlayShell({
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[200]">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto p-2 sm:p-4">
       {/* Backdrop */}
       <div
         ref={backdropRef}
@@ -231,7 +231,7 @@ function OverlayShell({
       {/* ── Mobile: bottom sheet ── */}
       <div
         ref={sheetRef}
-        className="absolute left-1/2 top-1/2 flex w-[98vw] max-w-[min(600px,98vw)] max-h-[92dvh] -translate-x-1/2 -translate-y-1/2 flex-col animate-overlay-modal"
+        className="relative flex w-full max-w-[600px] max-h-[calc(100dvh-16px)] flex-col animate-overlay-modal"
         role="dialog"
         aria-modal="true"
         aria-label={title}

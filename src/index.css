@@ -576,8 +576,8 @@
   to   { transform: translateY(0);    opacity: 1; }
 }
 @keyframes overlay-modal-in {
-  from { transform: translate(-50%, -46%) scale(0.95); opacity: 0; }
-  to   { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
 .animate-overlay-backdrop {
   animation: overlay-backdrop 0.22s ease both;
