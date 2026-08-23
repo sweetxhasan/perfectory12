@@ -687,12 +687,15 @@ function PlanCard({
         <div className="mb-1 flex items-start justify-between gap-2">
           {/* "Active" badge — only for logged-in users on their actual plan */}
           {current && !isGuest && (
-            <span className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-              inverted ? 'bg-white/15 text-white' : 'bg-brand/10 text-brand'
-            }`}>
+            <CutPanel
+              tone="card"
+              stroke="#16a34a"
+              className="inline-flex w-max"
+              contentClassName="flex items-center gap-1 bg-background px-2.5 py-0.5 text-[10px] font-semibold text-brand"
+            >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               Active
-            </span>
+            </CutPanel>
           )}
         </div>
 
@@ -726,11 +729,7 @@ function PlanCard({
 
         {/* Expiry notice — only for logged-in users on their plan */}
         {current && !isGuest && expiryDate && (
-          <div className={`mt-4 rounded-xl px-3 py-2 text-xs ${
-            inverted
-              ? (days ?? 999) <= 30 ? 'bg-orange-500/20 text-orange-200' : 'bg-white/10 text-white/70'
-              : (days ?? 999) <= 7  ? 'bg-orange-500/10 text-orange-600' : 'bg-secondary text-muted-foreground'
-          }`}>
+          <div className="mt-4 px-0 py-2 text-xs text-muted-foreground">
             <span className="font-medium">Expires {expiryDate}</span>
             {days !== null && ` · ${days} day${days !== 1 ? 's' : ''} left`}
             {(days ?? 999) <= 30 && <span className="ml-1.5 font-semibold">— Expiring soon</span>}
