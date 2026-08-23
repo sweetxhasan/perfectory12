@@ -517,19 +517,6 @@ function DeactivateContent({
   );
 }
 
-/* ── Stats row inside plan card ─────────────────────────── */
-function StatRow({ icon, label, value, inverted }: {
-  icon: string; label: string; value: string; inverted?: boolean;
-}) {
-  return (
-<CutPanel tone="soft" className="overflow-hidden" contentClassName="flex items-center gap-2.5 bg-secondary/45 px-3 py-2.5">
-  <Icon name={icon as never} size={14} className={inverted ? 'text-white/70' : 'text-brand-2'} />
-  <span className={`text-xs ${inverted ? 'text-white/70' : 'text-muted-foreground'}`}>{label}</span>
-  <span className={`ml-auto text-xs font-semibold ${inverted ? 'text-white' : 'text-foreground'}`}>{value}</span>
-  </CutPanel>
-  );
-}
-
 /* ── Pending review banner (inside plan card) ──────────────── */
 function PendingReviewBanner({ inverted }: { inverted?: boolean }) {
   return (
@@ -688,9 +675,6 @@ function PlanCard({
 
         {/* Header row */}
         <div className="mb-1 flex items-start justify-between gap-2">
-          <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-            {plan.id === 'yearly' ? 'Yearly Premium' : plan.id === 'monthly' ? 'Monthly Pro' : 'Free Plan'}
-          </span>
           {/* "Active" badge — only for logged-in users on their actual plan */}
           {current && !isGuest && (
             <span className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
@@ -713,15 +697,6 @@ function PlanCard({
           <span className="mb-1 text-sm text-muted-foreground">
             / {plan.period}
           </span>
-        </div>
-
-        {/* Stats grid */}
-        <div className="mt-5 space-y-2">
-          <StatRow icon="bolt"      label="Daily generations"   value={`${plan.dailyGen} / day`}          inverted={inverted} />
-          <StatRow icon="file"      label="Words per generation" value={`${fmtWords(plan.words)} words`}  inverted={inverted} />
-          <StatRow icon="user"      label="Male voices"          value={`${plan.maleVoices} voices`}      inverted={inverted} />
-          <StatRow icon="heart"     label="Female voices"        value={`${plan.femaleVoices} voices`}    inverted={inverted} />
-          <StatRow icon="soundwave" label="Voice quality"        value={plan.voiceTier}                   inverted={inverted} />
         </div>
 
         {/* Feature list */}
