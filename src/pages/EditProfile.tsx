@@ -204,16 +204,23 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
           {/* Tabs — hidden while uploading */}
           {!uploading && (
             <>
-              <div className="flex rounded-2xl border border-border bg-secondary p-1">
+              <CutPanel
+                tone="card"
+                className="w-full"
+                contentClassName="flex items-center gap-2 bg-secondary p-1.5"
+              >
                 {(['upload', 'link'] as OverlayTab[]).map((t) => (
-                  <button key={t} type="button"
+                  <CutButton
+                    key={t}
+                    type="button"
+                    variant={tab === t ? 'outline' : 'primary'}
                     onClick={() => { setTab(t); setErr(''); }}
-                    className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold tracking-wide uppercase transition
-                      ${tab === t ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+                    className={`min-w-0 flex-1 px-2 py-2 text-xs font-semibold uppercase tracking-wide ${tab === t ? 'bg-background text-foreground' : 'bg-transparent text-muted-foreground'}`}
+                  >
                     {t === 'upload' ? <><Icon name="upload" size={13} /> Upload</> : <><Icon name="link" size={13} /> Photo Link</>}
-                  </button>
+                  </CutButton>
                 ))}
-              </div>
+              </CutPanel>
 
               <div>
                 {tab === 'upload' ? (
@@ -224,7 +231,7 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                       onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                       onDragLeave={() => setDragOver(false)}
                       onDrop={onDrop}
-                      className={`group relative w-full overflow-hidden rounded-2xl border-2 border-dashed py-7 transition-all
+                      className={`group relative w-full overflow-hidden border-2 border-dashed py-7 transition-all
                         ${dragOver ? 'border-brand bg-brand/8 scale-[1.01]' : file ? 'border-green-400/60 bg-green-50/30' : 'border-border bg-secondary/40 hover:border-brand hover:bg-brand/5'}`}>
                       <div className="flex flex-col items-center gap-2.5">
                         <span className={`flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-300
@@ -264,11 +271,11 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
 
           {/* CTA */}
           {!uploading && (
-            <button type="button" onClick={handleUpdate}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-brand py-3 text-sm font-medium text-primary-foreground shadow-[0_2px_14px_rgba(99,102,241,0.4)] transition hover:opacity-90 hover:shadow-[0_4px_20px_rgba(99,102,241,0.5)] active:scale-[0.98]">
+            <CutButton type="button" onClick={handleUpdate} variant="primary"
+              className="w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] py-3 text-sm font-medium text-white">
               <Icon name="check" size={16} />
               Update Photo
-            </button>
+            </CutButton>
           )}
         </div>
         </CutPanel>
