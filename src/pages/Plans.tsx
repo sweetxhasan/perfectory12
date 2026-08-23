@@ -660,13 +660,15 @@ function PlanCard({
         contentClassName="bg-card"
       >
       {plan.badge && (
-        <CutPanel
-          tone="card"
-          className="absolute right-5 top-5 z-10 inline-flex w-max whitespace-nowrap"
-          contentClassName="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white"
-        >
-          {plan.badge}
-        </CutPanel>
+        <div className="absolute right-6 top-6 z-20 flex w-max">
+          <CutPanel
+            tone="card"
+            className="inline-flex whitespace-nowrap"
+            contentClassName="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white"
+          >
+            {plan.badge}
+          </CutPanel>
+        </div>
       )}
       <div className={cardStyle}>
         <CutPanel tone="soft" className="mb-4 size-14" contentClassName="flex items-center justify-center bg-secondary text-foreground">
