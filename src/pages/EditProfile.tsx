@@ -148,7 +148,7 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
               variant="primary"
               type="button"
               onClick={onClose}
-              className="absolute right-4 w-max shrink-0 bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-2.5 py-1.5 text-xs font-semibold text-white"
+              className="absolute right-0 top-0 w-max shrink-0 px-3 py-2 text-xs font-semibold text-white"
             >
               Close
             </CutButton>
