@@ -209,9 +209,9 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                   <CutButton
                     key={t}
                     type="button"
-                    variant="primary"
+                    variant={tab === t ? 'primary' : 'light'}
                     onClick={() => { setTab(t); setErr(''); }}
-                    className={`w-max px-4 py-2 text-xs font-semibold uppercase tracking-wide sm:px-5 ${tab === t ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white' : 'bg-background text-foreground'}`}
+                    className="w-max px-4 py-2 text-xs font-semibold uppercase tracking-wide text-foreground sm:px-5"
                   >
                     {t === 'upload' ? 'Upload' : 'Photo Link'}
                   </CutButton>
