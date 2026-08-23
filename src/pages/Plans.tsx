@@ -960,46 +960,7 @@ function PlansContent() {
           ))}
         </div>
 
-        {/* Comparison table — only for guests or free users */}
-        {(isGuest || currentPlan === 'free') && (
-          <div className="mt-10 overflow-hidden rounded-2xl border border-border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-secondary/40">
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Feature</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Free</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-brand">Monthly</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-brand-2">Yearly</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {[
-                  { label: 'Daily generations', free: '2 / day', monthly: '5 / day',   yearly: '10 / day' },
-                  { label: 'Words per gen',     free: '500',     monthly: '3,000',      yearly: '100,000' },
-                  { label: 'Male voices',       free: '2',       monthly: '5',          yearly: '10' },
-                  { label: 'Female voices',     free: '2',       monthly: '5',          yearly: '10' },
-                  { label: 'Voice quality',     free: 'Standard', monthly: 'Premium',   yearly: 'Ultra Premium' },
-                  { label: 'Live chat support', free: '—',       monthly: '✓',          yearly: 'Priority' },
-                ].map((row) => (
-                  <tr key={row.label} className="hover:bg-secondary/30 transition">
-                    <td className="px-4 py-3 font-medium text-foreground">{row.label}</td>
-                    <td className="px-4 py-3 text-center text-muted-foreground">{row.free}</td>
-                    <td className="px-4 py-3 text-center font-medium text-brand">{row.monthly}</td>
-                    <td className="px-4 py-3 text-center font-medium text-brand-2">{row.yearly}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
 
-        {/* Footer note */}
-        <div className="mt-6 rounded-2xl border border-border bg-gradient-soft p-4 text-center">
-          <p className="text-xs text-muted-foreground">
-            Paid plans auto-expire after their period — your account reverts to Free with no surprise charges.
-            1 generation = 1 credit. Credits reset daily at midnight Bangladesh Standard Time.
-          </p>
-        </div>
       </div>
 
       {/* Deactivate overlay */}
