@@ -416,10 +416,10 @@ function DeactivateContent({
 
           {/* Actions */}
           <div className="flex flex-nowrap items-center justify-between gap-3">
-            <CutButton variant="outline" onClick={onClose} className="w-[130px] px-3 py-2.5 text-xs font-semibold">
+            <CutButton variant="outline" onClick={onClose} className="ml-[10px] w-[140px] px-3 py-2.5 text-xs font-semibold">
               Cancel
             </CutButton>
-            <CutButton variant="primary" onClick={() => setStep(2)} className="w-[130px] px-3 py-2.5 text-xs font-semibold text-white">
+            <CutButton variant="primary" onClick={() => setStep(2)} className="w-[140px] px-3 py-2.5 text-xs font-semibold text-white">
               Deactivate
             </CutButton>
           </div>
@@ -462,10 +462,10 @@ function DeactivateContent({
 
           {/* Actions */}
           <div className="flex flex-nowrap items-center justify-between gap-3">
-            <CutButton variant="outline" onClick={() => setStep(1)} disabled={busy} className="w-[130px] px-3 py-2.5 text-xs font-semibold">
+            <CutButton variant="outline" onClick={() => setStep(1)} disabled={busy} className="ml-[10px] w-[140px] px-3 py-2.5 text-xs font-semibold">
               Cancel
             </CutButton>
-            <CutButton variant="primary" onClick={onConfirm} disabled={busy} className="w-[130px] px-3 py-2.5 text-xs font-semibold text-white">
+            <CutButton variant="primary" onClick={onConfirm} disabled={busy} className="w-[140px] px-3 py-2.5 text-xs font-semibold text-white">
               {busy ? 'Deactivating…' : 'Deactivate'}
             </CutButton>
           </div>
