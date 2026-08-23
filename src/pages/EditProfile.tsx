@@ -165,10 +165,10 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
             <div className={`relative rounded-full p-1 transition-all duration-500 ${uploading ? 'ring-4 ring-brand/40 ring-offset-2 ring-offset-background' : ''}`}>
               {preview ? (
                 <img src={preview} alt="Preview"
-                  className={`h-24 w-24 rounded-full object-cover shadow-xl transition-all duration-500 ${uploading ? 'opacity-60 scale-95' : ''}`}
+                  className={`h-24 w-24 rounded-full object-cover transition-all duration-500 ${uploading ? 'opacity-60 scale-95' : ''}`}
                   crossOrigin="anonymous" onError={() => setPreview('')} />
               ) : (
-                <span className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-soft text-brand shadow-xl">
+                <span className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-soft text-brand">
                   <Icon name="user" size={36} />
                 </span>
               )}
@@ -277,9 +277,13 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
 
           {/* CTA */}
           {!uploading && (
-            <CutButton type="button" onClick={handleUpdate} variant="primary"
-              className="w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] py-3 text-sm font-medium text-white">
-              <Icon name="check" size={16} />
+            <CutButton
+              type="button"
+              onClick={handleUpdate}
+              variant="primary"
+              stroke="url(#cut-brand-gradient)"
+              className="mx-auto w-[280px] bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] py-3 text-sm font-medium text-white"
+            >
               Update Photo
             </CutButton>
           )}
