@@ -244,20 +244,6 @@ function OverlayShell({
         >
           <div className="h-[5px] w-[52px] rounded-full bg-border/80" />
         </div>
-        {/* Header */}
-        <div
-          className="flex items-center justify-between px-5 py-3.5 border-b border-border shrink-0 touch-none select-none"
-          onTouchStart={onDragStart} onTouchMove={onDragMove} onTouchEnd={onDragEnd}
-        >
-          <span className="text-base font-bold">{title}</span>
-          <button
-            type="button" onClick={onClose} aria-label="Close"
-            onTouchStart={(e) => e.stopPropagation()}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-muted-foreground transition hover:bg-border hover:text-foreground"
-          >
-            <Icon name="close" size={15} />
-          </button>
-        </div>
         <div className="flex-1 overflow-y-auto overscroll-contain">
           {children}
         </div>
@@ -273,15 +259,6 @@ function OverlayShell({
         aria-label={title}
       >
         <CutPanel tone="card" className="flex max-h-[85vh] flex-col overflow-hidden" contentClassName="bg-card">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
-          <span className="text-base font-bold">{title}</span>
-          <button
-            type="button" onClick={onClose} aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-muted-foreground transition hover:bg-border hover:text-foreground"
-          >
-            <Icon name="close" size={15} />
-          </button>
-        </div>
         <div className="flex-1 overflow-y-auto overscroll-contain">
           {children}
         </div>
@@ -438,11 +415,11 @@ function DeactivateContent({
           </CutPanel>
 
           {/* Actions */}
-          <div className="flex flex-nowrap items-center justify-center gap-2">
-            <CutButton variant="outline" onClick={onClose} className="w-max px-3 py-2.5 text-xs font-semibold">
+          <div className="flex flex-nowrap items-center justify-between gap-3">
+            <CutButton variant="outline" onClick={onClose} className="w-[130px] px-3 py-2.5 text-xs font-semibold">
               Cancel
             </CutButton>
-            <CutButton variant="primary" onClick={() => setStep(2)} className="w-max px-3 py-2.5 text-xs font-semibold text-white">
+            <CutButton variant="primary" onClick={() => setStep(2)} className="w-[130px] px-3 py-2.5 text-xs font-semibold text-white">
               Deactivate
             </CutButton>
           </div>
@@ -484,11 +461,11 @@ function DeactivateContent({
           </div>
 
           {/* Actions */}
-          <div className="flex flex-nowrap items-center justify-center gap-2">
-            <CutButton variant="outline" onClick={() => setStep(1)} disabled={busy} className="w-max px-3 py-2.5 text-xs font-semibold">
+          <div className="flex flex-nowrap items-center justify-between gap-3">
+            <CutButton variant="outline" onClick={() => setStep(1)} disabled={busy} className="w-[130px] px-3 py-2.5 text-xs font-semibold">
               Cancel
             </CutButton>
-            <CutButton variant="primary" onClick={onConfirm} disabled={busy} className="w-max px-3 py-2.5 text-xs font-semibold text-white">
+            <CutButton variant="primary" onClick={onConfirm} disabled={busy} className="w-[130px] px-3 py-2.5 text-xs font-semibold text-white">
               {busy ? 'Deactivating…' : 'Deactivate'}
             </CutButton>
           </div>
