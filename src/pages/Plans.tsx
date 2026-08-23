@@ -325,19 +325,14 @@ function AnimatedCrownBreak() {
 }
 
 /* ── Animated consequence X icon ────────────────────────── */
-function AnimatedX({ delay = 0 }: { delay?: number }) {
+function AnimatedX() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5 shrink-0" aria-hidden="true">
-      <style>{`
-        @keyframes pv-x-in { from{stroke-dashoffset:28;opacity:0} to{stroke-dashoffset:0;opacity:1} }
-        .pv-x-line { stroke-dasharray:28; animation: pv-x-in 0.35s ease-out forwards; }
-      `}</style>
-      <circle cx="10" cy="10" r="9" fill="rgba(239,68,68,0.1)" stroke="#ef4444" strokeWidth="1.5" />
-      <line className="pv-x-line" x1="7" y1="7" x2="13" y2="13" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"
-        style={{ animationDelay: `${delay}ms` }} />
-      <line className="pv-x-line" x1="13" y1="7" x2="7" y2="13" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"
-        style={{ animationDelay: `${delay + 80}ms` }} />
-    </svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="mt-0.5 size-5 shrink-0 text-foreground" aria-hidden="true">
+    <g stroke="currentColor" strokeWidth="1.5">
+      <path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z" opacity=".5" />
+      <path strokeLinecap="round" d="m14.5 9.5l-5 5m0-5l5 5" />
+    </g>
+  </svg>
   );
 }
 
@@ -400,19 +395,19 @@ function DeactivateContent({
           </div>
 
           {/* Consequence list */}
-          <CutPanel tone="soft" className="mb-5 overflow-hidden" contentClassName="border border-destructive/20 bg-destructive/5 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-destructive/70 mb-3">
+          <div className="mb-5 px-1">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-destructive/70">
               What will happen
             </p>
             <ul className="space-y-3">
               {consequences.map((c, i) => (
                 <li key={c} className="flex items-start gap-3">
-                  <AnimatedX delay={i * 80} />
-                  <span className="text-sm text-foreground/80 leading-snug">{c}</span>
+                  <AnimatedX />
+                  <span className="text-sm leading-snug text-foreground/80">{c}</span>
                 </li>
               ))}
             </ul>
-          </CutPanel>
+          </div>
 
           {/* Actions */}
           <div className="flex flex-nowrap items-center justify-between gap-3">
