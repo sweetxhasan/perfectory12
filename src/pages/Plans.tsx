@@ -522,11 +522,11 @@ function StatRow({ icon, label, value, inverted }: {
   icon: string; label: string; value: string; inverted?: boolean;
 }) {
   return (
-    <div className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 ${inverted ? 'bg-white/8' : 'bg-gradient-soft'}`}>
-      <Icon name={icon as never} size={14} className={inverted ? 'text-white/70' : 'text-brand-2'} />
-      <span className={`text-xs ${inverted ? 'text-white/70' : 'text-muted-foreground'}`}>{label}</span>
-      <span className={`ml-auto text-xs font-semibold ${inverted ? 'text-white' : 'text-foreground'}`}>{value}</span>
-    </div>
+<CutPanel tone={inverted ? 'brand' : 'soft'} className="overflow-hidden" contentClassName={`flex items-center gap-2.5 px-3 py-2.5 ${inverted ? 'bg-white/10' : 'bg-secondary/55'}`}>
+  <Icon name={icon as never} size={14} className={inverted ? 'text-white/70' : 'text-brand-2'} />
+  <span className={`text-xs ${inverted ? 'text-white/70' : 'text-muted-foreground'}`}>{label}</span>
+  <span className={`ml-auto text-xs font-semibold ${inverted ? 'text-white' : 'text-foreground'}`}>{value}</span>
+  </CutPanel>
   );
 }
 
@@ -669,15 +669,13 @@ function PlanCard({
   return (
     <div className={`relative ${plan.badge ? 'pt-4' : ''} ${isOnlyCard ? 'max-w-lg mx-auto w-full' : ''}`}>
       {plan.badge && (
-        <span className={`absolute top-0 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full px-4 py-1 text-xs font-semibold ${
-          premium
-            ? 'bg-brand text-primary-foreground shadow-[0_2px_12px_oklch(0.60_0.18_270/0.4)]'
-            : highlight
-            ? 'bg-white text-brand shadow-md'
-            : 'border border-border bg-card text-brand shadow-sm'
-        }`}>
-          ✦ {plan.badge}
-        </span>
+        <CutPanel
+          tone={premium || highlight ? 'brand' : 'card'}
+          className="absolute top-0 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap"
+          contentClassName={`px-4 py-1 text-xs font-semibold ${premium ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-primary-foreground' : 'bg-card text-brand'}`}
+        >
+          {plan.badge}
+        </CutPanel>
       )}
 
       <CutPanel
@@ -728,11 +726,9 @@ function PlanCard({
         <ul className="mt-5 flex flex-1 flex-col gap-2">
           {plan.features.map((f) => (
             <li key={f.text} className={`flex items-start gap-2.5 text-sm ${inverted ? 'text-white/90' : 'text-foreground'}`}>
-              <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full ${
-                inverted ? 'bg-white/15 text-white' : f.highlight ? 'bg-brand/10 text-brand' : 'bg-secondary text-brand'
-              }`}>
+              <CutPanel tone={inverted ? 'brand' : 'soft'} className="mt-0.5 size-5 shrink-0" contentClassName={`flex items-center justify-center ${inverted ? 'bg-white/15 text-white' : f.highlight ? 'bg-brand/10 text-brand' : 'bg-secondary text-brand'}`}>
                 <Icon name="check" size={10} />
-              </span>
+              </CutPanel>
               <span className={f.highlight && !inverted ? 'font-medium' : ''}>{f.text}</span>
             </li>
           ))}
@@ -760,21 +756,23 @@ function PlanCard({
             {/* Guest → always show "Get Started" pointing to signup */}
             {isGuest ? (
               highlight ? (
-                <button
+                <CutButton
+                  variant="outline"
                   onClick={onChoose}
-                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-brand shadow-md transition hover:opacity-90 active:scale-[0.98]"
+                  className="w-full bg-white px-5 py-3 text-sm font-semibold text-brand"
                 >
                   <Icon name="crown" size={16} />
                   Get Started
-                </button>
+                </CutButton>
               ) : premium ? (
-                <button
+                <CutButton
+                  variant="primary"
                   onClick={onChoose}
-                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-brand px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_16px_oklch(0.60_0.18_22/0.45)] transition hover:opacity-90 active:scale-[0.98]"
+                  className="w-full px-5 py-3 text-sm font-semibold text-white"
                 >
                   <Icon name="crown" size={16} />
                   Get Started
-                </button>
+                </CutButton>
               ) : (
                 <GradientButton fullWidth icon="crown" onClick={onChoose}>
                   Get Started
@@ -782,9 +780,10 @@ function PlanCard({
               )
             ) : current && plan.id !== 'free' ? (
               /* Any paid active plan → Deactivate */
-              <button
+              <CutButton
+                variant="outline"
                 onClick={onDeactivate}
-                className={`w-full flex items-center justify-center gap-2 rounded-2xl border py-3 text-sm font-medium transition hover:opacity-90 active:scale-[0.98] ${
+                className={`w-full py-3 text-sm font-medium ${
                   inverted
                     ? 'border-white/20 bg-white/10 text-white/80 hover:bg-white/15'
                     : 'border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10'
@@ -792,33 +791,35 @@ function PlanCard({
               >
                 <Icon name="ban" size={15} />
                 Deactivate {plan.name} Plan
-              </button>
+              </CutButton>
             ) : current ? (
               <OutlineButton fullWidth disabled icon="check">Current Plan</OutlineButton>
             ) : plan.id === 'free' ? (
               <OutlineButton fullWidth disabled>Included Free</OutlineButton>
             ) : highlight ? (
-              <button
+              <CutButton
+                variant="outline"
                 onClick={onChoose}
                 disabled={busy}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-brand shadow-md transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+                className="w-full bg-white px-5 py-3 text-sm font-semibold text-brand disabled:opacity-60"
               >
                 {busy
                   ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
                   : <Icon name="crown" size={16} />}
                 Get Monthly
-              </button>
+              </CutButton>
             ) : premium ? (
-              <button
+              <CutButton
+                variant="primary"
                 onClick={onChoose}
                 disabled={busy}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-brand px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_16px_oklch(0.60_0.18_22/0.45)] transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+                className="w-full px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
               >
                 {busy
                   ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   : <Icon name="crown" size={16} />}
                 Get Yearly
-              </button>
+              </CutButton>
             ) : (
               <GradientButton fullWidth icon="crown" loading={busy} onClick={onChoose}>
                 Upgrade Now
