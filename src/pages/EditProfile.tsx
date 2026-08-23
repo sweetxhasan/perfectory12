@@ -415,7 +415,7 @@ function EditProfileContent() {
             </h1>
           </div>
           <Link href={`/profile/${profile.username}`} className="shrink-0">
-            <CutButton variant="primary" className="w-max bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:py-2.5 sm:text-sm">
+            <CutButton variant="primary" className="w-max px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:py-2.5 sm:text-sm">
               <Icon name="eye" size={15} />
               View Profile
             </CutButton>
