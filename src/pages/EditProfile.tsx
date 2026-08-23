@@ -139,8 +139,8 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
         <div className="h-1 w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)]" />
 
         {/* Header */}
-        <div className="relative flex items-center justify-center px-5 py-3.5">
-          <h3 className="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] bg-clip-text text-center text-base font-semibold text-transparent sm:text-lg">
+        <div className="relative flex min-h-14 w-full items-center justify-center px-5 py-3.5">
+          <h3 className="text-center text-base font-semibold text-foreground sm:text-lg">
             Upload Profile Photo
           </h3>
           {!uploading && (
@@ -148,7 +148,7 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
               variant="primary"
               type="button"
               onClick={onClose}
-              className="absolute right-0 top-0 w-max shrink-0 px-3 py-2 text-xs font-semibold text-white"
+              className="absolute right-3 top-1/2 w-max -translate-y-1/2 shrink-0 px-2.5 py-1.5 text-xs font-semibold text-white"
             >
               Close
             </CutButton>
