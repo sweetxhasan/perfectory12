@@ -131,10 +131,12 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
       <div className="absolute inset-0 bg-foreground/60 backdrop-blur-lg" onClick={!uploading ? onClose : undefined} />
 
       {/* Card */}
-      <div className="relative z-10 w-full max-w-sm overflow-hidden rounded-[2rem] border border-border bg-background shadow-[0_32px_64px_rgba(0,0,0,0.25)] float-up">
-
-        {/* Gradient top bar */}
-        <div className="h-1 w-full bg-gradient-brand" />
+      <CutPanel
+        tone="card"
+        className="relative z-10 w-full max-w-sm overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.25)] float-up"
+        contentClassName="bg-background"
+      >
+        <div className="h-1 w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)]" />
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4">
@@ -268,7 +270,7 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
             </button>
           )}
         </div>
-      </div>
+      </CutPanel>
     </div>
   );
 }
