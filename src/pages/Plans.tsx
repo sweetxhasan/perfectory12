@@ -6,6 +6,7 @@ import { SEOHead } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
 import { Panel, SectionBadge, GradientButton, OutlineButton } from '@/components/primitives';
 import { Icon } from '@/components/icon';
+import { CutButton, CutPanel } from '@/components/cut-ui';
 import { useAuth } from '@/lib/auth-context';
 import { deactivatePlan, PLAN_DAILY_CREDITS, type PlanId } from '@/lib/user-store';
 import { subscribeUserPayments } from '@/lib/payments';
@@ -660,12 +661,10 @@ function PlanCard({
   const { highlight, premium } = plan;
   const inverted = highlight || premium;
 
-  const cardBase = 'relative flex flex-col rounded-3xl border p-6';
-  const cardStyle = premium
-    ? `${cardBase} border-brand/30 bg-[oklch(0.18_0.04_270)] text-white shadow-[0_4px_40px_oklch(0.60_0.18_270/0.25)]`
-    : highlight
-    ? `${cardBase} border-brand/40 bg-gradient-brand text-white shadow-[0_4px_40px_oklch(0.60_0.18_22/0.30)]`
-    : `${cardBase} border-border bg-card`;
+  const cardBase = 'relative flex flex-col p-6';
+  const cardStyle = premium || highlight
+    ? `${cardBase} text-white`
+    : `${cardBase} text-foreground`;
 
   return (
     <div className={`relative ${plan.badge ? 'pt-4' : ''} ${isOnlyCard ? 'max-w-lg mx-auto w-full' : ''}`}>
@@ -681,6 +680,11 @@ function PlanCard({
         </span>
       )}
 
+      <CutPanel
+        tone={premium || highlight ? 'brand' : 'card'}
+        className="overflow-hidden shadow-[0_4px_40px_oklch(0.60_0.18_22/0.18)]"
+        contentClassName={premium || highlight ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)]' : 'bg-card'}
+      >
       <div className={cardStyle}>
         {/* Header row */}
         <div className="flex items-start justify-between gap-2 mb-1">
@@ -823,6 +827,7 @@ function PlanCard({
           </div>
         )}
       </div>
+      </CutPanel>
     </div>
   );
 }
