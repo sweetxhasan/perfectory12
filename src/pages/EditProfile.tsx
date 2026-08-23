@@ -400,6 +400,7 @@ function EditProfileContent() {
       )}
 
       <div className="mx-auto max-w-md">
+        <CutPanel tone="card" className="overflow-hidden" contentClassName="bg-card p-4 sm:p-6">
         {/* Page header */}
         <div className="mb-7 flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
@@ -573,16 +574,20 @@ function EditProfileContent() {
           </FieldCard>
 
           {/* Save */}
-          <button type="submit"
+          <CutButton
+            type="submit"
+            variant="primary"
             disabled={saving || usnStatus === 'taken' || usnStatus === 'short'}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-3xl bg-gradient-brand py-3.5 text-sm font-medium text-primary-foreground shadow-[0_2px_16px_rgba(99,102,241,0.4)] transition hover:opacity-90 hover:shadow-[0_4px_24px_rgba(99,102,241,0.5)] disabled:opacity-60 active:scale-[0.98]">
+            className="w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] py-3.5 text-sm font-medium text-white"
+          >
             {saving
               ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
               : <Icon name="check" size={17} />}
             {saved ? 'Profile Updated!' : 'Update Profile'}
-          </button>
+          </CutButton>
 
         </form>
+        </CutPanel>
       </div>
     </>
   );
