@@ -231,8 +231,12 @@ function OverlayShell({
       {/* ── Mobile: bottom sheet ── */}
       <div
         ref={sheetRef}
-        className="sm:hidden absolute bottom-0 left-0 right-0 flex flex-col bg-card rounded-t-[2rem] max-h-[92dvh] animate-overlay-sheet shadow-2xl"
+        className="sm:hidden absolute bottom-0 left-0 right-0 flex max-h-[92dvh] flex-col animate-overlay-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
       >
+        <CutPanel tone="card" className="flex min-h-0 flex-col overflow-hidden rounded-t-[2rem]" contentClassName="bg-card">
         {/* Drag handle */}
         <div
           className="flex justify-center items-center pt-3 pb-2 shrink-0 touch-none select-none cursor-grab active:cursor-grabbing"
@@ -258,13 +262,18 @@ function OverlayShell({
           {children}
         </div>
         <div className="shrink-0" style={{ height: 'env(safe-area-inset-bottom, 12px)' }} />
+        </CutPanel>
       </div>
 
       {/* ── Desktop: centred modal ── */}
       <div
-        className="hidden sm:flex flex-col bg-card rounded-3xl shadow-2xl border border-border w-[480px] max-h-[85vh] absolute top-1/2 left-1/2 animate-overlay-modal overflow-hidden"
+        className="hidden sm:flex w-[min(92vw,600px)] max-h-[85vh] absolute top-1/2 left-1/2 animate-overlay-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         style={{ transform: 'translate(-50%, -50%)' }}
       >
+        <CutPanel tone="card" className="flex max-h-[85vh] flex-col overflow-hidden" contentClassName="bg-card">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
           <span className="text-base font-bold">{title}</span>
           <button
@@ -277,6 +286,7 @@ function OverlayShell({
         <div className="flex-1 overflow-y-auto overscroll-contain">
           {children}
         </div>
+        </CutPanel>
       </div>
     </div>,
     document.body,
@@ -417,7 +427,7 @@ function DeactivateContent({
           </div>
 
           {/* Consequence list */}
-          <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-4 mb-5">
+          <CutPanel tone="soft" className="mb-5 overflow-hidden" contentClassName="border border-destructive/20 bg-destructive/5 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-destructive/70 mb-3">
               What will happen
             </p>
@@ -429,10 +439,10 @@ function DeactivateContent({
                 </li>
               ))}
             </ul>
-          </div>
+          </CutPanel>
 
           {/* Actions */}
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={onClose}
               className="flex-1 rounded-2xl border border-border bg-secondary px-4 py-3 text-sm font-semibold transition hover:bg-secondary/70 active:scale-[0.98]"
