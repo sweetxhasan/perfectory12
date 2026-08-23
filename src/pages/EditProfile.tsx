@@ -4,7 +4,7 @@ import { updateProfile as fbUpdateProfile } from 'firebase/auth';
 import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
 import { Icon } from '@/components/icon';
-import { CutButton } from '@/components/cut-ui';
+import { CutButton, CutPanel } from '@/components/cut-ui';
 import { useAuth } from '@/lib/auth-context';
 import { auth } from '@/lib/firebase';
 import { updateUserProfile, isUsernameAvailable } from '@/lib/user-store';
