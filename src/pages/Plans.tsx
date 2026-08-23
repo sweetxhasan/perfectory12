@@ -35,6 +35,7 @@ const PLANS: Plan[] = [
   {
     id: 'free',
     name: 'Free',
+    badge: 'Free',
     price: '৳0',
     period: 'forever',
     tagline: 'Try before you commit',
@@ -656,8 +657,8 @@ function PlanCard({
       {plan.badge && (
         <CutPanel
           tone="card"
-          className="absolute top-5 right-5 z-10 whitespace-nowrap"
-          contentClassName="bg-foreground px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-background"
+          className="absolute left-1/2 top-5 z-10 inline-flex w-max -translate-x-1/2 whitespace-nowrap"
+          contentClassName="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white"
         >
           {plan.badge}
         </CutPanel>
