@@ -124,6 +124,7 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
   }
 
   const stepLabels = { idle: '', reading: 'Reading file…', sending: 'Uploading to ImgBB…', done: 'Done! ✓' };
+  const canSubmit = tab === 'upload' ? Boolean(file) : isValidUrl(linkVal);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -278,10 +279,15 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
 
           {/* Error */}
           {err && (
-            <div className="flex items-start gap-2 rounded-xl border border-destructive/20 bg-destructive/8 px-3 py-2.5">
+            <CutPanel
+              tone="card"
+              stroke="url(#cut-brand-gradient)"
+              className="w-full"
+              contentClassName="flex items-start gap-2 bg-background px-3 py-2.5"
+            >
               <Icon name="x" size={13} className="mt-0.5 shrink-0 text-destructive" />
               <p className="text-xs text-destructive">{err}</p>
-            </div>
+            </CutPanel>
           )}
 
           {/* CTA */}
@@ -292,7 +298,8 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                 onClick={handleUpdate}
                 variant="primary"
                 stroke="url(#cut-brand-gradient)"
-                className="w-[280px] max-w-full overflow-hidden py-3 text-sm font-medium text-white"
+                disabled={!canSubmit || uploading}
+                className="w-[280px] max-w-full overflow-hidden py-3 text-sm font-medium text-white opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Update Photo
               </CutButton>
