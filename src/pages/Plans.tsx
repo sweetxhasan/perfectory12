@@ -522,7 +522,7 @@ function StatRow({ icon, label, value, inverted }: {
   icon: string; label: string; value: string; inverted?: boolean;
 }) {
   return (
-<CutPanel tone={inverted ? 'brand' : 'soft'} className="overflow-hidden" contentClassName={`flex items-center gap-2.5 px-3 py-2.5 ${inverted ? 'bg-white/10' : 'bg-secondary/55'}`}>
+<CutPanel tone="soft" className="overflow-hidden" contentClassName="flex items-center gap-2.5 bg-secondary/45 px-3 py-2.5">
   <Icon name={icon as never} size={14} className={inverted ? 'text-white/70' : 'text-brand-2'} />
   <span className={`text-xs ${inverted ? 'text-white/70' : 'text-muted-foreground'}`}>{label}</span>
   <span className={`ml-auto text-xs font-semibold ${inverted ? 'text-white' : 'text-foreground'}`}>{value}</span>
@@ -659,34 +659,36 @@ function PlanCard({
   pending?: boolean;
 }) {
   const { highlight, premium } = plan;
-  const inverted = highlight || premium;
+  const inverted = false;
 
   const cardBase = 'relative flex flex-col p-6';
-  const cardStyle = premium || highlight
-    ? `${cardBase} text-white`
-    : `${cardBase} text-foreground`;
+  const cardStyle = `${cardBase} text-foreground`;
 
   return (
     <div className={`relative ${plan.badge ? 'pt-4' : ''} ${isOnlyCard ? 'max-w-lg mx-auto w-full' : ''}`}>
       {plan.badge && (
         <CutPanel
-          tone={premium || highlight ? 'brand' : 'card'}
-          className="absolute top-0 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap"
-          contentClassName={`px-4 py-1 text-xs font-semibold ${premium ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-primary-foreground' : 'bg-card text-brand'}`}
+          tone="card"
+          className="absolute top-5 right-5 z-10 whitespace-nowrap"
+          contentClassName="bg-foreground px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-background"
         >
           {plan.badge}
         </CutPanel>
       )}
 
       <CutPanel
-        tone={premium || highlight ? 'brand' : 'card'}
-        className="overflow-hidden shadow-[0_4px_40px_oklch(0.60_0.18_22/0.18)]"
-        contentClassName={premium || highlight ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)]' : 'bg-card'}
+        tone="card"
+        className="overflow-hidden shadow-[0_18px_42px_oklch(0.15_0.02_260/0.08)] transition duration-300 hover:-translate-y-2"
+        contentClassName="bg-card"
       >
       <div className={cardStyle}>
+        <CutPanel tone="soft" className="mb-4 size-14" contentClassName="flex items-center justify-center bg-secondary text-foreground">
+          <Icon name={plan.id === 'free' ? 'bolt' : plan.id === 'monthly' ? 'crown' : 'sparkles'} size={24} />
+        </CutPanel>
+
         {/* Header row */}
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <span className={`text-xs font-semibold uppercase tracking-widest ${inverted ? 'text-white/60' : 'text-muted-foreground'}`}>
+        <div className="mb-1 flex items-start justify-between gap-2">
+          <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
             {plan.id === 'yearly' ? 'Yearly Premium' : plan.id === 'monthly' ? 'Monthly Pro' : 'Free Plan'}
           </span>
           {/* "Active" badge — only for logged-in users on their actual plan */}
@@ -700,15 +702,15 @@ function PlanCard({
           )}
         </div>
 
-        <h3 className={`text-2xl font-bold ${inverted ? 'text-white' : 'text-foreground'}`}>{plan.name}</h3>
-        <p className={`mt-0.5 text-xs ${inverted ? 'text-white/60' : 'text-muted-foreground'}`}>{plan.tagline}</p>
+        <h3 className="text-2xl font-semibold text-foreground">{plan.name}</h3>
+        <p className="mt-0.5 text-xs text-muted-foreground">{plan.tagline}</p>
 
         {/* Price */}
         <div className="mt-4 flex items-end gap-1">
-          <span className={`text-5xl font-extrabold leading-none ${inverted ? 'text-white' : 'text-gradient'}`}>
+          <span className="text-5xl font-normal leading-none text-foreground">
             {plan.price}
           </span>
-          <span className={`mb-1 text-sm ${inverted ? 'text-white/60' : 'text-muted-foreground'}`}>
+          <span className="mb-1 text-sm text-muted-foreground">
             / {plan.period}
           </span>
         </div>
@@ -725,7 +727,7 @@ function PlanCard({
         {/* Feature list */}
         <ul className="mt-5 flex flex-1 flex-col gap-2">
           {plan.features.map((f) => (
-            <li key={f.text} className={`flex items-start gap-2.5 text-sm ${inverted ? 'text-white/90' : 'text-foreground'}`}>
+            <li key={f.text} className="flex items-start gap-2.5 border-b border-border/50 py-1.5 text-sm text-foreground last:border-0">
               <CutPanel tone={inverted ? 'brand' : 'soft'} className="mt-0.5 size-5 shrink-0" contentClassName={`flex items-center justify-center ${inverted ? 'bg-white/15 text-white' : f.highlight ? 'bg-brand/10 text-brand' : 'bg-secondary text-brand'}`}>
                 <Icon name="check" size={10} />
               </CutPanel>
