@@ -228,11 +228,15 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                       onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                       onDragLeave={() => setDragOver(false)}
                       onDrop={onDrop}
-                      className={`group relative w-full overflow-hidden border-2 border-dashed py-7 transition-all
-                        ${dragOver ? 'border-brand bg-brand/8 scale-[1.01]' : file ? 'border-green-400/60 bg-green-50/30' : 'border-border bg-secondary/40 hover:border-brand hover:bg-brand/5'}`}>
-                      <div className="flex flex-col items-center gap-2.5">
-                        <span className={`flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-300
-                          ${dragOver ? 'bg-brand text-primary-foreground scale-110' : file ? 'bg-green-500/10 text-green-500' : 'bg-gradient-soft text-brand group-hover:scale-110'}`}>
+                      className="group relative w-full"
+                    >
+                      <CutPanel
+                        tone="card"
+                        stroke="url(#cut-brand-gradient)"
+                        className="w-full"
+                        contentClassName={`flex flex-col items-center gap-2.5 px-4 py-7 transition-all ${dragOver ? 'bg-brand/8 scale-[1.01]' : file ? 'bg-green-50/30' : 'bg-secondary/40 group-hover:bg-brand/5'}`}
+                      >
+                        <span className="flex size-12 items-center justify-center bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white transition-transform duration-300 group-hover:scale-110">
                           <Icon name={file ? 'check' : 'upload'} size={22} />
                         </span>
                         <div className="text-center">
@@ -243,7 +247,7 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                             {file ? `${(file.size / 1024).toFixed(0)} KB` : 'PNG, JPG, WEBP supported'}
                           </p>
                         </div>
-                      </div>
+                      </CutPanel>
                     </button>
                   </>
                 ) : (
