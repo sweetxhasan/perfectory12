@@ -231,7 +231,7 @@ function OverlayShell({
       {/* ── Mobile: bottom sheet ── */}
       <div
         ref={sheetRef}
-        className="sm:hidden absolute bottom-0 left-0 right-0 flex max-h-[92dvh] flex-col animate-overlay-sheet"
+        className="absolute left-1/2 top-1/2 flex w-[98vw] max-w-[360px] max-h-[92dvh] -translate-x-1/2 -translate-y-1/2 flex-col animate-overlay-modal"
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -239,7 +239,7 @@ function OverlayShell({
         <CutPanel tone="card" className="flex min-h-0 flex-col overflow-hidden rounded-t-[2rem]" contentClassName="bg-card">
         {/* Drag handle */}
         <div
-          className="flex justify-center items-center pt-3 pb-2 shrink-0 touch-none select-none cursor-grab active:cursor-grabbing"
+          className="hidden"
           onTouchStart={onDragStart} onTouchMove={onDragMove} onTouchEnd={onDragEnd}
         >
           <div className="h-[5px] w-[52px] rounded-full bg-border/80" />
@@ -267,11 +267,10 @@ function OverlayShell({
 
       {/* ── Desktop: centred modal ── */}
       <div
-        className="hidden sm:flex w-[min(92vw,600px)] max-h-[85vh] absolute top-1/2 left-1/2 animate-overlay-modal"
+        className="hidden"
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        style={{ transform: 'translate(-50%, -50%)' }}
       >
         <CutPanel tone="card" className="flex max-h-[85vh] flex-col overflow-hidden" contentClassName="bg-card">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
@@ -412,18 +411,15 @@ function DeactivateContent({
         <div>
           {/* Icon */}
           <div className="flex justify-center mb-4">
-            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-destructive/10 border border-destructive/20">
+            <CutPanel tone="soft" className="size-16" contentClassName="flex items-center justify-center bg-destructive/5">
               <WarningIcon />
-            </div>
+            </CutPanel>
           </div>
 
           {/* Title + subtitle */}
           <div className="text-center mb-5">
              <h2 className="text-xl font-bold text-foreground">Deactivate {planName} Plan?</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-              This will immediately downgrade your account.<br />
-              Please read the following before continuing.
-            </p>
+
           </div>
 
           {/* Consequence list */}
@@ -442,19 +438,13 @@ function DeactivateContent({
           </CutPanel>
 
           {/* Actions */}
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button
-              onClick={onClose}
-              className="flex-1 rounded-2xl border border-border bg-secondary px-4 py-3 text-sm font-semibold transition hover:bg-secondary/70 active:scale-[0.98]"
-            >
-              Keep My Plan
-            </button>
-            <button
-              onClick={() => setStep(2)}
-              className="flex-1 rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive transition hover:bg-destructive/15 active:scale-[0.98]"
-            >
-              I Understand →
-            </button>
+          <div className="flex flex-nowrap items-center justify-center gap-2">
+            <CutButton variant="outline" onClick={onClose} className="w-max px-3 py-2.5 text-xs font-semibold">
+              Cancel
+            </CutButton>
+            <CutButton variant="primary" onClick={() => setStep(2)} className="w-max px-3 py-2.5 text-xs font-semibold text-white">
+              Deactivate
+            </CutButton>
           </div>
         </div>
       ) : (
@@ -468,10 +458,7 @@ function DeactivateContent({
           {/* Title */}
           <div className="text-center mb-5">
             <h2 className="text-xl font-bold text-foreground">Final Confirmation</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-              Your plan and all credits will be cleared immediately.<br />
-              Are you absolutely sure?
-            </p>
+
           </div>
 
           {/* After-downgrade summary */}
@@ -497,30 +484,13 @@ function DeactivateContent({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3">
-            <button
-              onClick={() => setStep(1)}
-              disabled={busy}
-              className="flex-1 rounded-2xl border border-border bg-secondary px-4 py-3 text-sm font-semibold transition hover:bg-secondary/70 active:scale-[0.98] disabled:opacity-50"
-            >
-              ← Go Back
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={busy}
-              className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-destructive px-4 py-3 text-sm font-semibold text-white shadow-[0_2px_14px_rgba(239,68,68,0.4)] transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
-            >
-              {busy ? (
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              ) : (
-                <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4" aria-hidden="true">
-                  <circle cx="8" cy="8" r="7" stroke="white" strokeWidth="1.5" />
-                  <line x1="5" y1="5" x2="11" y2="11" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-                  <line x1="11" y1="5" x2="5" y2="11" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              )}
-              {busy ? 'Deactivating…' : 'Deactivate Now'}
-            </button>
+          <div className="flex flex-nowrap items-center justify-center gap-2">
+            <CutButton variant="outline" onClick={() => setStep(1)} disabled={busy} className="w-max px-3 py-2.5 text-xs font-semibold">
+              Cancel
+            </CutButton>
+            <CutButton variant="primary" onClick={onConfirm} disabled={busy} className="w-max px-3 py-2.5 text-xs font-semibold text-white">
+              {busy ? 'Deactivating…' : 'Deactivate'}
+            </CutButton>
           </div>
         </div>
       )}
