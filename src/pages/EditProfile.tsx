@@ -207,7 +207,7 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
               <CutPanel
                 tone="card"
                 className="w-full"
-                contentClassName="flex items-center gap-2 bg-secondary p-1.5"
+                contentClassName="flex items-center gap-1 bg-secondary p-1"
               >
                 {(['upload', 'link'] as OverlayTab[]).map((t) => (
                   <CutButton
@@ -215,9 +215,9 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                     type="button"
                     variant={tab === t ? 'outline' : 'primary'}
                     onClick={() => { setTab(t); setErr(''); }}
-                    className={`min-w-0 flex-1 px-2 py-2 text-xs font-semibold uppercase tracking-wide ${tab === t ? 'bg-background text-foreground' : 'bg-transparent text-muted-foreground'}`}
+                    className={`min-w-0 flex-1 px-2 py-1.5 text-xs font-semibold uppercase tracking-wide ${tab === t ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white' : 'bg-transparent text-muted-foreground'}`}
                   >
-                    {t === 'upload' ? <><Icon name="upload" size={13} /> Upload</> : <><Icon name="link" size={13} /> Photo Link</>}
+                    {t === 'upload' ? 'Upload' : 'Photo Link'}
                   </CutButton>
                 ))}
               </CutPanel>
