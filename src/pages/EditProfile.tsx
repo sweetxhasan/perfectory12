@@ -282,7 +282,7 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
               onClick={handleUpdate}
               variant="primary"
               stroke="url(#cut-brand-gradient)"
-              className="mx-auto w-[280px] bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] py-3 text-sm font-medium text-white"
+              className="mx-auto block w-[280px] max-w-full overflow-hidden py-3 text-sm font-medium text-white"
             >
               Update Photo
             </CutButton>
