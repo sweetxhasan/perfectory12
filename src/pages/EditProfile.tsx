@@ -139,21 +139,22 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
         <div className="h-1 w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)]" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-brand text-primary-foreground shadow-md">
-              <CameraIcon />
-            </span>
-            <div>
-              <h3 className="text-sm font-semibold leading-none">Update Profile Photo</h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">PNG, JPG, WEBP · max 10 MB</p>
-            </div>
+        <div className="flex items-center justify-between gap-3 px-5 py-4">
+          <div className="flex flex-1 justify-center text-center">
+            <h3 className="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] bg-clip-text text-base font-semibold text-transparent sm:text-lg">
+              Upload Profile Photo
+            </h3>
           </div>
           {!uploading && (
-            <button type="button" onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-destructive hover:bg-destructive/10 hover:text-destructive">
+            <CutButton
+              variant="primary"
+              type="button"
+              onClick={onClose}
+              className="w-max shrink-0 gap-1.5 bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-3 py-2 text-xs font-semibold text-white"
+            >
               <Icon name="x" size={14} />
-            </button>
+              Close
+            </CutButton>
           )}
         </div>
 
