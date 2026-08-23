@@ -277,15 +277,17 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
 
           {/* CTA */}
           {!uploading && (
-            <CutButton
-              type="button"
-              onClick={handleUpdate}
-              variant="primary"
-              stroke="url(#cut-brand-gradient)"
-              className="mx-auto block w-[280px] max-w-full overflow-hidden py-3 text-sm font-medium text-white"
-            >
-              Update Photo
-            </CutButton>
+            <div className="flex justify-center">
+              <CutButton
+                type="button"
+                onClick={handleUpdate}
+                variant="primary"
+                stroke="url(#cut-brand-gradient)"
+                className="w-[280px] max-w-full overflow-hidden py-3 text-sm font-medium text-white"
+              >
+                Update Photo
+              </CutButton>
+            </div>
           )}
         </div>
         </CutPanel>
