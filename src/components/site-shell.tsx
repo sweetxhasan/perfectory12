@@ -355,17 +355,17 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </div>
 
                 {/* Credits pill */}
-                <Link href="/credits" className="group relative hidden items-center gap-1.5 px-3 py-1.5 text-sm transition sm:flex">
+                <div className="group relative hidden items-center gap-1.5 px-3 py-1.5 text-sm sm:flex" aria-label={`${profile.credits} credits`}>
                   <CutFrame variant="outline" cut={9} />
                   <Icon name="bolt" size={15} className="relative z-10 text-brand-2" />
                   <span className="relative z-10 font-medium">{profile.credits}</span>
                   <span className="relative z-10 text-muted-foreground">credits</span>
-                </Link>
-                <Link href="/credits" className="group relative flex items-center gap-1 px-2.5 py-1.5 text-sm transition sm:hidden">
+                </div>
+                <div className="group relative flex items-center gap-1 px-2.5 py-1.5 text-sm sm:hidden" aria-label={`${profile.credits} credits`}>
                   <CutFrame variant="outline" cut={9} />
                   <Icon name="bolt" size={14} className="relative z-10 text-brand-2" />
                   <span className="relative z-10 font-medium leading-none">{profile.credits}</span>
-                </Link>
+                </div>
 
                 {/* Avatar / menu button */}
                 <div className="relative" ref={menuRef}>

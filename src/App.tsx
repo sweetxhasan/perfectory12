@@ -67,7 +67,6 @@ import AdminChat from '@/pages/admin/Chat';
 import BuyPlan from '@/pages/BuyPlan';
 import BuyPlanCheckout from '@/pages/BuyPlanCheckout';
 import LiveChat from '@/pages/LiveChat';
-import Credits from '@/pages/Credits';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import FAQ from '@/pages/FAQ';
@@ -95,7 +94,6 @@ function Router() {
       <Route path="/buyplan/:plan/:method" component={BuyPlanCheckout} />
       <Route path="/buyplan/:plan" component={BuyPlan} />
       <Route path="/dashboard" component={Dashboard} />
-      <Route path="/credits" component={Credits} />
       <Route path="/profile/edit" component={EditProfile} />
       <Route path="/profile/:username/edit" component={AdminEditProfile} />
       <Route path="/profile/:username" component={Profile} />
