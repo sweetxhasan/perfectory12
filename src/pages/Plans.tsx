@@ -670,7 +670,15 @@ function PlanCard({
       >
       <div className={cardStyle}>
         <CutPanel tone="soft" className="mb-4 size-14" contentClassName="flex items-center justify-center bg-secondary text-foreground">
-          <Icon name={plan.id === 'free' ? 'bolt' : plan.id === 'monthly' ? 'crown' : 'sparkles'} size={24} />
+          <svg className="size-6" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 19L12 3L22 19L18 21L12 17L6 21L2 19Z" />
+            <path d="M2 19L12 3" />
+            <path d="M22 19L12 3" />
+            <path d="M2 19L6 21L12 17L18 21L22 19" />
+            <circle cx="12" cy="3" r="1.5" strokeWidth="1.8" />
+            <circle cx="6" cy="12" r="1.2" strokeWidth="1.8" />
+            <circle cx="18" cy="12" r="1.2" strokeWidth="1.8" />
+          </svg>
         </CutPanel>
 
         {/* Header row */}
