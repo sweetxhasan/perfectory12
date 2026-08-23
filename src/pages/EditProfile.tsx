@@ -4,6 +4,7 @@ import { updateProfile as fbUpdateProfile } from 'firebase/auth';
 import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
 import { Icon } from '@/components/icon';
+import { CutButton } from '@/components/cut-ui';
 import { useAuth } from '@/lib/auth-context';
 import { auth } from '@/lib/firebase';
 import { updateUserProfile, isUsernameAvailable } from '@/lib/user-store';
@@ -400,14 +401,24 @@ function EditProfileContent() {
 
       <div className="mx-auto max-w-md">
         {/* Page header */}
-        <div className="mb-7 flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Account</p>
-            <h1 className="mt-1 text-2xl font-semibold">Edit Profile</h1>
+        <div className="mb-7 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link
+              href={`/profile/${profile.username}`}
+              aria-label="Back to profile"
+              className="flex size-9 shrink-0 items-center justify-center text-foreground transition hover:text-brand-2"
+            >
+              <Icon name="arrow-left" size={19} />
+            </Link>
+            <h1 className="truncate bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] bg-clip-text text-xl font-semibold text-transparent sm:text-2xl">
+              Edit Profile
+            </h1>
           </div>
-          <Link href={`/profile/${profile.username}`}
-            className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2 text-sm transition hover:border-brand-2 hover:text-brand-2">
-            <Icon name="eye" size={15} /> View Profile
+          <Link href={`/profile/${profile.username}`} className="shrink-0">
+            <CutButton variant="primary" className="w-max bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:py-2.5 sm:text-sm">
+              <Icon name="eye" size={15} />
+              View Profile
+            </CutButton>
           </Link>
         </div>
 
