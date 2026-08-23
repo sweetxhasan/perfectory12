@@ -433,18 +433,25 @@ function EditProfileContent() {
             stroke="#ec5252"
           >
             <div className="relative">
-              {form.photoURL ? (
-                <img src={form.photoURL} alt="Avatar" crossOrigin="anonymous"
-                  className="h-28 w-28 rounded-full border-4 border-border object-cover shadow-xl" />
-              ) : (
-                <span className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-border bg-gradient-brand text-4xl font-semibold text-primary-foreground shadow-xl">
-                  {form.name.charAt(0).toUpperCase() || 'U'}
-                </span>
-              )}
+              <CutPanel
+                tone="card"
+                stroke="url(#cut-brand-gradient)"
+                className="size-32 overflow-hidden p-1"
+                contentClassName="flex items-center justify-center overflow-hidden bg-background"
+              >
+                {form.photoURL ? (
+                  <img src={form.photoURL} alt="Avatar" crossOrigin="anonymous"
+                    className="h-full w-full object-cover" />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center bg-gradient-brand text-4xl font-semibold text-primary-foreground">
+                    {form.name.charAt(0).toUpperCase() || 'U'}
+                  </span>
+                )}
+              </CutPanel>
               <CutPanel
                 tone="brand"
-                className="absolute -bottom-1 -right-1 size-10 rounded-full"
-                contentClassName="flex items-center justify-center rounded-full"
+                className="absolute -bottom-1 -right-1 size-10"
+                contentClassName="flex items-center justify-center"
               >
                 <button type="button" onClick={() => setShowPhotoOverlay(true)}
                   className="flex size-full items-center justify-center text-primary-foreground transition hover:scale-110 active:scale-95"
