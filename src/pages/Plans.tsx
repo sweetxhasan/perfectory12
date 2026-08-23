@@ -660,7 +660,7 @@ function PlanCard({
         contentClassName="bg-card"
       >
       {plan.badge && (
-        <div className="absolute right-6 top-6 z-20 flex w-max">
+        <div className="absolute right-[10px] top-6 z-20 flex w-max">
           <CutPanel
             tone="card"
             className="inline-flex whitespace-nowrap"
