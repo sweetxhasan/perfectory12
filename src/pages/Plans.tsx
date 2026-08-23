@@ -653,22 +653,21 @@ function PlanCard({
   const cardStyle = `${cardBase} text-foreground`;
 
   return (
-    <div className={`relative ${plan.badge ? 'pt-4' : ''} ${isOnlyCard ? 'max-w-lg mx-auto w-full' : ''}`}>
-      {plan.badge && (
-        <CutPanel
-          tone="card"
-          className="absolute left-1/2 top-5 z-10 inline-flex w-max -translate-x-1/2 whitespace-nowrap"
-          contentClassName="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white"
-        >
-          {plan.badge}
-        </CutPanel>
-      )}
-
+    <div className={`relative ${isOnlyCard ? 'max-w-lg mx-auto w-full' : ''}`}>
       <CutPanel
         tone="card"
         className="overflow-hidden shadow-[0_18px_42px_oklch(0.15_0.02_260/0.08)] transition duration-300 hover:-translate-y-2"
         contentClassName="bg-card"
       >
+      {plan.badge && (
+        <CutPanel
+          tone="card"
+          className="absolute right-5 top-5 z-10 inline-flex w-max whitespace-nowrap"
+          contentClassName="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white"
+        >
+          {plan.badge}
+        </CutPanel>
+      )}
       <div className={cardStyle}>
         <CutPanel tone="soft" className="mb-4 size-14" contentClassName="flex items-center justify-center bg-secondary text-foreground">
           <svg className="size-6" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
