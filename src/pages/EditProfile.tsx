@@ -256,12 +256,21 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                     </button>
                   </>
                 ) : (
-                  <div className="relative">
+                  <CutPanel
+                    tone="card"
+                    stroke="#000000"
+                    className="w-full"
+                    contentClassName="relative bg-background"
+                  >
                     <Icon name="link" size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="url" placeholder="https://example.com/photo.jpg"
-                      value={linkVal} onChange={(e) => onLinkChange(e.target.value)}
-                      className="w-full rounded-2xl border border-border bg-secondary py-3 pl-9 pr-4 text-sm outline-none placeholder:text-muted-foreground/50 focus:border-brand transition" />
-                  </div>
+                    <input
+                      type="url"
+                      placeholder="Enter profile photo link..."
+                      value={linkVal}
+                      onChange={(e) => onLinkChange(e.target.value)}
+                      className="w-full bg-background py-3 pl-9 pr-4 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 transition"
+                    />
+                  </CutPanel>
                 )}
               </div>
             </>
