@@ -747,9 +747,8 @@ function PlanCard({
                 <CutButton
                   variant="outline"
                   onClick={onChoose}
-                  className="w-full bg-white px-5 py-3 text-sm font-semibold text-brand"
+                  className="px-5 py-3 text-sm font-semibold text-white"
                 >
-                  <Icon name="crown" size={16} />
                   Get Started
                 </CutButton>
               ) : premium ? (
@@ -758,42 +757,40 @@ function PlanCard({
                   onClick={onChoose}
                   className="w-full px-5 py-3 text-sm font-semibold text-white"
                 >
-                  <Icon name="crown" size={16} />
                   Get Started
                 </CutButton>
               ) : (
-                <GradientButton fullWidth icon="crown" onClick={onChoose}>
+                <CutButton variant="primary" onClick={onChoose} className="px-5 py-3 text-sm font-semibold text-white">
                   Get Started
-                </GradientButton>
+                </CutButton>
               )
             ) : current && plan.id !== 'free' ? (
               /* Any paid active plan → Deactivate */
               <CutButton
                 variant="outline"
                 onClick={onDeactivate}
-                className={`w-full py-3 text-sm font-medium ${
+                className={`px-5 py-3 text-sm font-medium ${
                   inverted
                     ? 'border-white/20 bg-white/10 text-white/80 hover:bg-white/15'
                     : 'border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10'
                 }`}
               >
-                <Icon name="ban" size={15} />
                 Deactivate {plan.name} Plan
               </CutButton>
             ) : current ? (
-              <OutlineButton fullWidth disabled icon="check">Current Plan</OutlineButton>
+              <CutButton variant="primary" disabled className="px-5 py-3 text-sm font-semibold text-white">Current Plan</CutButton>
             ) : plan.id === 'free' ? (
-              <OutlineButton fullWidth disabled>Included Free</OutlineButton>
+              <CutButton variant="primary" disabled className="px-5 py-3 text-sm font-semibold text-white">Included Free</CutButton>
             ) : highlight ? (
               <CutButton
-                variant="outline"
+                variant="primary"
                 onClick={onChoose}
                 disabled={busy}
-                className="w-full bg-white px-5 py-3 text-sm font-semibold text-brand disabled:opacity-60"
+                className="px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
               >
                 {busy
                   ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
-                  : <Icon name="crown" size={16} />}
+                  : null}
                 Get Monthly
               </CutButton>
             ) : premium ? (
@@ -805,13 +802,13 @@ function PlanCard({
               >
                 {busy
                   ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  : <Icon name="crown" size={16} />}
+                  : null}
                 Get Yearly
               </CutButton>
             ) : (
-              <GradientButton fullWidth icon="crown" loading={busy} onClick={onChoose}>
-                Upgrade Now
-              </GradientButton>
+              <CutButton variant="primary" onClick={onChoose} disabled={busy} className="px-5 py-3 text-sm font-semibold text-white">
+                {busy ? 'Loading…' : 'Upgrade Now'}
+              </CutButton>
             )}
           </div>
         )}
