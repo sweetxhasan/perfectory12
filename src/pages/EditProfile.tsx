@@ -130,12 +130,24 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
       {/* Backdrop */}
       <div className="absolute inset-0 bg-foreground/60 backdrop-blur-lg" onClick={!uploading ? onClose : undefined} />
 
-      {/* Card */}
-      <CutPanel
-        tone="card"
-        className="relative z-10 w-full max-w-sm overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.25)] float-up"
-        contentClassName="bg-background"
-      >
+      {/* Card with external close control */}
+      <div className="relative z-10 w-full max-w-sm float-up">
+        {!uploading && (
+          <CutButton
+            variant="primary"
+            type="button"
+            onClick={onClose}
+            aria-label="Close photo upload"
+            className="absolute -right-3 -top-3 z-30 w-max px-3 py-2 text-xs font-semibold text-white shadow-lg sm:-right-4 sm:-top-4"
+          >
+            Close
+          </CutButton>
+        )}
+        <CutPanel
+          tone="card"
+          className="w-full overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.25)]"
+          contentClassName="bg-background"
+        >
         <div className="h-1 w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)]" />
 
         {/* Header */}
@@ -143,16 +155,6 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
           <h3 className="text-center text-base font-semibold text-foreground sm:text-lg">
             Upload Profile Photo
           </h3>
-          {!uploading && (
-            <CutButton
-              variant="primary"
-              type="button"
-              onClick={onClose}
-              className="absolute right-3 top-1/2 w-max -translate-y-1/2 shrink-0 px-2.5 py-1.5 text-xs font-semibold text-white"
-            >
-              Close
-            </CutButton>
-          )}
         </div>
 
         <div className="px-5 pb-5 space-y-4">
@@ -268,7 +270,8 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
             </button>
           )}
         </div>
-      </CutPanel>
+        </CutPanel>
+      </div>
     </div>
   );
 }
