@@ -426,7 +426,12 @@ function EditProfileContent() {
         <form onSubmit={save} className="space-y-3">
 
           {/* ── Avatar ── */}
-          <div className="flex flex-col items-center pb-2">
+          <CutPanel
+            tone="card"
+            className="mx-auto mb-1 w-full max-w-[19rem] overflow-visible"
+            contentClassName="flex flex-col items-center bg-card px-4 py-5"
+            stroke="#ec5252"
+          >
             <div className="relative">
               {form.photoURL ? (
                 <img src={form.photoURL} alt="Avatar" crossOrigin="anonymous"
@@ -436,18 +441,23 @@ function EditProfileContent() {
                   {form.name.charAt(0).toUpperCase() || 'U'}
                 </span>
               )}
-              {/* Camera button */}
-              <button type="button" onClick={() => setShowPhotoOverlay(true)}
-                className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-background bg-gradient-brand text-primary-foreground shadow-lg transition hover:scale-110 active:scale-95"
-                aria-label="Change photo">
-                <CameraIcon />
-              </button>
+              <CutPanel
+                tone="brand"
+                className="absolute -bottom-1 -right-1 size-10 rounded-full"
+                contentClassName="flex items-center justify-center rounded-full"
+              >
+                <button type="button" onClick={() => setShowPhotoOverlay(true)}
+                  className="flex size-full items-center justify-center text-primary-foreground transition hover:scale-110 active:scale-95"
+                  aria-label="Change photo">
+                  <CameraIcon />
+                </button>
+              </CutPanel>
             </div>
             <button type="button" onClick={() => setShowPhotoOverlay(true)}
-              className="mt-3 text-xs text-brand-2 transition hover:underline">
+              className="mt-3 text-xs font-medium text-brand-2 transition hover:underline">
               Change photo
             </button>
-          </div>
+          </CutPanel>
 
           {/* Full name */}
           <FieldCard label="Full Name" icon={<Icon name="user" size={13} />}>
