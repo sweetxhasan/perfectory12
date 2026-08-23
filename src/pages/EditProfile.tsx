@@ -236,9 +236,14 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                         className="w-full"
                         contentClassName={`flex flex-col items-center gap-2.5 px-4 py-7 transition-all ${dragOver ? 'bg-brand/8 scale-[1.01]' : file ? 'bg-green-50/30' : 'bg-secondary/40 group-hover:bg-brand/5'}`}
                       >
-                        <span className="flex size-12 items-center justify-center bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white transition-transform duration-300 group-hover:scale-110">
+                        <CutPanel
+                          tone="card"
+                          stroke="url(#cut-brand-gradient)"
+                          className="size-12 transition-transform duration-300 group-hover:scale-110"
+                          contentClassName="flex size-full items-center justify-center bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white"
+                        >
                           <Icon name={file ? 'check' : 'upload'} size={22} />
-                        </span>
+                        </CutPanel>
                         <div className="text-center">
                           <p className="text-sm font-medium">
                             {dragOver ? 'Drop it here!' : file ? file.name : 'Click or drag & drop'}
