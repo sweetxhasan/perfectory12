@@ -740,14 +740,14 @@ function PlanCard({
           <PendingReviewBanner inverted={inverted} />
         ) : (
           /* CTA button */
-          <div className="mt-5">
+          <div className="mt-5 flex justify-center">
             {/* Guest → always show "Get Started" pointing to signup */}
             {isGuest ? (
               highlight ? (
                 <CutButton
-                  variant="outline"
+                  variant="primary"
                   onClick={onChoose}
-                  className="px-5 py-3 text-sm font-semibold text-white"
+                  className="w-[250px] px-5 py-3 text-sm font-semibold text-white"
                 >
                   Get Started
                 </CutButton>
@@ -755,12 +755,12 @@ function PlanCard({
                 <CutButton
                   variant="primary"
                   onClick={onChoose}
-                  className="w-full px-5 py-3 text-sm font-semibold text-white"
+                  className="w-[250px] px-5 py-3 text-sm font-semibold text-white"
                 >
                   Get Started
                 </CutButton>
               ) : (
-                <CutButton variant="primary" onClick={onChoose} className="px-5 py-3 text-sm font-semibold text-white">
+                <CutButton variant="primary" onClick={onChoose} className="w-[250px] px-5 py-3 text-sm font-semibold text-white">
                   Get Started
                 </CutButton>
               )
@@ -769,7 +769,7 @@ function PlanCard({
               <CutButton
                 variant="outline"
                 onClick={onDeactivate}
-                className={`px-5 py-3 text-sm font-medium ${
+                className={`w-[250px] px-5 py-3 text-sm font-medium ${
                   inverted
                     ? 'border-white/20 bg-white/10 text-white/80 hover:bg-white/15'
                     : 'border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10'
@@ -778,15 +778,15 @@ function PlanCard({
                 Deactivate {plan.name} Plan
               </CutButton>
             ) : current ? (
-              <CutButton variant="primary" disabled className="px-5 py-3 text-sm font-semibold text-white">Current Plan</CutButton>
+              <CutButton variant="primary" disabled className="w-[250px] px-5 py-3 text-sm font-semibold text-white">Current Plan</CutButton>
             ) : plan.id === 'free' ? (
-              <CutButton variant="primary" disabled className="px-5 py-3 text-sm font-semibold text-white">Included Free</CutButton>
+              <CutButton variant="primary" disabled className="w-[250px] px-5 py-3 text-sm font-semibold text-white">Included Free</CutButton>
             ) : highlight ? (
               <CutButton
                 variant="primary"
                 onClick={onChoose}
                 disabled={busy}
-                className="px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                className="w-[250px] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
               >
                 {busy
                   ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
@@ -806,7 +806,7 @@ function PlanCard({
                 Get Yearly
               </CutButton>
             ) : (
-              <CutButton variant="primary" onClick={onChoose} disabled={busy} className="px-5 py-3 text-sm font-semibold text-white">
+              <CutButton variant="primary" onClick={onChoose} disabled={busy} className="w-[250px] px-5 py-3 text-sm font-semibold text-white">
                 {busy ? 'Loading…' : 'Upgrade Now'}
               </CutButton>
             )}
