@@ -712,7 +712,12 @@ function PlanCard({
           {plan.features.map((f) => (
             <li key={f.text} className="flex items-start gap-2.5 border-b border-border/50 py-1.5 text-sm text-foreground last:border-0">
               <CutPanel tone={inverted ? 'brand' : 'soft'} className="mt-0.5 size-5 shrink-0" contentClassName={`flex items-center justify-center ${inverted ? 'bg-white/15 text-white' : f.highlight ? 'bg-brand/10 text-brand' : 'bg-secondary text-brand'}`}>
-                <Icon name="check" size={10} />
+                <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+                  <path d="M12 3V21" />
+                  <path d="M3 12H21" />
+                  <path d="M6 6L18 18" />
+                  <path d="M18 6L6 18" />
+                </svg>
               </CutPanel>
               <span className={f.highlight && !inverted ? 'font-medium' : ''}>{f.text}</span>
             </li>
