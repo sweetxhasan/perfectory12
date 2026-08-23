@@ -426,12 +426,7 @@ function EditProfileContent() {
         <form onSubmit={save} className="space-y-3">
 
           {/* ── Avatar ── */}
-          <CutPanel
-            tone="card"
-            className="mx-auto mb-1 w-full max-w-[19rem] overflow-visible"
-            contentClassName="flex flex-col items-center bg-card px-4 py-5"
-            stroke="#ec5252"
-          >
+          <div className="mx-auto mb-1 w-full max-w-[19rem] bg-card px-4 py-5">
             <div className="relative">
               <CutPanel
                 tone="card"
@@ -450,7 +445,7 @@ function EditProfileContent() {
               </CutPanel>
               <CutPanel
                 tone="brand"
-                className="absolute -bottom-1 -right-1 size-10"
+                className="absolute bottom-1 right-1 z-20 size-10"
                 contentClassName="flex items-center justify-center"
               >
                 <button type="button" onClick={() => setShowPhotoOverlay(true)}
@@ -464,7 +459,7 @@ function EditProfileContent() {
               className="mt-3 text-xs font-medium text-brand-2 transition hover:underline">
               Change photo
             </button>
-          </CutPanel>
+          </div>
 
           {/* Full name */}
           <FieldCard label="Full Name" icon={<Icon name="user" size={13} />}>
