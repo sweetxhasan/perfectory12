@@ -163,7 +163,13 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
 
           {/* Preview ring */}
           <div className="flex justify-center">
-            <div className={`relative rounded-full p-1 transition-all duration-500 ${uploading ? 'ring-4 ring-brand/40 ring-offset-2 ring-offset-background' : ''}`}>
+            <CutPanel
+              tone="card"
+              stroke={uploading ? "url(#cut-brand-gradient)" : "#000000"}
+              className="size-28 rounded-full p-1"
+              contentClassName="flex size-full items-center justify-center overflow-hidden rounded-full bg-background"
+            >
+            <div className="relative size-full rounded-full transition-all duration-500">
               {preview ? (
                 <img src={preview} alt="Preview"
                   className={`h-24 w-24 rounded-full object-cover transition-all duration-500 ${uploading ? 'opacity-60 scale-95' : ''}`}
@@ -185,11 +191,17 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                 </span>
               )}
             </div>
+            </CutPanel>
           </div>
 
           {/* Upload progress */}
           {uploading && (
-            <div className="space-y-2">
+            <CutPanel
+              tone="card"
+              stroke="url(#cut-brand-gradient)"
+              className="w-full"
+              contentClassName="space-y-2 bg-background px-3 py-2"
+            >
               <div className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">{stepLabels[uploadStep]}</span>
                 <span className="text-brand">{uploadStep === 'done' ? '100%' : uploadStep === 'sending' ? '60%' : '20%'}</span>
@@ -199,7 +211,7 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
                   uploadStep === 'reading' ? 'w-1/5' : uploadStep === 'sending' ? 'w-3/5' : 'w-full'
                 }`} />
               </div>
-            </div>
+            </CutPanel>
           )}
 
           {/* Tabs — hidden while uploading */}
