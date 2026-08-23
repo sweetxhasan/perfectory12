@@ -400,7 +400,6 @@ function EditProfileContent() {
       )}
 
       <div className="mx-auto max-w-md">
-        <CutPanel tone="card" className="overflow-hidden" contentClassName="bg-card p-4 sm:p-6">
         {/* Page header */}
         <div className="mb-7 flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
@@ -423,6 +422,7 @@ function EditProfileContent() {
           </Link>
         </div>
 
+        <CutPanel tone="card" className="overflow-hidden" contentClassName="bg-card p-4 sm:p-6">
         <form onSubmit={save} className="space-y-3">
 
           {/* ── Avatar ── */}
