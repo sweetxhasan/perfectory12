@@ -426,12 +426,12 @@ function EditProfileContent() {
         <form onSubmit={save} className="space-y-3">
 
           {/* ── Avatar ── */}
-          <div className="mx-auto mb-1 w-full max-w-[19rem] bg-card px-4 py-5">
-            <div className="relative">
+          <div className="mx-auto mb-1 flex w-full max-w-[19rem] flex-col items-center bg-card px-4 py-5">
+            <div className="relative size-32">
               <CutPanel
                 tone="card"
                 stroke="url(#cut-brand-gradient)"
-                className="size-32 overflow-hidden p-1"
+                className="size-full overflow-hidden p-1"
                 contentClassName="flex items-center justify-center overflow-hidden bg-background"
               >
                 {form.photoURL ? (
@@ -443,9 +443,10 @@ function EditProfileContent() {
                   </span>
                 )}
               </CutPanel>
-              <CutPanel
+              <div className="absolute -bottom-2 -right-2 z-20 size-10">
+                <CutPanel
                 tone="brand"
-                className="absolute bottom-1 right-1 z-20 size-10"
+                className="size-full"
                 contentClassName="flex items-center justify-center"
               >
                 <button type="button" onClick={() => setShowPhotoOverlay(true)}
@@ -453,9 +454,10 @@ function EditProfileContent() {
                   aria-label="Change photo">
                   <CameraIcon />
                 </button>
-              </CutPanel>
+                </CutPanel>
+              </div>
             </div>
-            <button type="button" onClick={() => setShowPhotoOverlay(true)}
+            <button type="button" onClick={() => setShowPhotoOverlay(true) }
               className="mt-3 text-xs font-medium text-brand-2 transition hover:underline">
               Change photo
             </button>
