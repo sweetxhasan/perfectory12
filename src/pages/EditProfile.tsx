@@ -204,23 +204,19 @@ function PhotoOverlay({ current, onUpdate, onClose }: PhotoOverlayProps) {
           {/* Tabs — hidden while uploading */}
           {!uploading && (
             <>
-              <CutPanel
-                tone="card"
-                className="w-full"
-                contentClassName="flex items-center gap-1 bg-secondary p-1"
-              >
+              <div className="flex items-center justify-center gap-2">
                 {(['upload', 'link'] as OverlayTab[]).map((t) => (
                   <CutButton
                     key={t}
                     type="button"
-                    variant={tab === t ? 'outline' : 'primary'}
+                    variant="primary"
                     onClick={() => { setTab(t); setErr(''); }}
-                    className={`min-w-0 flex-1 px-2 py-1.5 text-xs font-semibold uppercase tracking-wide ${tab === t ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white' : 'bg-transparent text-muted-foreground'}`}
+                    className={`w-max px-4 py-2 text-xs font-semibold uppercase tracking-wide sm:px-5 ${tab === t ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white' : 'bg-background text-foreground'}`}
                   >
                     {t === 'upload' ? 'Upload' : 'Photo Link'}
                   </CutButton>
                 ))}
-              </CutPanel>
+              </div>
 
               <div>
                 {tab === 'upload' ? (
