@@ -574,7 +574,7 @@ className="overflow-hidden shadow-[0_18px_42px_oklch(0.15_0.02_260/0.08)] transi
         </div>
       )}
       <div className={cardStyle}>
-        <CutPanel tone="soft" stroke={inverted ? '#ffffff' : undefined} className="mb-4 size-14" contentClassName={`flex items-center justify-center ${inverted ? 'bg-transparent text-white' : 'bg-secondary text-foreground'}`}>
+        <CutPanel tone="soft" stroke={inverted ? '#ffffff' : undefined} className="mb-4 size-14" contentClassName={`flex items-center justify-center ${inverted ? 'bg-background text-foreground' : 'bg-secondary text-foreground'}`}>
           <svg className="size-6" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M2 19L12 3L22 19L18 21L12 17L6 21L2 19Z" />
             <path d="M2 19L12 3" />
@@ -671,9 +671,10 @@ className="overflow-hidden shadow-[0_18px_42px_oklch(0.15_0.02_260/0.08)] transi
             ) : current && plan.id !== 'free' ? (
               /* Any paid active plan → Deactivate */
               <CutButton
-                variant="outline"
+                variant="light"
+                stroke="#ffffff"
                 onClick={onDeactivate}
-                className="w-[250px] bg-background px-5 py-3 text-sm font-medium text-foreground"
+                className="w-[250px] px-5 py-3 text-sm font-medium text-foreground"
               >
                 Deactivate {plan.name} Plan
               </CutButton>
