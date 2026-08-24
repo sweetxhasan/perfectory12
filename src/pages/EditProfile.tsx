@@ -650,15 +650,17 @@ function EditProfileContent() {
           </FieldCard>
 
           {/* Save */}
-          <CutButton
-            type="submit"
-            variant="light"
-            stroke="#000000"
-            disabled={saving || !hasChanges || usnStatus === 'taken' || usnStatus === 'short'}
-            className="mx-auto w-[230px] max-w-full bg-background py-3.5 text-sm font-semibold text-foreground opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {saving ? 'Updating Profile...' : saved ? 'Profile Updated!' : 'Update Profile'}
-          </CutButton>
+          <div className="flex justify-center">
+            <CutButton
+              type="submit"
+              variant="light"
+              stroke="#000000"
+              disabled={saving || !hasChanges || usnStatus === 'taken' || usnStatus === 'short'}
+              className="w-[230px] max-w-full bg-background py-3.5 text-sm font-semibold text-foreground opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {saving ? 'Updating Profile...' : saved ? 'Profile Updated!' : 'Update Profile'}
+            </CutButton>
+          </div>
 
         </form>
         </CutPanel>
