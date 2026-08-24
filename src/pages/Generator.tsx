@@ -1108,7 +1108,7 @@ function GeneratorContent() {
             `}
           />
 
-          {/* ── Bottom toolbar ── */}
+          {/* ���─ Bottom toolbar ── */}
           <div className="flex items-center justify-between gap-2 border-t border-border/60 bg-secondary/30 px-3 py-2.5">
 
             {/* Left: Language | Voice */}
@@ -1133,7 +1133,7 @@ function GeneratorContent() {
                 type="button"
                 onClick={generate}
                 disabled={generating || (hasZeroCredits && !!user)}
-                className="flex items-center h-[30px] rounded-full bg-gradient-to-r from-[#6e1a52] via-[#c03090] to-[#ec5252] text-white shadow transition hover:opacity-90 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden text-[11px] font-semibold shrink-0"
+                className="flex items-center h-[30px] rounded-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white shadow transition hover:opacity-90 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden text-[11px] font-semibold shrink-0"
               >
                 {generating ? (
                   <span className="flex items-center gap-2 px-3">
@@ -1300,7 +1300,7 @@ function GeneratorContent() {
         {currentGen && (
           <div
             className="mt-6 overflow-hidden rounded-3xl p-5 sm:p-6"
-            style={{ background: 'linear-gradient(-45deg, #6e1a52, #ec5252)' }}
+            style={{ background: 'linear-gradient(-45deg, #ec5252, #6e1a52)' }}
           >
             {/* Waveform animation */}
             <div className="mb-4 flex items-end justify-center gap-1 h-8">
