@@ -351,6 +351,7 @@ function EditProfileContent() {
   const { profile, refreshProfile } = useAuth();
   const [, setLocation] = useLocation();
   const [form, setForm] = useState({ name: '', bio: '', location: '', website: '', photoURL: '', username: '', phone: '', phonePublic: true });
+  const [initialForm, setInitialForm] = useState({ name: '', bio: '', location: '', website: '', photoURL: '', username: '', phone: '', phonePublic: true });
   const [phoneError, setPhoneError] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -362,16 +363,18 @@ function EditProfileContent() {
 
   useEffect(() => {
     if (profile) {
-      setForm({
-        name: profile.name || '',
-        bio: profile.bio || '',
-        location: profile.location || '',
-        website: profile.website || '',
-        photoURL: profile.photoURL || '',
-        username: profile.username || '',
-        phone: profile.phone?.startsWith('+880') ? profile.phone.slice(4) : (profile.phone || ''),
-        phonePublic: profile.phonePublic ?? true,
-      });
+    const nextForm = {
+      name: profile.name || '',
+      bio: profile.bio || '',
+      location: profile.location || '',
+      website: profile.website || '',
+      photoURL: profile.photoURL || '',
+      username: profile.username || '',
+      phone: profile.phone?.startsWith('+880') ? profile.phone.slice(4) : (profile.phone || ''),
+      phonePublic: profile.phonePublic ?? true,
+    };
+    setForm(nextForm);
+    setInitialForm(nextForm);
     }
   }, [profile]);
 
@@ -438,6 +441,8 @@ function EditProfileContent() {
       setSaving(false);
     }
   }
+
+  const hasChanges = JSON.stringify(form) !== JSON.stringify(initialForm);
 
   const usnHint: Record<typeof usnStatus, { text: string; color: string } | null> = {
     idle: null,
@@ -620,8 +625,7 @@ function EditProfileContent() {
                   ? <CutPanel tone="soft" stroke="#16a34a" className="inline-flex" contentClassName="bg-background px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-green-600">Public</CutPanel>
                   : <CutPanel tone="soft" stroke="#000000" className="inline-flex" contentClassName="bg-background px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground">Private</CutPanel>}
               </div>
-              <CutPanel tone="soft" stroke="#000000" className="size-9" contentClassName="flex items-center justify-center bg-background">
-                <button
+              <button
                   type="button"
                   role="switch"
                   aria-checked={form.phonePublic}
@@ -630,8 +634,7 @@ function EditProfileContent() {
                   aria-label="Toggle public phone visibility"
                 >
                   <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition-transform ${form.phonePublic ? 'translate-x-4' : 'translate-x-0'}`} />
-                </button>
-              </CutPanel>
+              </button>
             </div>
           </FieldCard>
 
@@ -649,14 +652,12 @@ function EditProfileContent() {
           {/* Save */}
           <CutButton
             type="submit"
-            variant="primary"
-            disabled={saving || usnStatus === 'taken' || usnStatus === 'short'}
-            className="w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] py-3.5 text-sm font-medium text-white"
+            variant="light"
+            stroke="#000000"
+            disabled={saving || !hasChanges || usnStatus === 'taken' || usnStatus === 'short'}
+            className="mx-auto w-[230px] max-w-full bg-background py-3.5 text-sm font-semibold text-foreground opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {saving
-              ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-              : <Icon name="check" size={17} />}
-            {saved ? 'Profile Updated!' : 'Update Profile'}
+            {saving ? 'Updating Profile...' : saved ? 'Profile Updated!' : 'Update Profile'}
           </CutButton>
 
         </form>
