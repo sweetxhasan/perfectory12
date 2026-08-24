@@ -360,12 +360,10 @@ function DeactivateContent({
   onConfirm: () => void;
   busy: boolean;
 }) {
-  const [step, setStep] = useState<1 | 2>(1);
   const isYearly = planId === 'yearly';
   const planName = isYearly ? 'Yearly' : 'Monthly';
   const dailyCredits = PLAN_DAILY_CREDITS[planId];
   const voiceCount = isYearly ? '10 male · 10 female' : '5 male · 5 female';
-  const duration = isYearly ? '365 days' : '30 days';
 
   const consequences = [
     `Your ${planName} plan ends immediately`,
@@ -378,9 +376,8 @@ function DeactivateContent({
 
   return (
     <div className="px-5 py-5">
-      {step === 1 ? (
-        /* ── Step 1: Warning ── */
-        <div>
+      {/* Deactivation warning */}
+      <div>
           {/* Icon */}
           <div className="flex justify-center mb-4">
             <CutPanel tone="soft" className="size-16" contentClassName="flex items-center justify-center bg-destructive/5">
@@ -414,58 +411,11 @@ function DeactivateContent({
             <CutButton variant="outline" onClick={onClose} className="ml-[10px] w-[140px] px-3 py-2.5 text-xs font-semibold">
               Cancel
             </CutButton>
-            <CutButton variant="primary" onClick={() => setStep(2)} className="w-[140px] px-3 py-2.5 text-xs font-semibold text-white">
+            <CutButton variant="primary" onClick={onConfirm} disabled={busy} className="w-[140px] px-3 py-2.5 text-xs font-semibold text-white">
               Deactivate
             </CutButton>
           </div>
         </div>
-      ) : (
-        /* ── Step 2: Final confirm ── */
-        <div>
-          {/* Icon */}
-          <div className="flex justify-center mb-4">
-            <AnimatedCrownBreak />
-          </div>
-
-          {/* Title */}
-          <div className="text-center mb-5">
-            <h2 className="text-xl font-bold text-foreground">Final Confirmation</h2>
-
-          </div>
-
-          {/* After-downgrade summary */}
-          <div className="rounded-2xl border border-border bg-secondary/40 overflow-hidden mb-5">
-            <div className="px-4 py-2.5 bg-destructive/8 border-b border-border">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-destructive/70">
-                After deactivation
-              </p>
-            </div>
-            {[
-              { label: 'Plan changes to', value: 'Free', delay: 0 },
-              { label: 'Credits reset to', value: '2 credits', delay: 100 },
-               { label: 'Daily generations', value: '2 / day', delay: 200 },
-               { label: 'Voice access', value: '2 male · 2 female', delay: 300 },
-               { label: 'Paid period cleared', value: duration, delay: 400 },
-            ].map((row) => (
-              <div key={row.label} className="flex items-center gap-3 px-4 py-3 border-b border-border/50 last:border-0">
-                <AnimatedCheck delay={row.delay} />
-                <span className="text-sm text-muted-foreground flex-1">{row.label}</span>
-                <span className="text-sm font-semibold text-foreground">{row.value}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-nowrap items-center justify-between gap-3">
-            <CutButton variant="outline" onClick={() => setStep(1)} disabled={busy} className="ml-[10px] w-[140px] px-3 py-2.5 text-xs font-semibold">
-              Cancel
-            </CutButton>
-            <CutButton variant="primary" onClick={onConfirm} disabled={busy} className="w-[140px] px-3 py-2.5 text-xs font-semibold text-white">
-              {busy ? 'Deactivating…' : 'Deactivate'}
-            </CutButton>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
