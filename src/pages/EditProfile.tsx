@@ -656,7 +656,7 @@ function EditProfileContent() {
               variant="light"
               stroke="#000000"
               disabled={saving || !hasChanges || usnStatus === 'taken' || usnStatus === 'short'}
-              className="w-[230px] max-w-full bg-background py-3.5 text-sm font-semibold text-foreground opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+              className="w-[230px] max-w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] py-3.5 text-sm font-semibold text-white opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {saving ? 'Updating Profile...' : saved ? 'Profile Updated!' : 'Update Profile'}
             </CutButton>
