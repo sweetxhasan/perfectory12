@@ -824,22 +824,6 @@ function PlansContent() {
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{subline}</p>
         </div>
 
-        {/* Trust chips */}
-        {visiblePlans.length > 1 && (
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            {[
-              { icon: 'bolt',   text: 'Credits reset daily' },
-              { icon: 'shield', text: 'No surprise charges' },
-              { icon: 'ban',    text: 'Cancel anytime' },
-            ].map(({ icon, text }) => (
-              <span key={text} className="flex items-center gap-1.5 rounded-full border border-border bg-secondary/60 px-3.5 py-1.5 text-xs text-muted-foreground">
-                <Icon name={icon as never} size={12} className="text-brand-2" />
-                {text}
-              </span>
-            ))}
-          </div>
-        )}
-
         {/* Plan cards */}
         <div className={`mt-8 grid items-start gap-5 ${gridCols}`}>
           {visiblePlans.map((plan) => (
