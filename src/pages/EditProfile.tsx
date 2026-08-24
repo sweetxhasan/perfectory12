@@ -8,7 +8,6 @@ import { CutButton, CutPanel } from '@/components/cut-ui';
 import { useAuth } from '@/lib/auth-context';
 import { auth } from '@/lib/firebase';
 import { updateUserProfile, isUsernameAvailable } from '@/lib/user-store';
-import { notifyProfileUpdate } from '@/lib/notifications';
 
 const IMGBB_KEY = '3ee56b707e39804a444bf7dbb08599ee';
 
@@ -432,7 +431,6 @@ function EditProfileContent() {
         });
       }
       await refreshProfile();
-      notifyProfileUpdate(profile.uid).catch(() => {});
       setSaved(true);
       setTimeout(() => setSaved(false), 3500);
     } catch (err) {
