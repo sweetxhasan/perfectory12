@@ -1046,7 +1046,7 @@ function GeneratorContent() {
         <div className="text-center px-2">
           <h1 className="text-balance text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
             Turn any text into a{' '}
-            <span className="bg-gradient-to-r from-[#ec5252] via-[#c03090] to-[#7c3aed] bg-clip-text text-transparent">
+            <span className="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] bg-clip-text text-transparent">
               natural, lifelike voice
             </span>
           </h1>
