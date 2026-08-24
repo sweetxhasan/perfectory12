@@ -549,17 +549,18 @@ function PlanCard({
   pending?: boolean;
 }) {
   const { highlight, premium } = plan;
-  const inverted = false;
+  const inverted = current;
 
   const cardBase = 'relative flex flex-col p-6';
-  const cardStyle = `${cardBase} text-foreground`;
+  const cardStyle = `${cardBase} ${inverted ? 'text-white' : 'text-foreground'}`;
 
   return (
     <div className={`relative ${isOnlyCard ? 'max-w-lg mx-auto w-full' : ''}`}>
       <CutPanel
         tone="card"
-        className="overflow-hidden shadow-[0_18px_42px_oklch(0.15_0.02_260/0.08)] transition duration-300 hover:-translate-y-2"
-        contentClassName="bg-card"
+className="overflow-hidden shadow-[0_18px_42px_oklch(0.15_0.02_260/0.08)] transition duration-300 hover:-translate-y-2"
+        stroke={inverted ? '#ffffff' : undefined}
+        contentClassName={inverted ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)]' : 'bg-card'}
       >
       {plan.badge && (
         <div className="absolute right-[10px] top-6 z-20 flex w-max">
@@ -573,7 +574,7 @@ function PlanCard({
         </div>
       )}
       <div className={cardStyle}>
-        <CutPanel tone="soft" className="mb-4 size-14" contentClassName="flex items-center justify-center bg-secondary text-foreground">
+        <CutPanel tone="soft" stroke={inverted ? '#ffffff' : undefined} className="mb-4 size-14" contentClassName={`flex items-center justify-center ${inverted ? 'bg-transparent text-white' : 'bg-secondary text-foreground'}`}>
           <svg className="size-6" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M2 19L12 3L22 19L18 21L12 17L6 21L2 19Z" />
             <path d="M2 19L12 3" />
@@ -593,7 +594,7 @@ function PlanCard({
               tone="card"
               stroke="#16a34a"
               className="inline-flex w-max"
-              contentClassName="flex items-center gap-1 bg-background px-2.5 py-0.5 text-[10px] font-semibold text-brand"
+              contentClassName={`flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-semibold ${inverted ? 'bg-transparent text-white' : 'bg-background text-brand'}`}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               Active
@@ -601,15 +602,15 @@ function PlanCard({
           )}
         </div>
 
-        <h3 className="text-2xl font-semibold text-foreground">{plan.name}</h3>
-        <p className="mt-0.5 text-xs text-muted-foreground">{plan.tagline}</p>
+        <h3 className={`text-2xl font-semibold ${inverted ? 'text-white' : 'text-foreground'}`}>{plan.name}</h3>
+        <p className={`mt-0.5 text-xs ${inverted ? 'text-white/85' : 'text-muted-foreground'}`}>{plan.tagline}</p>
 
         {/* Price */}
         <div className="mt-4 flex items-end gap-1">
-          <span className="text-5xl font-normal leading-none text-foreground">
+          <span className={`text-5xl font-normal leading-none ${inverted ? 'text-white' : 'text-foreground'}`}>
             {plan.price}
           </span>
-          <span className="mb-1 text-sm text-muted-foreground">
+          <span className={`mb-1 text-sm ${inverted ? 'text-white/85' : 'text-muted-foreground'}`}>
             / {plan.period}
           </span>
         </div>
@@ -617,7 +618,7 @@ function PlanCard({
         {/* Feature list */}
         <ul className="mt-5 flex flex-1 flex-col gap-2">
           {plan.features.map((f) => (
-            <li key={f.text} className="flex items-start gap-2.5 border-b border-border/50 py-1.5 text-sm text-foreground last:border-0">
+            <li key={f.text} className={`flex items-start gap-2.5 border-b py-1.5 text-sm last:border-0 ${inverted ? 'border-white/20 text-white' : 'border-border/50 text-foreground'}`}>
               <svg viewBox="0 0 24 24" className={`mt-0.5 size-3.5 shrink-0 ${inverted ? 'text-white' : 'text-brand'}`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
                 <path d="M12 3V21" />
                 <path d="M3 12H21" />
@@ -631,7 +632,7 @@ function PlanCard({
 
         {/* Expiry notice — only for logged-in users on their plan */}
         {current && !isGuest && expiryDate && (
-          <div className="mt-4 px-0 py-2 text-xs text-muted-foreground">
+          <div className={`mt-4 px-0 py-2 text-xs ${inverted ? 'text-white/85' : 'text-muted-foreground'}`}>
             <span className="font-medium">Expires {expiryDate}</span>
             {days !== null && ` · ${days} day${days !== 1 ? 's' : ''} left`}
             {(days ?? 999) <= 30 && <span className="ml-1.5 font-semibold">— Expiring soon</span>}
@@ -672,11 +673,7 @@ function PlanCard({
               <CutButton
                 variant="outline"
                 onClick={onDeactivate}
-                className={`w-[250px] px-5 py-3 text-sm font-medium ${
-                  inverted
-                    ? 'border-white/20 bg-white/10 text-white/80 hover:bg-white/15'
-                    : 'border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10'
-                }`}
+                className="w-[250px] bg-background px-5 py-3 text-sm font-medium text-foreground"
               >
                 Deactivate {plan.name} Plan
               </CutButton>
