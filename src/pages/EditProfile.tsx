@@ -329,12 +329,19 @@ function FieldCard({ label, icon, hint, children }: {
   label: string; icon: React.ReactNode; hint?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors focus-within:border-brand">
-      <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+    <div className="flex flex-col gap-2">
+      <label className="flex items-center gap-1.5 px-1 text-sm font-semibold text-foreground">
         {icon} {label}
       </label>
-      {children}
-      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      <CutPanel
+        tone="card"
+        stroke="url(#cut-brand-gradient)"
+        className="w-full"
+        contentClassName="bg-background px-4 py-3.5 transition-colors focus-within:bg-background"
+      >
+        {children}
+        {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      </CutPanel>
     </div>
   );
 }
@@ -610,20 +617,21 @@ function EditProfileContent() {
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">Show on public profile</span>
                 {form.phonePublic
-                  ? <span className="rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-green-600">Public</span>
-                  : <span className="rounded-full bg-border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Private</span>}
+                  ? <CutPanel tone="soft" stroke="#16a34a" className="inline-flex" contentClassName="bg-background px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-green-600">Public</CutPanel>
+                  : <CutPanel tone="soft" stroke="#000000" className="inline-flex" contentClassName="bg-background px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground">Private</CutPanel>}
               </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={form.phonePublic}
-                onClick={() => update('phonePublic', !form.phonePublic)}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none
-                  ${form.phonePublic ? 'bg-green-500' : 'bg-border'}`}
-              >
-                <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition-transform
-                  ${form.phonePublic ? 'translate-x-4' : 'translate-x-0'}`} />
-              </button>
+              <CutPanel tone="soft" stroke="#000000" className="size-9" contentClassName="flex items-center justify-center bg-background">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={form.phonePublic}
+                  onClick={() => update('phonePublic', !form.phonePublic)}
+                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${form.phonePublic ? 'bg-green-500' : 'bg-border'}`}
+                  aria-label="Toggle public phone visibility"
+                >
+                  <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition-transform ${form.phonePublic ? 'translate-x-4' : 'translate-x-0'}`} />
+                </button>
+              </CutPanel>
             </div>
           </FieldCard>
 
