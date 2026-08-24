@@ -443,7 +443,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} aria-hidden="true" />
                 <button type="button" onClick={() => setSidebarOpen(false)}
-                  className="group absolute left-72 top-4 z-10 flex h-9 items-center gap-1.5 overflow-hidden bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-3 text-white shadow-lg transition hover:brightness-110" aria-label="Close menu">
+                  className="group absolute left-72 top-4 z-10 flex h-9 items-center gap-1.5 overflow-hidden px-3 text-white shadow-lg transition hover:brightness-110" aria-label="Close menu">
                   <CutFrame variant="primary" />
                   <Icon name="close" size={14} className="relative z-10" />
                   <span className="relative z-10 text-xs font-semibold">Close</span>
