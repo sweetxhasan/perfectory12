@@ -653,10 +653,10 @@ function EditProfileContent() {
           <div className="flex justify-center">
             <CutButton
               type="submit"
-              variant="light"
-              stroke="#000000"
+              variant="primary"
+              stroke="#ffffff"
               disabled={saving || !hasChanges || usnStatus === 'taken' || usnStatus === 'short'}
-              className="w-[230px] max-w-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] py-3.5 text-sm font-semibold text-white opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+              className="w-[230px] max-w-full py-3.5 text-sm font-semibold !text-white opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {saving ? 'Updating Profile...' : saved ? 'Profile Updated!' : 'Update Profile'}
             </CutButton>
