@@ -9,6 +9,7 @@ import { SiteShell } from '@/components/site-shell';
 import { SEOHead } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
 import { GradientButton, OutlineButton, Panel, SectionBadge } from '@/components/primitives';
+import { CutPanel, CutButton } from '@/components/cut-ui';
 import { Icon } from '@/components/icon';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -1057,14 +1058,23 @@ function GeneratorContent() {
 
         {/* ── Guest banner ── */}
         {!user && (
-          <div className="mt-6 flex flex-col items-center justify-between gap-3 rounded-2xl border border-border bg-gradient-soft px-5 py-4 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              Log in to generate and download your audio.
-            </p>
-            <Link href="/login">
-              <OutlineButton icon="login" className="py-2">Log in</OutlineButton>
-            </Link>
-          </div>
+          <CutPanel
+            tone="soft"
+            stroke="url(#cut-brand-gradient)"
+            className="mt-6 w-full"
+            contentClassName="bg-gradient-to-br from-[#fff7f7] to-[#f8eef2] px-5 py-4"
+          >
+            <div className="flex w-full flex-row items-center justify-between gap-4">
+              <p className="min-w-0 flex-1 whitespace-nowrap text-[clamp(0.68rem,2.8vw,1rem)] text-foreground">
+                Log in to generate and download your audio.
+              </p>
+              <Link href="/login" className="shrink-0">
+                <CutButton variant="primary" className="px-5 py-2.5 text-sm font-semibold !text-white">
+                  Log In
+                </CutButton>
+              </Link>
+            </div>
+          </CutPanel>
         )}
 
         {/* ── Photo-style textarea card ── */}
