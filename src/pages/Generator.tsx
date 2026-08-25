@@ -1141,8 +1141,21 @@ function GeneratorContent() {
             <section>
               <div className="mb-3 flex items-center justify-between gap-3">
                 <h2 className="text-base font-semibold text-slate-800 sm:text-lg">Voice List</h2>
-                <div className="flex gap-1">
-                  {(['all', 'male', 'female'] as const).map((filter) => <button key={filter} type="button" className="rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-semibold capitalize text-slate-600 transition hover:border-[#ec5252]" onClick={() => setVoiceFilter(filter)}>{filter}</button>)}
+                <div className="flex gap-2">
+                  {(['all', 'male', 'female'] as const).map((filter) => {
+                    const active = voiceFilter === filter;
+                    return (
+                      <CutButton
+                        key={filter}
+                        type="button"
+                        variant={active ? 'primary' : 'light'}
+                        onClick={() => setVoiceFilter(filter)}
+                        className={`h-8 min-w-[52px] px-3 py-1 text-[11px] font-semibold capitalize sm:min-w-[60px] sm:text-xs ${active ? '!bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] !text-white' : 'border-slate-200 bg-white text-slate-600'}`}
+                      >
+                        {filter}
+                      </CutButton>
+                    );
+                  })}
                 </div>
               </div>
               <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 snap-x snap-mandatory">
