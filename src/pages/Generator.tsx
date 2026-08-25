@@ -1386,53 +1386,6 @@ function GeneratorContent() {
           </div>
         )}
 
-        {/* ── History ── */}
-        {history.length > 0 && (
-          <Panel className="mt-6 p-5 sm:p-6">
-            <p className="mb-3 text-sm font-semibold">
-              Recent generations{' '}
-              <span className="text-xs font-normal text-muted-foreground">(auto-deleted after 1 h)</span>
-            </p>
-            <div className="flex flex-col gap-2">
-              {history.map((item) => {
-                const minsLeft = Math.max(0, Math.floor((ONE_HOUR - (Date.now() - item.createdAt)) / 60_000));
-                const isPlaying = historyPlayId === item.id;
-                return (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-3 rounded-2xl border border-border bg-gradient-soft px-3.5 py-2.5"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => toggleHistoryPlay(item)}
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition
-                        ${isPlaying ? 'bg-gradient-brand text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-brand-2'}`}
-                    >
-                      <Icon name={isPlaying ? 'pause' : 'play'} size={13} />
-                    </button>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-xs font-medium">
-                        {item.text.slice(0, 70)}{item.text.length > 70 ? '…' : ''}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {item.language} · {item.voiceName}
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-[10px] text-muted-foreground">{minsLeft}m left</span>
-                    <button
-                      type="button"
-                      onClick={() => download(item.audioUrl, item.text)}
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition hover:text-brand-2"
-                      title="Download"
-                    >
-                      <Icon name="download" size={14} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </Panel>
-        )}
 
       </div>
     </SiteShell>
