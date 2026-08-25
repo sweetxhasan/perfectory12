@@ -156,7 +156,6 @@ interface Props {
 export function VoiceHistoryList({ generations, isOwner, ownerName }: Props) {
   const [playingId,     setPlayingId]     = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const [confirmId,     setConfirmId]     = useState<string | null>(null);
   const [deletingId,    setDeletingId]    = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -210,17 +209,16 @@ export function VoiceHistoryList({ generations, isOwner, ownerName }: Props) {
   }
 
   async function handleDelete(id: string) {
+    if (deletingId) return;
     setDeletingId(id);
     try {
       await deleteGeneration(id);
+    } catch {
+      // The realtime listener will keep the row visible if deletion fails.
     } finally {
       setDeletingId(null);
-      setConfirmId(null);
     }
   }
-
-  /* The generation currently being confirmed for deletion */
-  const confirmGen = confirmId ? generations.find(g => g.id === confirmId) ?? null : null;
 
   if (generations.length === 0) {
     return (
@@ -339,7 +337,7 @@ export function VoiceHistoryList({ generations, isOwner, ownerName }: Props) {
                   type="button"
                   variant="outline"
                   title="Delete voice"
-                  onClick={() => setConfirmId(g.id)}
+                  onClick={() => handleDelete(g.id)}
                   disabled={isDeleting}
                   className="size-9 shrink-0 p-0 text-muted-foreground hover:text-red-500 disabled:opacity-40"
                 >
@@ -360,15 +358,6 @@ export function VoiceHistoryList({ generations, isOwner, ownerName }: Props) {
         })}
       </ul>
 
-      {/* Confirmation dialog portal */}
-      {confirmGen && (
-        <DeleteConfirmDialog
-          gen={confirmGen}
-          deleting={deletingId === confirmGen.id}
-          onConfirm={() => handleDelete(confirmGen.id)}
-          onCancel={() => setConfirmId(null)}
-        />
-      )}
     </>
   );
 }
