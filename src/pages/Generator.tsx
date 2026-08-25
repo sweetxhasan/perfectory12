@@ -53,39 +53,47 @@ function GeneratorSkeleton() {
   return (
     <SiteShell>
       <div className="mx-auto max-w-3xl space-y-6">
-        {/* Header */}
         <div className="flex flex-col items-center gap-3 text-center">
           <Sk className="h-5 w-28 rounded-full" />
           <Sk className="h-10 w-80 rounded-2xl" />
           <Sk className="h-3.5 w-40 rounded-full" />
         </div>
 
-        {/* Main card */}
-        <div className="rounded-3xl border border-border bg-card overflow-hidden">
-          {/* char counter row */}
-          <div className="flex justify-end px-4 pt-3">
+        <CutPanel tone="card" stroke="oklch(0.42 0.16 350 / 0.35)" className="w-full" contentClassName="overflow-hidden bg-card">
+          <div className="flex justify-end px-5 pt-4">
             <Sk className="h-5 w-20 rounded-full" />
           </div>
-          {/* textarea area */}
-          <div className="px-5 pt-2 pb-4 space-y-2.5">
-            <Sk className="h-4 w-[72%] rounded-full" />
-            <Sk className="h-4 w-[55%] rounded-full" />
-            <Sk className="h-4 w-[63%] rounded-full" />
-            <Sk className="h-4 w-[40%] rounded-full" style={{ opacity: 0.5 }} />
-            <div className="h-16" />
+          <div className="space-y-3 px-5 pb-6 pt-3">
+            <Sk className="h-4 w-[78%] rounded-full" />
+            <Sk className="h-4 w-[58%] rounded-full" />
+            <Sk className="h-4 w-[68%] rounded-full" />
+            <Sk className="h-4 w-[42%] rounded-full" style={{ opacity: 0.5 }} />
+            <div className="h-14" />
           </div>
-          {/* toolbar */}
-          <div className="flex items-center justify-between gap-2 border-t border-border/60 bg-secondary/30 px-3 py-2.5">
-            <div className="flex items-center gap-1.5">
-              {/* language pill */}
-              <Sk className="h-[30px] w-[80px] rounded-full" />
-              {/* voice pill */}
-              <Sk className="h-[30px] w-[90px] rounded-full" />
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 bg-secondary/30 px-4 py-3">
+            <div className="flex gap-2">
+              <Sk className="h-9 w-20 rounded-full" />
+              <Sk className="h-9 w-24 rounded-full" />
             </div>
-            {/* generate button */}
-            <Sk className="h-[30px] w-[110px] rounded-full" />
+            <Sk className="h-10 w-36 rounded-full" />
           </div>
-        </div>
+        </CutPanel>
+
+        <CutPanel tone="card" stroke="oklch(0.42 0.16 350 / 0.28)" className="w-full" contentClassName="bg-card p-5 sm:p-6">
+          <div className="mb-5 flex items-center justify-between">
+            <Sk className="h-7 w-32 rounded-full" />
+            <div className="flex gap-2"><Sk className="h-8 w-16 rounded-full" /><Sk className="h-8 w-16 rounded-full" /></div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <CutPanel key={i} tone="soft" stroke="oklch(0.42 0.16 350 / 0.18)" contentClassName="flex items-center gap-3 p-3">
+                <Sk className="h-10 w-10 shrink-0 rounded-full" />
+                <span className="flex-1 space-y-2"><Sk className="h-3 w-3/4 rounded-full" /><Sk className="h-2.5 w-1/2 rounded-full" /></span>
+                <Sk className="h-8 w-8 shrink-0 rounded-full" />
+              </CutPanel>
+            ))}
+          </div>
+        </CutPanel>
       </div>
     </SiteShell>
   );
