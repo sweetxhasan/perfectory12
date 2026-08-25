@@ -74,7 +74,7 @@ function GeneratorSkeleton() {
             <div className="h-16" />
           </div>
           {/* toolbar */}
-          <div className="flex flex-col items-stretch gap-5 border-t border-white/10 bg-black/10 px-8 py-7 sm:gap-6">
+          <div className="flex items-center justify-between gap-2 border-t border-border/60 bg-secondary/30 px-3 py-2.5">
             <div className="flex items-center gap-1.5">
               {/* language pill */}
               <Sk className="h-[30px] w-[80px] rounded-full" />
@@ -1040,26 +1040,29 @@ function GeneratorContent() {
   /* ── Render ── */
   return (
     <SiteShell>
-      <div className="-mx-4 -mt-6 min-h-[calc(100vh-4rem)] bg-[radial-gradient(circle_at_50%_0%,#30265b_0%,transparent_48%),linear-gradient(180deg,#131b3d_0%,#090b19_68%,#24133b_100%)] px-4 pb-10 pt-8 text-white sm:-mx-6 sm:px-6 sm:pt-10">
-        <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-3xl">
+
         {/* ── Header ── */}
-        <div className="px-2 text-center">
-          <h1 className="font-serif text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
-            Voice Generator
+        <div className="text-center px-2">
+          <h1 className="text-balance text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
+            Turn any text into a{' '}
+            <span className="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] bg-clip-text text-transparent">
+              natural, lifelike voice
+            </span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/55 sm:text-xl">
-            Test text-to-speech output live using your configured voices before wiring the API into your product.
+          <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+            Bangla · English · Hindi
           </p>
         </div>
 
         {/* ── Guest banner ── */}
         {!user && (
-          <div className="mt-6 flex flex-col items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/[0.08] px-5 py-4 text-white backdrop-blur-xl sm:flex-row">
+          <div className="mt-6 flex flex-col items-center justify-between gap-3 rounded-2xl border border-border bg-gradient-soft px-5 py-4 sm:flex-row">
             <p className="text-sm text-muted-foreground">
               Log in to generate and download your audio.
             </p>
             <Link href="/login">
-              <OutlineButton icon="login" className="border-white/25 bg-white/10 py-2 text-white hover:bg-white/20">Log in</OutlineButton>
+              <OutlineButton icon="login" className="py-2">Log in</OutlineButton>
             </Link>
           </div>
         )}
@@ -1067,14 +1070,14 @@ function GeneratorContent() {
         {/* ── Photo-style textarea card ── */}
         <div
           className={`
-            mt-10 relative overflow-hidden rounded-[2.5rem] border border-white/20 bg-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-all duration-200
-            focus-within:border-violet-300/50 focus-within:ring-2 focus-within:ring-violet-300/10
+            mt-6 relative rounded-3xl border bg-card overflow-hidden
+            shadow-sm transition-all duration-200
+            focus-within:border-brand-2/60 focus-within:ring-2 focus-within:ring-brand-2/10
             ${error ? 'border-destructive/40' : 'border-border'}
           `}
         >
           {/* Plan-based char counter row — sits above textarea, never overlaps text */}
-          <div className="flex items-center justify-between px-8 pt-7 pb-0 pointer-events-none select-none">
-            <span className="font-serif text-xl text-white sm:text-2xl">Text to convert</span>
+          <div className="flex items-center justify-end px-4 pt-3 pb-0 pointer-events-none select-none">
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full transition-colors ${
               text.length >= textLimit
                 ? 'bg-destructive/15 text-destructive'
@@ -1095,9 +1098,10 @@ function GeneratorContent() {
             readOnly={clearingText}
             className={`
               pv-textarea
-              mx-8 mt-3 w-[calc(100%-4rem)] resize-none rounded-[2rem] border border-white/10 bg-white/[0.03]
-              px-5 pt-4 pb-3 text-base leading-relaxed text-white outline-none
-              placeholder:text-white/35
+              w-full resize-none bg-transparent
+              px-5 pt-2 pb-3
+              text-sm leading-relaxed outline-none
+              placeholder:text-muted-foreground/40
               min-h-[180px] sm:min-h-[210px] max-h-[320px]
               overflow-y-auto transition-opacity duration-75
               ${clearingText ? 'text-destructive/70 select-none cursor-default' : ''}
@@ -1105,7 +1109,7 @@ function GeneratorContent() {
           />
 
           {/* ���─ Bottom toolbar ── */}
-          <div className="flex flex-col items-stretch gap-5 border-t border-white/10 bg-black/10 px-8 py-7 sm:gap-6">
+          <div className="flex items-center justify-between gap-2 border-t border-border/60 bg-secondary/30 px-3 py-2.5">
 
             {/* Left: Language | Voice */}
             <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
@@ -1129,7 +1133,7 @@ function GeneratorContent() {
                 type="button"
                 onClick={generate}
                 disabled={generating || (hasZeroCredits && !!user)}
-                className="flex w-full items-center justify-center rounded-full bg-[linear-gradient(110deg,#8b5cf6,#60a5fa)] px-5 py-4 text-white shadow-[0_12px_30px_rgba(96,165,250,0.25)] transition hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 text-base font-semibold"
+                className="flex items-center h-[30px] rounded-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white shadow transition hover:opacity-90 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden text-[11px] font-semibold shrink-0"
               >
                 {generating ? (
                   <span className="flex items-center gap-2 px-3">
@@ -1393,7 +1397,6 @@ function GeneratorContent() {
           </Panel>
         )}
 
-        </div>
       </div>
     </SiteShell>
   );
