@@ -785,7 +785,7 @@ function GeneratorContent() {
   const { user, profile, refreshProfile } = useAuth();
   const [text, setText] = useState('');
   const [clearingText, setClearingText] = useState(false);
-  const [lang, setLang] = useState<LanguageId>('en');
+  const [lang, setLang] = useState<LanguageId>('bn');
   const [voiceId, setVoiceId] = useState('');
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
@@ -1078,16 +1078,15 @@ function GeneratorContent() {
         )}
 
         {/* ── Photo-style textarea card ── */}
-        <div
-          className={`
-            mt-6 relative rounded-3xl border bg-card overflow-hidden
-            shadow-sm transition-all duration-200
-            focus-within:border-brand-2/60 focus-within:ring-2 focus-within:ring-brand-2/10
-            ${error ? 'border-destructive/40' : 'border-border'}
-          `}
+        <CutPanel
+          tone="card"
+          stroke="url(#cut-brand-gradient)"
+          className={`mt-8 w-full ${error ? 'ring-2 ring-destructive/20' : ''}`}
+          contentClassName="bg-white px-5 pb-5 pt-5 sm:px-8 sm:pb-8 sm:pt-6"
         >
-          {/* Plan-based char counter row — sits above textarea, never overlaps text */}
-          <div className="flex items-center justify-end px-4 pt-3 pb-0 pointer-events-none select-none">
+          {/* Text label and character counter */}
+          <div className="flex items-center justify-between px-1 pb-3">
+            <span className="text-base font-semibold text-slate-800 sm:text-lg">Your Text</span>
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full transition-colors ${
               text.length >= textLimit
                 ? 'bg-destructive/15 text-destructive'
@@ -1100,6 +1099,7 @@ function GeneratorContent() {
           </div>
 
           {/* Scrollable textarea */}
+          <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName="bg-white">
           <textarea
             maxLength={textLimit}
             placeholder={activeLang.placeholder}
@@ -1117,12 +1117,15 @@ function GeneratorContent() {
               ${clearingText ? 'text-destructive/70 select-none cursor-default' : ''}
             `}
           />
+          </CutPanel>
 
           {/* ���─ Bottom toolbar ── */}
-          <div className="flex items-center justify-between gap-2 border-t border-border/60 bg-secondary/30 px-3 py-2.5">
+          <div className="flex flex-col gap-5 border-t border-slate-200 bg-slate-50/80 px-1 pt-5 sm:gap-6">
 
             {/* Left: Language | Voice */}
-            <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-semibold text-slate-700">Select Language</span>
+              <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
               <LanguagePicker value={lang} onChange={setLang} compact />
               <VoicePicker
                 value={voiceId}
@@ -1134,6 +1137,7 @@ function GeneratorContent() {
                 voicesLoading={voicesLoading}
                 compact
               />
+              </div>
             </div>
 
             {/* Right: Generate button */}
@@ -1143,7 +1147,7 @@ function GeneratorContent() {
                 type="button"
                 onClick={generate}
                 disabled={generating || (hasZeroCredits && !!user)}
-                className="flex items-center h-[30px] rounded-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white shadow transition hover:opacity-90 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden text-[11px] font-semibold shrink-0"
+                className="mx-auto flex min-h-12 w-[250px] max-w-full items-center justify-center rounded-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white shadow-lg transition hover:opacity-90 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 overflow-hidden text-sm font-semibold [&_svg]:hidden"
               >
                 {generating ? (
                   <span className="flex items-center gap-2 px-3">
@@ -1201,7 +1205,7 @@ function GeneratorContent() {
               </button>
             </div>
           </div>
-        </div>
+        </CutPanel>
 
         {/* ── Zero-credit banners ── */}
         {showFreeZero && (
