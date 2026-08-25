@@ -352,12 +352,17 @@ export default function PublicProfilePage({ params }: { params: { username: stri
             {/* Avatar — overlapping cover */}
             <div className="-mt-16 sm:-mt-20">
               {profile.photoURL ? (
-                <CutPanel tone="card" className="size-28 rounded-full sm:size-36" contentClassName="h-full w-full rounded-full border-4 border-card bg-card shadow-xl">
+                <CutPanel
+                  tone="brand"
+                  stroke="oklch(1 0 0 / 0.72)"
+                  className="size-28 rounded-full sm:size-36"
+                  contentClassName="h-full w-full rounded-full border-4 border-white bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] p-1 shadow-xl"
+                >
                   <img
                     src={profile.photoURL}
                     alt={profile.name}
                     crossOrigin="anonymous"
-                    className="h-full w-full rounded-full object-cover"
+                    className="relative z-10 h-full w-full rounded-full object-cover"
                   />
                 </CutPanel>
               ) : (
