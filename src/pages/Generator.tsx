@@ -1173,7 +1173,7 @@ function GeneratorContent() {
           </div>
 
           {/* Generate button */}
-            <div className="flex items-center shrink-0">
+            <div className="mt-5 flex items-center shrink-0">
               {/* Generate button — three-part: [credit | divider | generate] */}
               <CutButton
                 type="button"
