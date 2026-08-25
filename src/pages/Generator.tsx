@@ -787,6 +787,7 @@ function GeneratorContent() {
   const [clearingText, setClearingText] = useState(false);
   const [lang, setLang] = useState<LanguageId>('bn');
   const [voiceId, setVoiceId] = useState('');
+  const [voiceFilter, setVoiceFilter] = useState<'all' | 'male' | 'female'>('all');
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
   const [previewId, setPreviewId] = useState<string | null>(null);
@@ -1119,92 +1120,58 @@ function GeneratorContent() {
           />
           </CutPanel>
 
-          {/* ���─ Bottom toolbar ── */}
-          <div className="flex flex-col gap-5 border-t border-slate-200 bg-slate-50/80 px-1 pt-5 sm:gap-6">
-
-            {/* Left: Language | Voice */}
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-semibold text-slate-700">Select Language</span>
-              <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
-              <LanguagePicker value={lang} onChange={setLang} compact />
-              <VoicePicker
-                value={voiceId}
-                onChange={setVoiceId}
-                userPlan={userPlan}
-                previewId={previewId}
-                onTogglePreview={toggleVoicePreview}
-                voices={voices}
-                voicesLoading={voicesLoading}
-                compact
-              />
+          {/* Language and voice controls */}
+          <div className="mt-7 flex flex-col gap-7">
+            <section>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-base font-semibold text-slate-800 sm:text-lg">Select Language</h2>
               </div>
-            </div>
+              <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName="bg-white p-2 sm:p-3">
+                <div className="grid grid-cols-3 gap-2">
+                  {LANGUAGES.map((item) => {
+                    const selected = lang === item.id;
+                    return <CutButton key={item.id} type="button" variant={selected ? 'primary' : 'light'} onClick={() => setLang(item.id)} className="min-h-11 w-full px-2 text-xs sm:text-sm">
+                      <span>{LANG_FLAG[item.id]}</span><span>{item.label}</span>
+                    </CutButton>;
+                  })}
+                </div>
+              </CutPanel>
+            </section>
 
-            {/* Right: Generate button */}
+            <section>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h2 className="text-base font-semibold text-slate-800 sm:text-lg">Voice List</h2>
+                <div className="flex gap-1">
+                  {(['all', 'male', 'female'] as const).map((filter) => <button key={filter} type="button" className="rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-semibold capitalize text-slate-600 transition hover:border-[#ec5252]" onClick={() => setVoiceFilter(filter)}>{filter}</button>)}
+                </div>
+              </div>
+              <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 snap-x snap-mandatory">
+                {(voices.length ? voices : Array.from({ length: 5 }, (_, index) => ({ voice_id: `simulated-${index}`, name: ['Ujjwal', 'Tiyasha', 'Arif', 'Maya', 'Rafi'][index], gender: index % 2 ? 'female' : 'male', plan: 'free', profile_photo_url: '', play_audio_url: '' } as ApiVoice))).filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).slice(0, 5).map((voice) => <div role="button" tabIndex={0} key={voice.voice_id} onClick={() => setVoiceId(voice.voice_id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setVoiceId(voice.voice_id); }} className="w-[170px] shrink-0 snap-start text-left">
+                <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName={`bg-white p-3 ${voiceId === voice.voice_id ? 'ring-2 ring-[#ec5252]/30' : ''}`}>
+                  <div className="flex items-center gap-2">
+                    {voice.profile_photo_url ? <img src={voice.profile_photo_url} alt={voice.name} className="h-10 w-10 rounded-full object-cover" /> : <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#ec5252] to-[#6e1a52] text-sm font-bold text-white">{voice.name.charAt(0)}</span>}
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800">{voice.name}</span>
+                    <CutButton type="button" variant="primary" onClick={(event) => onTogglePreview(event, voice)} className="size-9 shrink-0 px-0 py-0 [&_svg]:hidden"><Icon name={previewId === voice.voice_id ? 'pause' : 'play'} size={14} className="text-white" /></CutButton>
+                  </div>
+                </CutPanel>
+              </div>)}
+              </div>
+            </section>
+          </div>
+
+          {/* Generate button */}
             <div className="flex items-center shrink-0">
               {/* Generate button — three-part: [credit | divider | generate] */}
-              <button
+              <CutButton
                 type="button"
+                variant="primary"
                 onClick={generate}
-                disabled={generating || (hasZeroCredits && !!user)}
-                className="mx-auto flex min-h-12 w-[250px] max-w-full items-center justify-center rounded-full bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white shadow-lg transition hover:opacity-90 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 overflow-hidden text-sm font-semibold [&_svg]:hidden"
+                disabled={generating || !text.trim() || (hasZeroCredits && !!user)}
+                className="mx-auto min-h-12 w-[250px] max-w-full px-6 text-sm font-semibold !text-white"
               >
-                {generating ? (
-                  <span className="flex items-center gap-2 px-3">
-                    {/* mini waveform bars matching voice/audio context */}
-                    <span className="flex items-end gap-[2.5px] h-[12px] shrink-0">
-                      {[3, 6, 9, 6, 3].map((h, i) => (
-                        <span
-                          key={i}
-                          className="w-[2.5px] rounded-full bg-white/90"
-                          style={{
-                            height: `${h}px`,
-                            animation: `genBar 0.7s ease-in-out ${(i * 0.1).toFixed(1)}s infinite alternate`,
-                          }}
-                        />
-                      ))}
-                    </span>
-                    <span>Generating…</span>
-                  </span>
-                ) : hasZeroCredits && user ? (
-                  <span className="flex items-center gap-1.5 px-3">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" className="shrink-0">
-                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                    </svg>
-                    <span>Upgrade</span>
-                  </span>
-                ) : (
-                  <>
-                    {/* Left: cost badge */}
-                    <span className="flex items-center gap-1 px-2.5">
-                      <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" className="text-white/80 shrink-0">
-                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                      </svg>
-                      <span
-                        key={text.trim() ? '1' : '0'}
-                        className="text-white leading-none font-bold tabular-nums"
-                        style={{
-                          animation: 'creditFlip 0.22s cubic-bezier(.4,0,.2,1)',
-                          display: 'inline-block',
-                        }}
-                      >
-                        {text.trim() ? cost : 0}
-                      </span>
-                    </span>
-                    {/* Divider */}
-                    <span className="h-full w-px bg-white/25 shrink-0" />
-                    {/* Right: icon + Generate */}
-                    <span className="flex items-center gap-1.5 px-2.5">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="shrink-0">
-                        <path d="M2 12h2M6 8v8M10 5v14M14 8v8M18 10v4M22 12h-2" />
-                      </svg>
-                      <span>Generate</span>
-                    </span>
-                  </>
-                )}
-              </button>
+                {generating ? 'Generating voice...' : hasZeroCredits && user ? 'Upgrade' : 'Generate Voice'}
+              </CutButton>
             </div>
-          </div>
         </CutPanel>
 
         {/* ── Zero-credit banners ── */}
