@@ -932,7 +932,9 @@ function GeneratorContent() {
     if (!text.trim())   { setError('Please enter some text.'); return; }
     if (hasZeroCredits) return;
     if (!canAfford)     { setError('Not enough credits. Shorten your text or upgrade.'); return; }
+    if (!activeVoice?.voice_id) { setError('Please select a voice first.'); return; }
 
+    const selectedVoiceId = activeVoice.voice_id;
     setGenerating(true);
     audioRef.current?.pause();
     setAudioPlaying(false);
@@ -945,7 +947,7 @@ function GeneratorContent() {
         body: JSON.stringify({
           text: text.trim(),
           language_code: activeLang.id,
-          speaker: activeVoice?.voice_id,
+          speaker: selectedVoiceId,
         }),
       });
 
@@ -1204,7 +1206,7 @@ function GeneratorContent() {
                 type="button"
                 variant="primary"
                 onClick={generate}
-                disabled={generating || !text.trim() || (hasZeroCredits && !!user)}
+                disabled={generating || !text.trim() || !activeVoice?.voice_id || (hasZeroCredits && !!user)}
                 className="mx-auto min-h-12 w-[250px] max-w-full px-6 text-sm font-semibold !text-white"
               >
                 {generating ? 'Generating voice...' : hasZeroCredits && user ? 'Upgrade' : 'Generate Voice'}
