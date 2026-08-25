@@ -1191,7 +1191,7 @@ function GeneratorContent() {
                   <div className="flex items-center gap-1.5">
                     {voice.profile_photo_url ? <img src={voice.profile_photo_url} alt={voice.name} className="h-7 w-7 rounded-full object-cover" /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#ec5252] to-[#6e1a52] text-xs font-bold text-white">{voice.name.charAt(0)}</span>}
                     <span className={`min-w-0 flex-1 whitespace-nowrap text-xs font-semibold sm:text-sm ${voiceId === voice.voice_id ? 'text-white' : 'text-slate-800'}`}>{voice.name}</span>
-                    <CutButton type="button" variant="primary" onClick={(event) => onTogglePreview(event, voice)} className="size-7 shrink-0 !bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-0 py-0 !text-slate-900 [&_svg]:!text-slate-900 [&_svg]:opacity-100"><Icon name={previewId === voice.voice_id ? 'pause' : 'play'} size={12} className="!text-slate-900" /></CutButton>
+                    <CutButton type="button" variant="primary" onClick={(event) => onTogglePreview(event, voice)} className="size-7 shrink-0 px-0 py-0 !text-white [&_svg]:!text-white [&_svg]:opacity-100"><Icon name={previewId === voice.voice_id ? 'pause' : 'play'} size={12} className="!text-white" /></CutButton>
                   </div>
                 </CutPanel>
               </div>)}
