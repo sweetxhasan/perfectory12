@@ -1146,12 +1146,12 @@ function GeneratorContent() {
                 </div>
               </div>
               <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 snap-x snap-mandatory">
-                {(voices.length ? voices : Array.from({ length: 5 }, (_, index) => ({ voice_id: `simulated-${index}`, name: ['Ujjwal', 'Tiyasha', 'Arif', 'Maya', 'Rafi'][index], gender: index % 2 ? 'female' : 'male', plan: 'free', profile_photo_url: '', play_audio_url: '' } as ApiVoice))).filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).slice(0, 5).map((voice) => <div role="button" tabIndex={0} key={voice.voice_id} onClick={() => setVoiceId(voice.voice_id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setVoiceId(voice.voice_id); }} className="w-[112px] shrink-0 snap-start text-left sm:w-[132px]">
+                {(voices.length ? voices : Array.from({ length: 5 }, (_, index) => ({ voice_id: `simulated-${index}`, name: ['Ujjwal', 'Tiyasha', 'Arif', 'Maya', 'Rafi'][index], gender: index % 2 ? 'female' : 'male', plan: 'free', profile_photo_url: '', play_audio_url: '' } as ApiVoice))).filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).slice(0, 5).map((voice) => <div role="button" tabIndex={0} key={voice.voice_id} onClick={() => setVoiceId(voice.voice_id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setVoiceId(voice.voice_id); }} className="w-[148px] shrink-0 snap-start text-left sm:w-[168px]">
                 <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName={`bg-white p-2 ${voiceId === voice.voice_id ? 'ring-2 ring-[#ec5252]/30' : ''}`}>
                   <div className="flex items-center gap-1.5">
-                    {voice.profile_photo_url ? <img src={voice.profile_photo_url} alt={voice.name} className="h-7 w-7 rounded-full object-cover" /> : <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#ec5252] to-[#6e1a52] text-sm font-bold text-white">{voice.name.charAt(0)}</span>}
-                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800">{voice.name}</span>
-                    <CutButton type="button" variant="primary" onClick={(event) => onTogglePreview(event, voice)} className="size-6 shrink-0 px-0 py-0 text-white [&_svg]:!text-white [&_svg]:opacity-100"><Icon name={previewId === voice.voice_id ? 'pause' : 'play'} size={14} className="text-white" /></CutButton>
+                    {voice.profile_photo_url ? <img src={voice.profile_photo_url} alt={voice.name} className="h-7 w-7 rounded-full object-cover" /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#ec5252] to-[#6e1a52] text-xs font-bold text-white">{voice.name.charAt(0)}</span>}
+                    <span className="min-w-0 flex-1 whitespace-nowrap text-xs font-semibold text-slate-800 sm:text-sm">{voice.name}</span>
+                    <CutButton type="button" variant="primary" onClick={(event) => onTogglePreview(event, voice)} className="size-7 shrink-0 px-0 py-0 text-white [&_svg]:!text-white [&_svg]:opacity-100"><Icon name={previewId === voice.voice_id ? 'pause' : 'play'} size={12} className="text-white" /></CutButton>
                   </div>
                 </CutPanel>
               </div>)}
