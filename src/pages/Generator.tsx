@@ -39,7 +39,7 @@ interface GenEntry {
   createdAt: number;
 }
 
-const TTS_API = 'https://gsvtcpiwxaslgusfmzok.supabase.co/functions/v1/text-to-voice';
+const TTS_API = '/api/text-to-voice';
 const ONE_HOUR = 60 * 60 * 1000;
 
 const Sk = ({ className = '', style }: { className?: string; style?: CSSProperties }) => (
@@ -908,6 +908,13 @@ function GeneratorContent() {
   }
 
 
+  function parseDurationMs(value?: string): number | null {
+    if (!value) return null;
+    const match = value.match(/(?:(\\d+)m)?\\s*(?:(\\d+(?:\\.\\d+)?)s)?/i);
+    if (!match || (!match[1] && !match[2])) return null;
+    return ((Number(match[1] ?? 0) * 60) + Number(match[2] ?? 0)) * 1000;
+  }
+
   function fmtCountdown(ms: number): string {
     const s   = Math.floor(ms / 1000);
     const h   = Math.floor(s / 3600);
@@ -937,16 +944,20 @@ function GeneratorContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: text.trim(),
-          voice_id: (activeVoice?.voice_id ?? 'default').toLowerCase(),
-          language: activeLang.id,
+          language_code: activeLang.id,
+          speaker: activeVoice?.voice_id,
         }),
       });
 
       const result = await resp.json();
-      if (!result.success) throw new Error(result.error ?? 'Voice generation failed. Please try again.');
+      if (!resp.ok || !Array.isArray(result.audios) || !result.audios[0]) {
+        throw new Error(result.error ?? 'Voice generation failed. Please try again.');
+      }
 
-      const audioUrl = result.data.audio_url as string;
-      const durationMs: number = result.data.duration_ms ?? (Date.now() - reqStart);
+      const audioUrl = result.audios[0].startsWith('data:')
+        ? result.audios[0]
+        : `data:audio/wav;base64,${result.audios[0]}`;
+      const durationMs: number = parseDurationMs(result.audio_durations?.[0]) ?? (Date.now() - reqStart);
 
       const voiceName = activeVoice?.name ?? 'Unknown';
       const gen = { url: audioUrl, text: text.trim(), language: activeLang.label, voiceName, emotion: '' };
