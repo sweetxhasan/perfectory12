@@ -1053,7 +1053,7 @@ function GeneratorContent() {
             </span>
           </h1>
           <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-            Bangla · English · Hindi
+            বাংলা · English · Hindi
           </p>
         </div>
 
