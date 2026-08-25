@@ -1150,7 +1150,7 @@ function GeneratorContent() {
                         type="button"
                         variant={active ? 'primary' : 'light'}
                         onClick={() => setVoiceFilter(filter)}
-                        className={`h-8 min-w-[52px] px-3 py-1 text-[11px] font-semibold capitalize sm:min-w-[60px] sm:text-xs ${active ? '!bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] !text-white' : 'border-slate-200 bg-white text-slate-600'}`}
+                        className={`h-8 min-w-[52px] px-3 py-1 text-[11px] font-semibold capitalize sm:min-w-[60px] sm:text-xs ${active ? '!text-white' : 'border-slate-200 bg-white text-slate-600'}`}
                       >
                         {filter}
                       </CutButton>
