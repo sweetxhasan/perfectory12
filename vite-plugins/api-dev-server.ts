@@ -19,6 +19,7 @@ const AUTHED_ROUTES: Record<string, keyof Awaited<ReturnType<ViteDevServer['ssrL
 
 /** Routes whose handler signature is `(body)` only — public, unauthenticated endpoints. */
 const PUBLIC_ROUTES: Record<string, keyof Awaited<ReturnType<ViteDevServer['ssrLoadModule']>>> = {
+  '/api/voices': 'handleVoices',
   '/api/send-verification-code': 'handleSendVerificationCode',
   '/api/verify-code': 'handleVerifyCode',
   '/api/send-reset-code': 'handleSendResetCode',
@@ -61,9 +62,16 @@ export function apiDevServerPlugin(): Plugin {
         const isPublic = url && url in PUBLIC_ROUTES;
         if (!url || (!isAuthed && !isPublic)) return next();
 
-        if (req.method !== 'POST') {
-          return sendJson(res, 405, { error: 'Method not allowed.' });
+        if (url === '/api/voices' && req.method === 'GET') {
+          try {
+            const language = new URL(req.url ?? '/', 'http://localhost').searchParams.get('language') ?? 'bn';
+            const upstream = await fetch(`https://littlevoiceapi.littleblog.online/api/voices?language=${encodeURIComponent(language)}`, { headers: { Accept: 'application/json' } });
+            return sendJson(res, upstream.status, await upstream.json());
+          } catch (error) {
+            return sendJson(res, 502, { error: error instanceof Error ? error.message : 'Voice API unavailable.' });
+          }
         }
+        if (req.method !== 'POST') return sendJson(res, 405, { error: 'Method not allowed.' });
 
         try {
           const mod = await server.ssrLoadModule('/api/_lib/handlers.ts');

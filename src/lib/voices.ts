@@ -22,8 +22,9 @@ function mapVoiceType(type: string): VoicePlan {
 }
 
 export async function fetchVoices(language: LanguageId = 'bn'): Promise<ApiVoice[]> {
-  const res = await fetch(`https://littlevoiceapi.littleblog.online/api/voices?language=${encodeURIComponent(language)}`, {
+  const res = await fetch(`/api/voices?language=${encodeURIComponent(language)}`, {
     headers: { Accept: 'application/json' },
+    cache: 'no-store',
   });
   if (!res.ok) throw new Error(`Voice list fetch failed: ${res.status}`);
   const json = await res.json();
