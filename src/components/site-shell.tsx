@@ -281,23 +281,25 @@ export function SiteShell({ children }: { children: ReactNode }) {
                         {notifications.length > 0 && (
                           confirmDeleteAll ? (
                             /* Inline compact confirm — replaces the button */
-                            <div className="flex shrink-0 items-center gap-1 rounded-xl border border-destructive/25 bg-destructive/6 px-2 py-1">
+                            <CutPanel tone="soft" className="shrink-0" contentClassName="flex items-center gap-0.5 px-1.5 py-0.5">
                               <span className="mr-0.5 text-[10px] font-medium text-destructive/80">Sure?</span>
-                              <button
+                              <CutButton
                                 type="button"
                                 onClick={handleDeleteAll}
-                                className="rounded-lg bg-destructive px-2 py-0.5 text-[10px] font-semibold text-white transition hover:bg-destructive/85"
+                                variant="primary"
+                                className="h-7 min-h-7 px-1.5 py-0 text-[10px] text-primary-foreground [background:linear-gradient(-45deg,#ec5252,#6e1a52)]"
                               >
                                 Yes
-                              </button>
-                              <button
+                              </CutButton>
+                              <CutButton
                                 type="button"
                                 onClick={() => setConfirmDeleteAll(false)}
-                                className="rounded-lg px-2 py-0.5 text-[10px] font-medium text-muted-foreground transition hover:bg-secondary"
+                                variant="ghost"
+                                className="h-7 min-h-7 px-1.5 py-0 text-[10px] text-muted-foreground"
                               >
                                 No
-                              </button>
-                            </div>
+                              </CutButton>
+                            </CutPanel>
                           ) : (
                             <button
                               type="button"
@@ -353,17 +355,17 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </div>
 
                 {/* Credits pill */}
-                <Link href="/credits" className="group relative hidden items-center gap-1.5 px-3 py-1.5 text-sm transition sm:flex">
+                <div className="group relative hidden items-center gap-1.5 px-3 py-1.5 text-sm sm:flex" aria-label={`${profile.credits} credits`}>
                   <CutFrame variant="outline" cut={9} />
                   <Icon name="bolt" size={15} className="relative z-10 text-brand-2" />
                   <span className="relative z-10 font-medium">{profile.credits}</span>
                   <span className="relative z-10 text-muted-foreground">credits</span>
-                </Link>
-                <Link href="/credits" className="group relative flex items-center gap-1 px-2.5 py-1.5 text-sm transition sm:hidden">
+                </div>
+                <div className="group relative flex items-center gap-1 px-2.5 py-1.5 text-sm sm:hidden" aria-label={`${profile.credits} credits`}>
                   <CutFrame variant="outline" cut={9} />
                   <Icon name="bolt" size={14} className="relative z-10 text-brand-2" />
                   <span className="relative z-10 font-medium leading-none">{profile.credits}</span>
-                </Link>
+                </div>
 
                 {/* Avatar / menu button */}
                 <div className="relative" ref={menuRef}>
@@ -441,8 +443,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} aria-hidden="true" />
                 <button type="button" onClick={() => setSidebarOpen(false)}
-                  className="group absolute left-72 top-4 z-10 flex h-9 items-center gap-1.5 px-3 text-foreground shadow-lg transition hover:text-brand-2" aria-label="Close menu">
-                  <CutFrame variant="outline" />
+                  className="group absolute left-72 top-4 z-10 flex h-9 items-center gap-1.5 overflow-hidden px-3 text-white shadow-lg transition hover:brightness-110" aria-label="Close menu">
+                  <CutFrame variant="primary" />
                   <Icon name="close" size={14} className="relative z-10" />
                   <span className="relative z-10 text-xs font-semibold">Close</span>
                 </button>
@@ -729,32 +731,31 @@ function NotificationRow({ notification, onDelete }: { notification: AppNotifica
 
   return (
     <div className={`group flex gap-3 px-4 py-3.5 transition hover:bg-secondary/60 ${isUnread ? 'bg-secondary/30' : 'bg-card'}`}>
-      <span className={`relative mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ring-4 ${tone}`}>
-        {isUnread && <span className="absolute inset-0 rounded-2xl animate-pulse bg-current opacity-[0.08]" />}
-        <Icon name={notification.icon as IconName} size={19} className="relative animate-[notification-pop_2.4s_ease-in-out_infinite]" />
-      </span>
+<CutPanel tone="card" className={`mt-0.5 size-10 shrink-0 ${tone}`} contentClassName={`flex items-center justify-center ${tone}`}>
+  <Icon name={notification.icon as IconName} size={19} />
+  </CutPanel>
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-xs font-semibold leading-snug">{notification.title}</p>
+          <p className="text-xs font-semibold leading-none">{notification.title}</p>
           <div className="flex shrink-0 items-center gap-1.5">
             {isUnread && (
               <span className="h-1.5 w-1.5 rounded-full bg-brand-2 mt-0.5" aria-label="Unread" />
             )}
             {/* Delete button — always visible at low opacity, full on hover */}
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              title="Delete notification"
-              className="flex h-6 w-6 items-center justify-center rounded-lg text-muted-foreground/40 transition hover:bg-destructive/10 hover:text-destructive group-hover:text-muted-foreground/70"
-              aria-label="Delete notification"
-            >
+<button
+  type="button"
+  onClick={(e) => { e.stopPropagation(); onDelete(); }}
+  title="Delete notification"
+  className="flex size-5 items-center justify-center rounded-lg text-muted-foreground/40 transition hover:bg-destructive/10 hover:text-destructive group-hover:text-muted-foreground/70"
+  aria-label="Delete notification"
+  >
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-              </svg>
-            </button>
-          </div>
+  </svg>
+  </button>
+  </div>
         </div>
-        <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{notification.description}</p>
+        <p className="text-[11px] leading-relaxed text-muted-foreground">{notification.description}</p>
         <div className="mt-2 flex items-center justify-between gap-2">
           <span className="text-[10px] text-muted-foreground/70">
             {formatNotificationTime(notification.createdAt)}

@@ -9,6 +9,7 @@ import { SiteShell } from '@/components/site-shell';
 import { SEOHead } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
 import { GradientButton, OutlineButton, Panel, SectionBadge } from '@/components/primitives';
+import { CutPanel, CutButton } from '@/components/cut-ui';
 import { Icon } from '@/components/icon';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -38,7 +39,7 @@ interface GenEntry {
   createdAt: number;
 }
 
-const TTS_API = 'https://gsvtcpiwxaslgusfmzok.supabase.co/functions/v1/text-to-voice';
+const TTS_API = '/api/text-to-voice';
 const ONE_HOUR = 60 * 60 * 1000;
 
 const Sk = ({ className = '', style }: { className?: string; style?: CSSProperties }) => (
@@ -52,39 +53,47 @@ function GeneratorSkeleton() {
   return (
     <SiteShell>
       <div className="mx-auto max-w-3xl space-y-6">
-        {/* Header */}
         <div className="flex flex-col items-center gap-3 text-center">
           <Sk className="h-5 w-28 rounded-full" />
           <Sk className="h-10 w-80 rounded-2xl" />
           <Sk className="h-3.5 w-40 rounded-full" />
         </div>
 
-        {/* Main card */}
-        <div className="rounded-3xl border border-border bg-card overflow-hidden">
-          {/* char counter row */}
-          <div className="flex justify-end px-4 pt-3">
+        <CutPanel tone="card" stroke="oklch(0.42 0.16 350 / 0.35)" className="w-full" contentClassName="overflow-hidden bg-card">
+          <div className="flex justify-end px-5 pt-4">
             <Sk className="h-5 w-20 rounded-full" />
           </div>
-          {/* textarea area */}
-          <div className="px-5 pt-2 pb-4 space-y-2.5">
-            <Sk className="h-4 w-[72%] rounded-full" />
-            <Sk className="h-4 w-[55%] rounded-full" />
-            <Sk className="h-4 w-[63%] rounded-full" />
-            <Sk className="h-4 w-[40%] rounded-full" style={{ opacity: 0.5 }} />
-            <div className="h-16" />
+          <div className="space-y-3 px-5 pb-6 pt-3">
+            <Sk className="h-4 w-[78%] rounded-full" />
+            <Sk className="h-4 w-[58%] rounded-full" />
+            <Sk className="h-4 w-[68%] rounded-full" />
+            <Sk className="h-4 w-[42%] rounded-full" style={{ opacity: 0.5 }} />
+            <div className="h-14" />
           </div>
-          {/* toolbar */}
-          <div className="flex items-center justify-between gap-2 border-t border-border/60 bg-secondary/30 px-3 py-2.5">
-            <div className="flex items-center gap-1.5">
-              {/* language pill */}
-              <Sk className="h-[30px] w-[80px] rounded-full" />
-              {/* voice pill */}
-              <Sk className="h-[30px] w-[90px] rounded-full" />
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 bg-secondary/30 px-4 py-3">
+            <div className="flex gap-2">
+              <Sk className="h-9 w-20 rounded-full" />
+              <Sk className="h-9 w-24 rounded-full" />
             </div>
-            {/* generate button */}
-            <Sk className="h-[30px] w-[110px] rounded-full" />
+            <Sk className="h-10 w-36 rounded-full" />
           </div>
-        </div>
+        </CutPanel>
+
+        <CutPanel tone="card" stroke="oklch(0.42 0.16 350 / 0.28)" className="w-full" contentClassName="bg-card p-5 sm:p-6">
+          <div className="mb-5 flex items-center justify-between">
+            <Sk className="h-7 w-32 rounded-full" />
+            <div className="flex gap-2"><Sk className="h-8 w-16 rounded-full" /><Sk className="h-8 w-16 rounded-full" /></div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <CutPanel key={i} tone="soft" stroke="oklch(0.42 0.16 350 / 0.18)" contentClassName="flex items-center gap-3 p-3">
+                <Sk className="h-10 w-10 shrink-0 rounded-full" />
+                <span className="flex-1 space-y-2"><Sk className="h-3 w-3/4 rounded-full" /><Sk className="h-2.5 w-1/2 rounded-full" /></span>
+                <Sk className="h-8 w-8 shrink-0 rounded-full" />
+              </CutPanel>
+            ))}
+          </div>
+        </CutPanel>
       </div>
     </SiteShell>
   );
@@ -378,7 +387,7 @@ function LanguagePicker({
   );
 }
 
-/* ═══════════════════════════════════════════════════
+/* ═════════════════���═════════════════════════════════
    Voice picker — premium overlay with plan sections
 ═══════════════════════════════════════════════════ */
 function VoicePicker({
@@ -784,8 +793,9 @@ function GeneratorContent() {
   const { user, profile, refreshProfile } = useAuth();
   const [text, setText] = useState('');
   const [clearingText, setClearingText] = useState(false);
-  const [lang, setLang] = useState<LanguageId>('en');
+  const [lang, setLang] = useState<LanguageId>('bn');
   const [voiceId, setVoiceId] = useState('');
+  const [voiceFilter, setVoiceFilter] = useState<'all' | 'male' | 'female'>('all');
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
   const [previewId, setPreviewId] = useState<string | null>(null);
@@ -804,14 +814,24 @@ function GeneratorContent() {
   const [voicesLoading, setVoicesLoading] = useState(true);
 
   useEffect(() => {
-    fetchVoices()
+    let cancelled = false;
+    setVoicesLoading(true);
+    setPreviewId(null);
+    fetchVoices(lang)
       .then((list) => {
+        if (cancelled) return;
         setVoices(list);
-        if (list.length > 0) setVoiceId((prev) => prev || list[0].voice_id);
+        setVoiceId((current) => list.some((voice) => voice.voice_id === current) ? current : (list[0]?.voice_id ?? ''));
       })
-      .catch(() => { /* silently fall back to empty list */ })
-      .finally(() => setVoicesLoading(false));
-  }, []);
+      .catch(() => {
+        if (!cancelled) {
+          setVoices([]);
+          setVoiceId('');
+        }
+      })
+      .finally(() => { if (!cancelled) setVoicesLoading(false); });
+    return () => { cancelled = true; };
+  }, [lang]);
 
   const cost      = creditCost(text);
   const credits   = profile?.credits ?? 0;
@@ -862,39 +882,62 @@ function GeneratorContent() {
 
   /* ── Voice preview — one at a time ── */
   const activePreviewId = useRef<string | null>(null);
-
+  const previewRequestId = useRef(0);
+  
+  function stopVoicePreview() {
+    previewRequestId.current += 1;
+    const audio = previewAudioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.onended = null;
+      audio.onerror = null;
+    }
+    previewAudioRef.current = null;
+    activePreviewId.current = null;
+    setPreviewId(null);
+  }
+  
   function toggleVoicePreview(e: React.MouseEvent, v: ApiVoice) {
     e.stopPropagation();
-
-    // Clicking the same voice again → stop
+  
     if (activePreviewId.current === v.voice_id) {
-      previewAudioRef.current?.pause();
-      previewAudioRef.current = null;
-      activePreviewId.current = null;
-      setPreviewId(null);
+      stopVoicePreview();
       return;
     }
-
-    // Stop whatever is already playing
-    previewAudioRef.current?.pause();
-    previewAudioRef.current = null;
-
+  
+    // Always stop the previous voice before starting a new preview.
+    stopVoicePreview();
     if (!v.play_audio_url) return;
-
+  
+    const requestId = previewRequestId.current;
+    const audio = new Audio();
+    audio.crossOrigin = 'anonymous';
+    audio.preload = 'auto';
+    audio.src = v.play_audio_url;
+    previewAudioRef.current = audio;
     activePreviewId.current = v.voice_id;
     setPreviewId(v.voice_id);
-
-    const audio = new Audio(v.play_audio_url);
-    previewAudioRef.current = audio;
-    audio.play().catch(() => {});
-    audio.onended = () => {
-      if (activePreviewId.current === v.voice_id) {
+  
+    const finish = () => {
+      if (previewRequestId.current === requestId && activePreviewId.current === v.voice_id) {
+        previewAudioRef.current = null;
         activePreviewId.current = null;
         setPreviewId(null);
       }
     };
+    audio.onended = finish;
+    audio.onerror = finish;
+    audio.play().catch(finish);
   }
 
+
+  function parseDurationMs(value?: string): number | null {
+    if (!value) return null;
+    const match = value.match(/(?:(\\d+)m)?\\s*(?:(\\d+(?:\\.\\d+)?)s)?/i);
+    if (!match || (!match[1] && !match[2])) return null;
+    return ((Number(match[1] ?? 0) * 60) + Number(match[2] ?? 0)) * 1000;
+  }
 
   function fmtCountdown(ms: number): string {
     const s   = Math.floor(ms / 1000);
@@ -913,7 +956,9 @@ function GeneratorContent() {
     if (!text.trim())   { setError('Please enter some text.'); return; }
     if (hasZeroCredits) return;
     if (!canAfford)     { setError('Not enough credits. Shorten your text or upgrade.'); return; }
+    if (!activeVoice?.voice_id) { setError('Please select a voice first.'); return; }
 
+    const selectedVoiceId = activeVoice.voice_id;
     setGenerating(true);
     audioRef.current?.pause();
     setAudioPlaying(false);
@@ -925,16 +970,20 @@ function GeneratorContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: text.trim(),
-          voice_id: (activeVoice?.voice_id ?? 'default').toLowerCase(),
-          language: activeLang.id,
+          language_code: activeLang.id,
+          speaker: selectedVoiceId,
         }),
       });
 
       const result = await resp.json();
-      if (!result.success) throw new Error(result.error ?? 'Voice generation failed. Please try again.');
+      if (!resp.ok || !Array.isArray(result.audios) || !result.audios[0]) {
+        throw new Error(result.error ?? 'Voice generation failed. Please try again.');
+      }
 
-      const audioUrl = result.data.audio_url as string;
-      const durationMs: number = result.data.duration_ms ?? (Date.now() - reqStart);
+      const audioUrl = result.audios[0].startsWith('data:')
+        ? result.audios[0]
+        : `data:audio/wav;base64,${result.audios[0]}`;
+      const durationMs: number = parseDurationMs(result.audio_durations?.[0]) ?? (Date.now() - reqStart);
 
       const voiceName = activeVoice?.name ?? 'Unknown';
       const gen = { url: audioUrl, text: text.trim(), language: activeLang.label, voiceName, emotion: '' };
@@ -1046,38 +1095,46 @@ function GeneratorContent() {
         <div className="text-center px-2">
           <h1 className="text-balance text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
             Turn any text into a{' '}
-            <span className="bg-gradient-to-r from-[#ec5252] via-[#c03090] to-[#7c3aed] bg-clip-text text-transparent">
+            <span className="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] bg-clip-text text-transparent">
               natural, lifelike voice
             </span>
           </h1>
           <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-            Bangla · English · Hindi
+            বাংলা · English · Hindi
           </p>
         </div>
 
         {/* ── Guest banner ── */}
         {!user && (
-          <div className="mt-6 flex flex-col items-center justify-between gap-3 rounded-2xl border border-border bg-gradient-soft px-5 py-4 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              Log in to generate and download your audio.
-            </p>
-            <Link href="/login">
-              <OutlineButton icon="login" className="py-2">Log in</OutlineButton>
-            </Link>
-          </div>
+          <CutPanel
+            tone="soft"
+            stroke="url(#cut-brand-gradient)"
+            className="mt-6 w-full"
+            contentClassName="bg-gradient-to-br from-[#fff7f7] to-[#f8eef2] px-5 py-4"
+          >
+            <div className="flex w-full flex-row items-center justify-between gap-4">
+              <p className="min-w-0 flex-1 whitespace-nowrap text-[clamp(0.68rem,2.8vw,1rem)] text-foreground">
+                Log in to generate and download your audio.
+              </p>
+              <Link href="/login" className="shrink-0">
+                <CutButton variant="primary" className="px-5 py-2.5 text-sm font-semibold !text-white">
+                  Log In
+                </CutButton>
+              </Link>
+            </div>
+          </CutPanel>
         )}
 
         {/* ── Photo-style textarea card ── */}
-        <div
-          className={`
-            mt-6 relative rounded-3xl border bg-card overflow-hidden
-            shadow-sm transition-all duration-200
-            focus-within:border-brand-2/60 focus-within:ring-2 focus-within:ring-brand-2/10
-            ${error ? 'border-destructive/40' : 'border-border'}
-          `}
+        <CutPanel
+          tone="card"
+          stroke="url(#cut-brand-gradient)"
+          className={`mt-8 w-full ${error ? 'ring-2 ring-destructive/20' : ''}`}
+          contentClassName="bg-white px-5 pb-5 pt-5 sm:px-8 sm:pb-8 sm:pt-6"
         >
-          {/* Plan-based char counter row — sits above textarea, never overlaps text */}
-          <div className="flex items-center justify-end px-4 pt-3 pb-0 pointer-events-none select-none">
+          {/* Text label and character counter */}
+          <div className="flex items-center justify-between px-1 pb-3">
+            <span className="text-base font-semibold text-slate-800 sm:text-lg">Your Text</span>
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full transition-colors ${
               text.length >= textLimit
                 ? 'bg-destructive/15 text-destructive'
@@ -1090,6 +1147,7 @@ function GeneratorContent() {
           </div>
 
           {/* Scrollable textarea */}
+          <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName="bg-white">
           <textarea
             maxLength={textLimit}
             placeholder={activeLang.placeholder}
@@ -1107,91 +1165,78 @@ function GeneratorContent() {
               ${clearingText ? 'text-destructive/70 select-none cursor-default' : ''}
             `}
           />
+          </CutPanel>
 
-          {/* ── Bottom toolbar ── */}
-          <div className="flex items-center justify-between gap-2 border-t border-border/60 bg-secondary/30 px-3 py-2.5">
+          {/* Language and voice controls */}
+          <div className="mt-7 flex flex-col gap-7">
+            <section>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-base font-semibold text-slate-800 sm:text-lg">Select Language</h2>
+              </div>
+              <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName="bg-white p-2 sm:p-3">
+                <div className="grid grid-cols-3 gap-2">
+                  {LANGUAGES.map((item) => {
+                    const selected = lang === item.id;
+                    return <CutButton key={item.id} type="button" variant={selected ? 'primary' : 'light'} onClick={() => setLang(item.id)} className="min-h-11 w-full px-2 text-xs sm:text-sm">
+                      <span>{LANG_FLAG[item.id]}</span><span>{item.label}</span>
+                    </CutButton>;
+                  })}
+                </div>
+              </CutPanel>
+            </section>
 
-            {/* Left: Language | Voice */}
-            <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
-              <LanguagePicker value={lang} onChange={setLang} compact />
-              <VoicePicker
-                value={voiceId}
-                onChange={setVoiceId}
-                userPlan={userPlan}
-                previewId={previewId}
-                onTogglePreview={toggleVoicePreview}
-                voices={voices}
-                voicesLoading={voicesLoading}
-                compact
-              />
-            </div>
-
-            {/* Right: Generate button */}
-            <div className="flex items-center shrink-0">
-              {/* Generate button — three-part: [credit | divider | generate] */}
-              <button
-                type="button"
-                onClick={generate}
-                disabled={generating || (hasZeroCredits && !!user)}
-                className="flex items-center h-[30px] rounded-full bg-gradient-to-r from-[#6e1a52] via-[#c03090] to-[#ec5252] text-white shadow transition hover:opacity-90 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden text-[11px] font-semibold shrink-0"
-              >
-                {generating ? (
-                  <span className="flex items-center gap-2 px-3">
-                    {/* mini waveform bars matching voice/audio context */}
-                    <span className="flex items-end gap-[2.5px] h-[12px] shrink-0">
-                      {[3, 6, 9, 6, 3].map((h, i) => (
-                        <span
-                          key={i}
-                          className="w-[2.5px] rounded-full bg-white/90"
-                          style={{
-                            height: `${h}px`,
-                            animation: `genBar 0.7s ease-in-out ${(i * 0.1).toFixed(1)}s infinite alternate`,
-                          }}
-                        />
-                      ))}
-                    </span>
-                    <span>Generating…</span>
-                  </span>
-                ) : hasZeroCredits && user ? (
-                  <span className="flex items-center gap-1.5 px-3">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" className="shrink-0">
-                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                    </svg>
-                    <span>Upgrade</span>
-                  </span>
-                ) : (
-                  <>
-                    {/* Left: cost badge */}
-                    <span className="flex items-center gap-1 px-2.5">
-                      <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" className="text-white/80 shrink-0">
-                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                      </svg>
-                      <span
-                        key={text.trim() ? '1' : '0'}
-                        className="text-white leading-none font-bold tabular-nums"
-                        style={{
-                          animation: 'creditFlip 0.22s cubic-bezier(.4,0,.2,1)',
-                          display: 'inline-block',
-                        }}
+            <section>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h2 className="text-base font-semibold text-slate-800 sm:text-lg">Voice List</h2>
+                <div className="flex gap-2">
+                  {(['all', 'male', 'female'] as const).map((filter) => {
+                    const active = voiceFilter === filter;
+                    return (
+                      <CutButton
+                        key={filter}
+                        type="button"
+                        variant={active ? 'primary' : 'light'}
+                        onClick={() => setVoiceFilter(filter)}
+                        className={`h-8 min-w-[52px] px-3 py-1 text-[11px] font-semibold capitalize sm:min-w-[60px] sm:text-xs ${active ? '!text-white' : 'border-slate-200 bg-white text-slate-600'}`}
                       >
-                        {text.trim() ? cost : 0}
-                      </span>
-                    </span>
-                    {/* Divider */}
-                    <span className="h-full w-px bg-white/25 shrink-0" />
-                    {/* Right: icon + Generate */}
-                    <span className="flex items-center gap-1.5 px-2.5">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="shrink-0">
-                        <path d="M2 12h2M6 8v8M10 5v14M14 8v8M18 10v4M22 12h-2" />
-                      </svg>
-                      <span>Generate</span>
-                    </span>
-                  </>
-                )}
-              </button>
-            </div>
+                        {filter}
+                      </CutButton>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="-mx-1 flex min-h-16 gap-3 overflow-x-auto px-1 pb-2 snap-x snap-mandatory">
+                {voicesLoading ? (
+                  <p className="voice-loading-text px-1 py-4 text-sm font-semibold">Voice founding please wait<span className="loading-dots" aria-hidden="true">...</span></p>
+                ) : voices.filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).length === 0 ? (
+                  <p className="voice-loading-text px-1 py-4 text-sm font-semibold">No voice found</p>
+                ) : voices.filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).slice(0, 20).map((voice) => <div role="button" tabIndex={0} key={voice.voice_id} onClick={() => setVoiceId(voice.voice_id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setVoiceId(voice.voice_id); }} className="w-[148px] shrink-0 snap-start text-left sm:w-[168px]">
+                <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName={`p-2 ${voiceId === voice.voice_id ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white' : 'bg-white text-slate-800'}`}>
+                  <div className="flex items-center gap-1.5">
+                    {voice.profile_photo_url ? <img src={voice.profile_photo_url} alt={voice.name} className="h-7 w-7 rounded-full object-cover" /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#ec5252] to-[#6e1a52] text-xs font-bold text-white">{voice.name.charAt(0)}</span>}
+                    <span className={`min-w-0 flex-1 whitespace-nowrap text-xs font-semibold sm:text-sm ${voiceId === voice.voice_id ? 'text-white' : 'text-slate-800'}`}>{voice.name}</span>
+                    <CutButton type="button" variant="primary" onClick={(event) => onTogglePreview(event, voice)} className="h-7 w-7 min-w-7 shrink-0 px-0 py-0 !text-white [&_svg]:!text-white [&_svg]:opacity-100"><Icon name={previewId === voice.voice_id ? 'pause' : 'play'} size={12} className="!text-white" /></CutButton>
+                  </div>
+                </CutPanel>
+              </div>)}
+              </div>
+            </section>
           </div>
-        </div>
+
+          {/* Generate button */}
+            <div className="mt-5 flex items-center shrink-0">
+              {/* Generate button — three-part: [credit | divider | generate] */}
+              <CutButton
+                type="button"
+                variant="primary"
+                onClick={generate}
+                disabled={generating || !text.trim() || !activeVoice?.voice_id || (hasZeroCredits && !!user)}
+                className="mx-auto min-h-12 w-[250px] max-w-full px-6 text-sm font-semibold !text-white"
+              >
+                {generating ? 'Generating voice...' : hasZeroCredits && user ? 'Upgrade' : 'Generate Voice'}
+              </CutButton>
+            </div>
+        </CutPanel>
 
         {/* ── Zero-credit banners ── */}
         {showFreeZero && (
@@ -1298,9 +1343,11 @@ function GeneratorContent() {
 
         {/* ── Result player ── */}
         {currentGen && (
-          <div
-            className="mt-6 overflow-hidden rounded-3xl p-5 sm:p-6"
-            style={{ background: 'linear-gradient(-45deg, #6e1a52, #ec5252)' }}
+          <CutPanel
+            tone="brand"
+            stroke="oklch(1 0 0 / 0.55)"
+            className="mt-6 w-full"
+            contentClassName="overflow-hidden bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] p-5 sm:p-6"
           >
             {/* Waveform animation */}
             <div className="mb-4 flex items-end justify-center gap-1 h-8">
@@ -1330,72 +1377,27 @@ function GeneratorContent() {
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
-              <button
+              <CutButton
                 type="button"
+                variant="primary"
                 onClick={toggleCurrentAudio}
-                className="inline-flex items-center gap-2 rounded-2xl bg-white/20 px-4 sm:px-5 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/30 active:scale-[0.98]"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium !text-white sm:px-5"
               >
-                <Icon name={audioPlaying ? 'pause' : 'play'} size={16} />
+                <Icon name={audioPlaying ? 'pause' : 'play'} size={16} className="!text-white" />
                 {audioPlaying ? 'Pause' : 'Play again'}
-              </button>
-              <button
+              </CutButton>
+              <CutButton
                 type="button"
+                variant="primary"
                 onClick={() => download(currentGen.url, currentGen.text)}
-                className="inline-flex items-center gap-2 rounded-2xl bg-white/20 px-4 sm:px-5 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/30 active:scale-[0.98]"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium !text-white sm:px-5"
               >
-                <Icon name="download" size={16} /> Download
-              </button>
+                <Icon name="download" size={16} className="!text-white" /> Download
+              </CutButton>
             </div>
-          </div>
+          </CutPanel>
         )}
 
-        {/* ── History ── */}
-        {history.length > 0 && (
-          <Panel className="mt-6 p-5 sm:p-6">
-            <p className="mb-3 text-sm font-semibold">
-              Recent generations{' '}
-              <span className="text-xs font-normal text-muted-foreground">(auto-deleted after 1 h)</span>
-            </p>
-            <div className="flex flex-col gap-2">
-              {history.map((item) => {
-                const minsLeft = Math.max(0, Math.floor((ONE_HOUR - (Date.now() - item.createdAt)) / 60_000));
-                const isPlaying = historyPlayId === item.id;
-                return (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-3 rounded-2xl border border-border bg-gradient-soft px-3.5 py-2.5"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => toggleHistoryPlay(item)}
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition
-                        ${isPlaying ? 'bg-gradient-brand text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-brand-2'}`}
-                    >
-                      <Icon name={isPlaying ? 'pause' : 'play'} size={13} />
-                    </button>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-xs font-medium">
-                        {item.text.slice(0, 70)}{item.text.length > 70 ? '…' : ''}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {item.language} · {item.voiceName}
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-[10px] text-muted-foreground">{minsLeft}m left</span>
-                    <button
-                      type="button"
-                      onClick={() => download(item.audioUrl, item.text)}
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition hover:text-brand-2"
-                      title="Download"
-                    >
-                      <Icon name="download" size={14} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </Panel>
-        )}
 
       </div>
     </SiteShell>

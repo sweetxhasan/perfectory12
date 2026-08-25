@@ -6,6 +6,7 @@ import { SEOHead } from '@/components/seo-head';
 import { PAGE_SEO } from '@/lib/seo-config';
 import { Panel, SectionBadge, GradientButton, OutlineButton } from '@/components/primitives';
 import { Icon } from '@/components/icon';
+import { CutButton, CutPanel } from '@/components/cut-ui';
 import { useAuth } from '@/lib/auth-context';
 import { deactivatePlan, PLAN_DAILY_CREDITS, type PlanId } from '@/lib/user-store';
 import { subscribeUserPayments } from '@/lib/payments';
@@ -34,6 +35,7 @@ const PLANS: Plan[] = [
   {
     id: 'free',
     name: 'Free',
+    badge: 'Free',
     price: '৳0',
     period: 'forever',
     tagline: 'Try before you commit',
@@ -218,7 +220,7 @@ function OverlayShell({
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[200]">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto p-2 sm:p-4">
       {/* Backdrop */}
       <div
         ref={backdropRef}
@@ -229,52 +231,38 @@ function OverlayShell({
       {/* ── Mobile: bottom sheet ── */}
       <div
         ref={sheetRef}
-        className="sm:hidden absolute bottom-0 left-0 right-0 flex flex-col bg-card rounded-t-[2rem] max-h-[92dvh] animate-overlay-sheet shadow-2xl"
+        className="relative flex w-full max-w-[600px] max-h-[calc(100dvh-16px)] flex-col animate-overlay-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
       >
+        <CutPanel tone="card" className="flex min-h-0 flex-col overflow-hidden rounded-t-[2rem]" contentClassName="bg-card">
         {/* Drag handle */}
         <div
-          className="flex justify-center items-center pt-3 pb-2 shrink-0 touch-none select-none cursor-grab active:cursor-grabbing"
+          className="hidden"
           onTouchStart={onDragStart} onTouchMove={onDragMove} onTouchEnd={onDragEnd}
         >
           <div className="h-[5px] w-[52px] rounded-full bg-border/80" />
-        </div>
-        {/* Header */}
-        <div
-          className="flex items-center justify-between px-5 py-3.5 border-b border-border shrink-0 touch-none select-none"
-          onTouchStart={onDragStart} onTouchMove={onDragMove} onTouchEnd={onDragEnd}
-        >
-          <span className="text-base font-bold">{title}</span>
-          <button
-            type="button" onClick={onClose} aria-label="Close"
-            onTouchStart={(e) => e.stopPropagation()}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-muted-foreground transition hover:bg-border hover:text-foreground"
-          >
-            <Icon name="close" size={15} />
-          </button>
         </div>
         <div className="flex-1 overflow-y-auto overscroll-contain">
           {children}
         </div>
         <div className="shrink-0" style={{ height: 'env(safe-area-inset-bottom, 12px)' }} />
+        </CutPanel>
       </div>
 
       {/* ── Desktop: centred modal ── */}
       <div
-        className="hidden sm:flex flex-col bg-card rounded-3xl shadow-2xl border border-border w-[480px] max-h-[85vh] absolute top-1/2 left-1/2 animate-overlay-modal overflow-hidden"
-        style={{ transform: 'translate(-50%, -50%)' }}
+        className="hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
-          <span className="text-base font-bold">{title}</span>
-          <button
-            type="button" onClick={onClose} aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-muted-foreground transition hover:bg-border hover:text-foreground"
-          >
-            <Icon name="close" size={15} />
-          </button>
-        </div>
+        <CutPanel tone="card" className="flex max-h-[85vh] flex-col overflow-hidden" contentClassName="bg-card">
         <div className="flex-1 overflow-y-auto overscroll-contain">
           {children}
         </div>
+        </CutPanel>
       </div>
     </div>,
     document.body,
@@ -337,19 +325,14 @@ function AnimatedCrownBreak() {
 }
 
 /* ── Animated consequence X icon ────────────────────────── */
-function AnimatedX({ delay = 0 }: { delay?: number }) {
+function AnimatedX() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5 shrink-0" aria-hidden="true">
-      <style>{`
-        @keyframes pv-x-in { from{stroke-dashoffset:28;opacity:0} to{stroke-dashoffset:0;opacity:1} }
-        .pv-x-line { stroke-dasharray:28; animation: pv-x-in 0.35s ease-out forwards; }
-      `}</style>
-      <circle cx="10" cy="10" r="9" fill="rgba(239,68,68,0.1)" stroke="#ef4444" strokeWidth="1.5" />
-      <line className="pv-x-line" x1="7" y1="7" x2="13" y2="13" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"
-        style={{ animationDelay: `${delay}ms` }} />
-      <line className="pv-x-line" x1="13" y1="7" x2="7" y2="13" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"
-        style={{ animationDelay: `${delay + 80}ms` }} />
-    </svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="mt-0.5 size-5 shrink-0 text-foreground" aria-hidden="true">
+    <g stroke="currentColor" strokeWidth="1.5">
+      <path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z" opacity=".5" />
+      <path strokeLinecap="round" d="m14.5 9.5l-5 5m0-5l5 5" />
+    </g>
+  </svg>
   );
 }
 
@@ -377,12 +360,10 @@ function DeactivateContent({
   onConfirm: () => void;
   busy: boolean;
 }) {
-  const [step, setStep] = useState<1 | 2>(1);
   const isYearly = planId === 'yearly';
   const planName = isYearly ? 'Yearly' : 'Monthly';
   const dailyCredits = PLAN_DAILY_CREDITS[planId];
   const voiceCount = isYearly ? '10 male · 10 female' : '5 male · 5 female';
-  const duration = isYearly ? '365 days' : '30 days';
 
   const consequences = [
     `Your ${planName} plan ends immediately`,
@@ -395,136 +376,46 @@ function DeactivateContent({
 
   return (
     <div className="px-5 py-5">
-      {step === 1 ? (
-        /* ── Step 1: Warning ── */
-        <div>
+      {/* Deactivation warning */}
+      <div>
           {/* Icon */}
           <div className="flex justify-center mb-4">
-            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-destructive/10 border border-destructive/20">
+            <CutPanel tone="soft" className="size-16" contentClassName="flex items-center justify-center bg-destructive/5">
               <WarningIcon />
-            </div>
+            </CutPanel>
           </div>
 
           {/* Title + subtitle */}
           <div className="text-center mb-5">
              <h2 className="text-xl font-bold text-foreground">Deactivate {planName} Plan?</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-              This will immediately downgrade your account.<br />
-              Please read the following before continuing.
-            </p>
+
           </div>
 
           {/* Consequence list */}
-          <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-4 mb-5">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-destructive/70 mb-3">
+          <div className="mb-5 px-1">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-destructive/70">
               What will happen
             </p>
             <ul className="space-y-3">
               {consequences.map((c, i) => (
                 <li key={c} className="flex items-start gap-3">
-                  <AnimatedX delay={i * 80} />
-                  <span className="text-sm text-foreground/80 leading-snug">{c}</span>
+                  <AnimatedX />
+                  <span className="text-sm leading-snug text-foreground/80">{c}</span>
                 </li>
               ))}
             </ul>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 rounded-2xl border border-border bg-secondary px-4 py-3 text-sm font-semibold transition hover:bg-secondary/70 active:scale-[0.98]"
-            >
-              Keep My Plan
-            </button>
-            <button
-              onClick={() => setStep(2)}
-              className="flex-1 rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive transition hover:bg-destructive/15 active:scale-[0.98]"
-            >
-              I Understand →
-            </button>
+          <div className="flex flex-nowrap items-center justify-between gap-3">
+            <CutButton variant="outline" onClick={onClose} className="ml-[10px] w-[140px] px-3 py-2.5 text-xs font-semibold">
+              Cancel
+            </CutButton>
+            <CutButton variant="primary" onClick={onConfirm} disabled={busy} className="w-[140px] px-3 py-2.5 text-xs font-semibold text-white">
+              Deactivate
+            </CutButton>
           </div>
         </div>
-      ) : (
-        /* ── Step 2: Final confirm ── */
-        <div>
-          {/* Icon */}
-          <div className="flex justify-center mb-4">
-            <AnimatedCrownBreak />
-          </div>
-
-          {/* Title */}
-          <div className="text-center mb-5">
-            <h2 className="text-xl font-bold text-foreground">Final Confirmation</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-              Your plan and all credits will be cleared immediately.<br />
-              Are you absolutely sure?
-            </p>
-          </div>
-
-          {/* After-downgrade summary */}
-          <div className="rounded-2xl border border-border bg-secondary/40 overflow-hidden mb-5">
-            <div className="px-4 py-2.5 bg-destructive/8 border-b border-border">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-destructive/70">
-                After deactivation
-              </p>
-            </div>
-            {[
-              { label: 'Plan changes to', value: 'Free', delay: 0 },
-              { label: 'Credits reset to', value: '2 credits', delay: 100 },
-               { label: 'Daily generations', value: '2 / day', delay: 200 },
-               { label: 'Voice access', value: '2 male · 2 female', delay: 300 },
-               { label: 'Paid period cleared', value: duration, delay: 400 },
-            ].map((row) => (
-              <div key={row.label} className="flex items-center gap-3 px-4 py-3 border-b border-border/50 last:border-0">
-                <AnimatedCheck delay={row.delay} />
-                <span className="text-sm text-muted-foreground flex-1">{row.label}</span>
-                <span className="text-sm font-semibold text-foreground">{row.value}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-3">
-            <button
-              onClick={() => setStep(1)}
-              disabled={busy}
-              className="flex-1 rounded-2xl border border-border bg-secondary px-4 py-3 text-sm font-semibold transition hover:bg-secondary/70 active:scale-[0.98] disabled:opacity-50"
-            >
-              ← Go Back
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={busy}
-              className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-destructive px-4 py-3 text-sm font-semibold text-white shadow-[0_2px_14px_rgba(239,68,68,0.4)] transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
-            >
-              {busy ? (
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              ) : (
-                <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4" aria-hidden="true">
-                  <circle cx="8" cy="8" r="7" stroke="white" strokeWidth="1.5" />
-                  <line x1="5" y1="5" x2="11" y2="11" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-                  <line x1="11" y1="5" x2="5" y2="11" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              )}
-              {busy ? 'Deactivating…' : 'Deactivate Now'}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── Stats row inside plan card ─────────────────────────── */
-function StatRow({ icon, label, value, inverted }: {
-  icon: string; label: string; value: string; inverted?: boolean;
-}) {
-  return (
-    <div className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 ${inverted ? 'bg-white/8' : 'bg-gradient-soft'}`}>
-      <Icon name={icon as never} size={14} className={inverted ? 'text-white/70' : 'text-brand-2'} />
-      <span className={`text-xs ${inverted ? 'text-white/70' : 'text-muted-foreground'}`}>{label}</span>
-      <span className={`ml-auto text-xs font-semibold ${inverted ? 'text-white' : 'text-foreground'}`}>{value}</span>
     </div>
   );
 }
@@ -658,77 +549,82 @@ function PlanCard({
   pending?: boolean;
 }) {
   const { highlight, premium } = plan;
-  const inverted = highlight || premium;
+  const inverted = current;
 
-  const cardBase = 'relative flex flex-col rounded-3xl border p-6';
-  const cardStyle = premium
-    ? `${cardBase} border-brand/30 bg-[oklch(0.18_0.04_270)] text-white shadow-[0_4px_40px_oklch(0.60_0.18_270/0.25)]`
-    : highlight
-    ? `${cardBase} border-brand/40 bg-gradient-brand text-white shadow-[0_4px_40px_oklch(0.60_0.18_22/0.30)]`
-    : `${cardBase} border-border bg-card`;
+  const cardBase = 'relative flex flex-col p-6';
+  const cardStyle = `${cardBase} ${inverted ? 'text-white' : 'text-foreground'}`;
 
   return (
-    <div className={`relative ${plan.badge ? 'pt-4' : ''} ${isOnlyCard ? 'max-w-lg mx-auto w-full' : ''}`}>
+    <div className={`relative ${isOnlyCard ? 'max-w-lg mx-auto w-full' : ''}`}>
+      <CutPanel
+        tone="card"
+className="overflow-hidden shadow-[0_18px_42px_oklch(0.15_0.02_260/0.08)] transition duration-300 hover:-translate-y-2"
+        stroke={inverted ? '#ffffff' : undefined}
+        contentClassName={inverted ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)]' : 'bg-card'}
+      >
       {plan.badge && (
-        <span className={`absolute top-0 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full px-4 py-1 text-xs font-semibold ${
-          premium
-            ? 'bg-brand text-primary-foreground shadow-[0_2px_12px_oklch(0.60_0.18_270/0.4)]'
-            : highlight
-            ? 'bg-white text-brand shadow-md'
-            : 'border border-border bg-card text-brand shadow-sm'
-        }`}>
-          ✦ {plan.badge}
-        </span>
+        <div className="absolute right-[10px] top-6 z-20 flex w-max">
+          <CutPanel
+            tone="card"
+            className="inline-flex whitespace-nowrap"
+            contentClassName="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white"
+          >
+            {plan.badge}
+          </CutPanel>
+        </div>
       )}
-
       <div className={cardStyle}>
+        <CutPanel tone="soft" stroke={inverted ? '#ffffff' : undefined} className="mb-4 size-14" contentClassName={`flex items-center justify-center ${inverted ? 'bg-background text-foreground' : 'bg-secondary text-foreground'}`}>
+          <svg className="size-6" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 19L12 3L22 19L18 21L12 17L6 21L2 19Z" />
+            <path d="M2 19L12 3" />
+            <path d="M22 19L12 3" />
+            <path d="M2 19L6 21L12 17L18 21L22 19" />
+            <circle cx="12" cy="3" r="1.5" strokeWidth="1.8" />
+            <circle cx="6" cy="12" r="1.2" strokeWidth="1.8" />
+            <circle cx="18" cy="12" r="1.2" strokeWidth="1.8" />
+          </svg>
+        </CutPanel>
+
         {/* Header row */}
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <span className={`text-xs font-semibold uppercase tracking-widest ${inverted ? 'text-white/60' : 'text-muted-foreground'}`}>
-            {plan.id === 'yearly' ? 'Yearly Premium' : plan.id === 'monthly' ? 'Monthly Pro' : 'Free Plan'}
-          </span>
+        <div className="mb-1 flex items-start justify-between gap-2">
           {/* "Active" badge — only for logged-in users on their actual plan */}
           {current && !isGuest && (
-            <span className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-              inverted ? 'bg-white/15 text-white' : 'bg-brand/10 text-brand'
-            }`}>
+            <CutPanel
+              tone="card"
+              stroke="#16a34a"
+              className="inline-flex w-max"
+              contentClassName={`flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-semibold ${inverted ? 'bg-transparent text-white' : 'bg-background text-brand'}`}
+            >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               Active
-            </span>
+            </CutPanel>
           )}
         </div>
 
-        <h3 className={`text-2xl font-bold ${inverted ? 'text-white' : 'text-foreground'}`}>{plan.name}</h3>
-        <p className={`mt-0.5 text-xs ${inverted ? 'text-white/60' : 'text-muted-foreground'}`}>{plan.tagline}</p>
+        <h3 className={`text-2xl font-semibold ${inverted ? 'text-white' : 'text-foreground'}`}>{plan.name}</h3>
+        <p className={`mt-0.5 text-xs ${inverted ? 'text-white/85' : 'text-muted-foreground'}`}>{plan.tagline}</p>
 
         {/* Price */}
         <div className="mt-4 flex items-end gap-1">
-          <span className={`text-5xl font-extrabold leading-none ${inverted ? 'text-white' : 'text-gradient'}`}>
+          <span className={`text-5xl font-normal leading-none ${inverted ? 'text-white' : 'text-foreground'}`}>
             {plan.price}
           </span>
-          <span className={`mb-1 text-sm ${inverted ? 'text-white/60' : 'text-muted-foreground'}`}>
+          <span className={`mb-1 text-sm ${inverted ? 'text-white/85' : 'text-muted-foreground'}`}>
             / {plan.period}
           </span>
-        </div>
-
-        {/* Stats grid */}
-        <div className="mt-5 space-y-2">
-          <StatRow icon="bolt"      label="Daily generations"   value={`${plan.dailyGen} / day`}          inverted={inverted} />
-          <StatRow icon="file"      label="Words per generation" value={`${fmtWords(plan.words)} words`}  inverted={inverted} />
-          <StatRow icon="user"      label="Male voices"          value={`${plan.maleVoices} voices`}      inverted={inverted} />
-          <StatRow icon="heart"     label="Female voices"        value={`${plan.femaleVoices} voices`}    inverted={inverted} />
-          <StatRow icon="soundwave" label="Voice quality"        value={plan.voiceTier}                   inverted={inverted} />
         </div>
 
         {/* Feature list */}
         <ul className="mt-5 flex flex-1 flex-col gap-2">
           {plan.features.map((f) => (
-            <li key={f.text} className={`flex items-start gap-2.5 text-sm ${inverted ? 'text-white/90' : 'text-foreground'}`}>
-              <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full ${
-                inverted ? 'bg-white/15 text-white' : f.highlight ? 'bg-brand/10 text-brand' : 'bg-secondary text-brand'
-              }`}>
-                <Icon name="check" size={10} />
-              </span>
+            <li key={f.text} className={`flex items-start gap-2.5 border-b py-1.5 text-sm last:border-0 ${inverted ? 'border-white/20 text-white' : 'border-border/50 text-foreground'}`}>
+              <svg viewBox="0 0 24 24" className={`mt-0.5 size-3.5 shrink-0 ${inverted ? 'text-white' : 'text-brand'}`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+                <path d="M12 3V21" />
+                <path d="M3 12H21" />
+                <path d="M6 6L18 18" />
+                <path d="M18 6L6 18" />
+              </svg>
               <span className={f.highlight && !inverted ? 'font-medium' : ''}>{f.text}</span>
             </li>
           ))}
@@ -736,11 +632,7 @@ function PlanCard({
 
         {/* Expiry notice — only for logged-in users on their plan */}
         {current && !isGuest && expiryDate && (
-          <div className={`mt-4 rounded-xl px-3 py-2 text-xs ${
-            inverted
-              ? (days ?? 999) <= 30 ? 'bg-orange-500/20 text-orange-200' : 'bg-white/10 text-white/70'
-              : (days ?? 999) <= 7  ? 'bg-orange-500/10 text-orange-600' : 'bg-secondary text-muted-foreground'
-          }`}>
+          <div className={`mt-4 px-0 py-2 text-xs ${inverted ? 'text-white/85' : 'text-muted-foreground'}`}>
             <span className="font-medium">Expires {expiryDate}</span>
             {days !== null && ` · ${days} day${days !== 1 ? 's' : ''} left`}
             {(days ?? 999) <= 30 && <span className="ml-1.5 font-semibold">— Expiring soon</span>}
@@ -752,77 +644,77 @@ function PlanCard({
           <PendingReviewBanner inverted={inverted} />
         ) : (
           /* CTA button */
-          <div className="mt-5">
+          <div className="mt-5 flex justify-center">
             {/* Guest → always show "Get Started" pointing to signup */}
             {isGuest ? (
               highlight ? (
-                <button
+                <CutButton
+                  variant="primary"
                   onClick={onChoose}
-                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-brand shadow-md transition hover:opacity-90 active:scale-[0.98]"
+                  className="w-[250px] px-5 py-3 text-sm font-semibold text-white"
                 >
-                  <Icon name="crown" size={16} />
                   Get Started
-                </button>
+                </CutButton>
               ) : premium ? (
-                <button
+                <CutButton
+                  variant="primary"
                   onClick={onChoose}
-                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-brand px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_16px_oklch(0.60_0.18_22/0.45)] transition hover:opacity-90 active:scale-[0.98]"
+                  className="w-[250px] px-5 py-3 text-sm font-semibold text-white"
                 >
-                  <Icon name="crown" size={16} />
                   Get Started
-                </button>
+                </CutButton>
               ) : (
-                <GradientButton fullWidth icon="crown" onClick={onChoose}>
+                <CutButton variant="primary" onClick={onChoose} className="w-[250px] px-5 py-3 text-sm font-semibold text-white">
                   Get Started
-                </GradientButton>
+                </CutButton>
               )
             ) : current && plan.id !== 'free' ? (
               /* Any paid active plan → Deactivate */
-              <button
+              <CutButton
+                variant="light"
+                stroke="#ffffff"
                 onClick={onDeactivate}
-                className={`w-full flex items-center justify-center gap-2 rounded-2xl border py-3 text-sm font-medium transition hover:opacity-90 active:scale-[0.98] ${
-                  inverted
-                    ? 'border-white/20 bg-white/10 text-white/80 hover:bg-white/15'
-                    : 'border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10'
-                }`}
+                className="w-[250px] px-5 py-3 text-sm font-medium text-foreground"
               >
-                <Icon name="ban" size={15} />
                 Deactivate {plan.name} Plan
-              </button>
+              </CutButton>
             ) : current ? (
-              <OutlineButton fullWidth disabled icon="check">Current Plan</OutlineButton>
+              <CutButton variant="primary" disabled className="w-[250px] px-5 py-3 text-sm font-semibold text-white">Current Plan</CutButton>
             ) : plan.id === 'free' ? (
-              <OutlineButton fullWidth disabled>Included Free</OutlineButton>
+              <CutButton variant="primary" disabled className="w-[250px] px-5 py-3 text-sm font-semibold text-white">Included Free</CutButton>
             ) : highlight ? (
-              <button
+              <CutButton
+                variant="primary"
                 onClick={onChoose}
                 disabled={busy}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-brand shadow-md transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+                className="w-[250px] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
               >
                 {busy
                   ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
-                  : <Icon name="crown" size={16} />}
+                  : null}
                 Get Monthly
-              </button>
+              </CutButton>
             ) : premium ? (
-              <button
+              <CutButton
+                variant="primary"
                 onClick={onChoose}
                 disabled={busy}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-brand px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_16px_oklch(0.60_0.18_22/0.45)] transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+                className="w-full px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
               >
                 {busy
                   ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  : <Icon name="crown" size={16} />}
+                  : null}
                 Get Yearly
-              </button>
+              </CutButton>
             ) : (
-              <GradientButton fullWidth icon="crown" loading={busy} onClick={onChoose}>
-                Upgrade Now
-              </GradientButton>
+              <CutButton variant="primary" onClick={onChoose} disabled={busy} className="w-[250px] px-5 py-3 text-sm font-semibold text-white">
+                {busy ? 'Loading…' : 'Upgrade Now'}
+              </CutButton>
             )}
           </div>
         )}
       </div>
+      </CutPanel>
     </div>
   );
 }
@@ -932,22 +824,6 @@ function PlansContent() {
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{subline}</p>
         </div>
 
-        {/* Trust chips */}
-        {visiblePlans.length > 1 && (
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            {[
-              { icon: 'bolt',   text: 'Credits reset daily' },
-              { icon: 'shield', text: 'No surprise charges' },
-              { icon: 'ban',    text: 'Cancel anytime' },
-            ].map(({ icon, text }) => (
-              <span key={text} className="flex items-center gap-1.5 rounded-full border border-border bg-secondary/60 px-3.5 py-1.5 text-xs text-muted-foreground">
-                <Icon name={icon as never} size={12} className="text-brand-2" />
-                {text}
-              </span>
-            ))}
-          </div>
-        )}
-
         {/* Plan cards */}
         <div className={`mt-8 grid items-start gap-5 ${gridCols}`}>
           {visiblePlans.map((plan) => (
@@ -967,46 +843,7 @@ function PlansContent() {
           ))}
         </div>
 
-        {/* Comparison table — only for guests or free users */}
-        {(isGuest || currentPlan === 'free') && (
-          <div className="mt-10 overflow-hidden rounded-2xl border border-border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-secondary/40">
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Feature</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Free</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-brand">Monthly</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-brand-2">Yearly</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {[
-                  { label: 'Daily generations', free: '2 / day', monthly: '5 / day',   yearly: '10 / day' },
-                  { label: 'Words per gen',     free: '500',     monthly: '3,000',      yearly: '100,000' },
-                  { label: 'Male voices',       free: '2',       monthly: '5',          yearly: '10' },
-                  { label: 'Female voices',     free: '2',       monthly: '5',          yearly: '10' },
-                  { label: 'Voice quality',     free: 'Standard', monthly: 'Premium',   yearly: 'Ultra Premium' },
-                  { label: 'Live chat support', free: '—',       monthly: '✓',          yearly: 'Priority' },
-                ].map((row) => (
-                  <tr key={row.label} className="hover:bg-secondary/30 transition">
-                    <td className="px-4 py-3 font-medium text-foreground">{row.label}</td>
-                    <td className="px-4 py-3 text-center text-muted-foreground">{row.free}</td>
-                    <td className="px-4 py-3 text-center font-medium text-brand">{row.monthly}</td>
-                    <td className="px-4 py-3 text-center font-medium text-brand-2">{row.yearly}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
 
-        {/* Footer note */}
-        <div className="mt-6 rounded-2xl border border-border bg-gradient-soft p-4 text-center">
-          <p className="text-xs text-muted-foreground">
-            Paid plans auto-expire after their period — your account reverts to Free with no surprise charges.
-            1 generation = 1 credit. Credits reset daily at midnight Bangladesh Standard Time.
-          </p>
-        </div>
       </div>
 
       {/* Deactivate overlay */}

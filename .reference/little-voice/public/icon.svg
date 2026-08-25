@@ -1,0 +1,47 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lv-bg" x1="10" y1="6" x2="120" y2="124" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9B7BF7" />
+      <stop offset="0.55" stop-color="#7C5CFB" />
+      <stop offset="1" stop-color="#5B8DF6" />
+    </linearGradient>
+    <linearGradient id="lv-gloss" x1="24" y1="10" x2="80" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="lv-bars" x1="30" y1="40" x2="98" y2="88" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#F3EFFF" />
+    </linearGradient>
+    <radialGradient id="lv-glow" cx="64" cy="64" r="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0.7" stop-color="#000000" stop-opacity="0" />
+      <stop offset="1" stop-color="#2A1B6B" stop-opacity="0.25" />
+    </radialGradient>
+  </defs>
+
+  <!-- Badge base -->
+  <rect x="4" y="4" width="120" height="120" rx="30" fill="url(#lv-bg)" />
+  <rect x="4" y="4" width="120" height="120" rx="30" fill="url(#lv-glow)" />
+
+  <!-- Inner premium ring -->
+  <rect x="6.5" y="6.5" width="115" height="115" rx="27.5" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1.5" />
+
+  <!-- Glossy top highlight -->
+  <path d="M12 34C12 16.3269 26.3269 4 44 4H84C101.673 4 116 16.3269 116 34V44C116 44 92 20 64 20C36 20 12 44 12 44V34Z" fill="url(#lv-gloss)" />
+
+  <!-- Soundwave glyph -->
+  <g>
+    <rect x="26" y="58" width="10" height="20" rx="5" fill="url(#lv-bars)" />
+    <rect x="43" y="46" width="10" height="44" rx="5" fill="url(#lv-bars)" />
+    <rect x="60" y="32" width="10" height="72" rx="5" fill="url(#lv-bars)" />
+    <rect x="77" y="46" width="10" height="44" rx="5" fill="url(#lv-bars)" />
+    <rect x="94" y="58" width="10" height="20" rx="5" fill="url(#lv-bars)" />
+  </g>
+
+  <!-- Bottom vignette for depth -->
+  <path
+    d="M4 94C4 94 30 110 64 110C98 110 124 94 124 94V96C124 111.464 111.464 124 96 124H32C16.536 124 4 111.464 4 96V94Z"
+    fill="#2A1B6B"
+    fill-opacity="0.12"
+  />
+</svg>

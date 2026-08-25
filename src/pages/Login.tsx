@@ -84,7 +84,12 @@ export default function LoginPage() {
     setErrorType('generic');
     setLoading(true);
     try {
-      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      try {
+        await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      } catch {
+        // If persistent storage is unavailable, keep the current auth session
+        // instead of failing the login request.
+      }
       // Redirect (dashboard vs. /verify/email) is decided by the effect
       // above once `user`/`profile` update — avoids racing this call
       // against an unverified account and sending them to the wrong place.

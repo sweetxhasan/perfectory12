@@ -20,11 +20,12 @@ export function CutButton({
   children,
   variant = 'outline',
   className = '',
+  stroke,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: CutVariant }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: CutVariant; stroke?: string }) {
   return (
-    <button {...props} className={`group relative inline-flex items-center justify-center gap-2 overflow-hidden px-5 py-3 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60 ${className}`}>
-      <CutFrame variant={variant} />
+    <button {...props} className={`group relative isolate inline-flex items-center justify-center gap-2 overflow-hidden px-5 py-3 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60 ${className}`}>
+      <CutFrame variant={variant} stroke={stroke} />
       <span className={`relative z-10 inline-flex items-center gap-2 ${variant === 'primary' ? 'text-primary-foreground' : ''}`}>{children}</span>
     </button>
   );
@@ -78,18 +79,20 @@ export function CutFrame({
   variant = 'outline',
   active = false,
   className = '',
+  stroke,
 }: {
   variant?: CutVariant;
   /** @deprecated no longer configurable — geometry is fixed to CUT_FRAME_PATH */
   cut?: number;
   active?: boolean;
   className?: string;
+  stroke?: string;
 }) {
   if (variant === 'light') {
     return (
       <span aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
         <span className="absolute inset-0 bg-background" style={{ clipPath: CUT_FRAME_CLIP_PATH }} />
-        <CutFrameStrokes stroke="oklch(1 0 0 / 0.9)" strokeWidth={1} innerStroke="oklch(0.15 0 0 / 0.12)" />
+        <CutFrameStrokes stroke={stroke ?? 'oklch(1 0 0 / 0.9)'} strokeWidth={1} innerStroke={stroke ? `${stroke}55` : 'oklch(0.15 0 0 / 0.12)'} />
       </span>
     );
   }
@@ -98,14 +101,14 @@ export function CutFrame({
     return (
       <span aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
         <span
-          className="absolute inset-0 bg-gradient-brand shadow-[0_8px_22px_-10px_oklch(0.42_0.16_350_/_0.5)]"
+          className="absolute inset-0 bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] shadow-[0_8px_22px_-10px_oklch(0.42_0.16_350_/_0.5)]"
           style={{ clipPath: CUT_FRAME_CLIP_PATH }}
         />
         <span
           className="absolute inset-0 -translate-x-full bg-white/15 transition-transform duration-500 group-hover:translate-x-full"
           style={{ clipPath: CUT_FRAME_CLIP_PATH }}
         />
-        <CutFrameStrokes stroke="url(#cut-brand-gradient)" strokeWidth={1} innerStroke="url(#cut-brand-gradient)" />
+        <CutFrameStrokes stroke="oklch(1 0 0 / 0.32)" strokeWidth={1} innerStroke="oklch(1 0 0 / 0.16)" />
       </span>
     );
   }
@@ -152,14 +155,16 @@ export function CutPanel({
   contentClassName = '',
   style,
   children,
+  stroke,
 }: {
-  /** @deprecated no longer configurable — geometry is fixed to CUT_FRAME_PATH */
+  /** @deprecated no longer configurable — geometry is fixed to CUT_FRAME_CLIP_PATH */
   cut?: number;
   tone?: 'card' | 'soft' | 'brand' | 'popover';
   className?: string;
   contentClassName?: string;
   style?: CSSProperties;
   children?: ReactNode;
+  stroke?: string;
 }) {
   const fill =
     tone === 'soft' ? 'bg-gradient-soft'
@@ -170,7 +175,7 @@ export function CutPanel({
   return (
     <div className={`relative isolate ${className}`} style={{ clipPath: CUT_FRAME_CLIP_PATH, ...style }}>
       <div className={`relative z-10 h-full w-full ${fill} ${contentClassName}`}>{children}</div>
-      <CutFrameStrokes className="z-20" />
+      <CutFrameStrokes stroke={stroke} innerStroke={stroke ? `${stroke}55` : undefined} className="z-20" />
     </div>
   );
 }

@@ -1,0 +1,46 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Apple touch icon variant of icon.svg: iOS applies its own rounded-square
+    mask and expects a fully opaque, edge-to-edge square (no transparency,
+    no pre-baked corner radius) — reusing icon.svg's inset badge as-is would
+    leave a visible transparent border once iOS crops it.
+  -->
+  <defs>
+    <linearGradient id="lv-bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9B7BF7" />
+      <stop offset="0.55" stop-color="#7C5CFB" />
+      <stop offset="1" stop-color="#5B8DF6" />
+    </linearGradient>
+    <linearGradient id="lv-gloss" x1="20" y1="6" x2="80" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="lv-bars" x1="30" y1="40" x2="98" y2="88" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#F3EFFF" />
+    </linearGradient>
+    <radialGradient id="lv-glow" cx="64" cy="64" r="66" gradientUnits="userSpaceOnUse">
+      <stop offset="0.7" stop-color="#000000" stop-opacity="0" />
+      <stop offset="1" stop-color="#2A1B6B" stop-opacity="0.25" />
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="128" height="128" fill="url(#lv-bg)" />
+  <rect x="0" y="0" width="128" height="128" fill="url(#lv-glow)" />
+
+  <path d="M0 30C0 13.4315 13.4315 0 30 0H98C114.569 0 128 13.4315 128 30V40C128 40 100 16 64 16C28 16 0 40 0 40V30Z" fill="url(#lv-gloss)" />
+
+  <g>
+    <rect x="26" y="58" width="10" height="20" rx="5" fill="url(#lv-bars)" />
+    <rect x="43" y="46" width="10" height="44" rx="5" fill="url(#lv-bars)" />
+    <rect x="60" y="32" width="10" height="72" rx="5" fill="url(#lv-bars)" />
+    <rect x="77" y="46" width="10" height="44" rx="5" fill="url(#lv-bars)" />
+    <rect x="94" y="58" width="10" height="20" rx="5" fill="url(#lv-bars)" />
+  </g>
+
+  <path
+    d="M0 96C0 96 26 112 64 112C102 112 128 96 128 96V98C128 114.569 114.569 128 98 128H30C13.4315 128 0 114.569 0 98V96Z"
+    fill="#2A1B6B"
+    fill-opacity="0.12"
+  />
+</svg>
