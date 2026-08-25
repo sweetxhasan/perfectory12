@@ -379,7 +379,7 @@ function LanguagePicker({
   );
 }
 
-/* ═══════════════════════════════════════════════════
+/* ═════════════════���═════════════════════════════════
    Voice picker — premium overlay with plan sections
 ═══════════════════════════════════════════════════ */
 function VoicePicker({
@@ -1335,9 +1335,11 @@ function GeneratorContent() {
 
         {/* ── Result player ── */}
         {currentGen && (
-          <div
-            className="mt-6 overflow-hidden rounded-3xl p-5 sm:p-6"
-            style={{ background: 'linear-gradient(-45deg, #ec5252, #6e1a52)' }}
+          <CutPanel
+            tone="brand"
+            stroke="oklch(1 0 0 / 0.55)"
+            className="mt-6 w-full"
+            contentClassName="overflow-hidden bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] p-5 sm:p-6"
           >
             {/* Waveform animation */}
             <div className="mb-4 flex items-end justify-center gap-1 h-8">
@@ -1369,23 +1371,23 @@ function GeneratorContent() {
             <div className="mt-4 flex flex-wrap gap-2">
               <CutButton
                 type="button"
-                variant="light"
+                variant="primary"
                 onClick={toggleCurrentAudio}
-                className="inline-flex items-center gap-2 border-0 bg-white/20 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/30 sm:px-5"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium !text-white sm:px-5"
               >
-                <Icon name={audioPlaying ? 'pause' : 'play'} size={16} className="text-white" />
+                <Icon name={audioPlaying ? 'pause' : 'play'} size={16} className="!text-white" />
                 {audioPlaying ? 'Pause' : 'Play again'}
               </CutButton>
               <CutButton
                 type="button"
-                variant="light"
+                variant="primary"
                 onClick={() => download(currentGen.url, currentGen.text)}
-                className="inline-flex items-center gap-2 border-0 bg-white/20 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/30 sm:px-5"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium !text-white sm:px-5"
               >
-                <Icon name="download" size={16} className="text-white" /> Download
+                <Icon name="download" size={16} className="!text-white" /> Download
               </CutButton>
             </div>
-          </div>
+          </CutPanel>
         )}
 
 
