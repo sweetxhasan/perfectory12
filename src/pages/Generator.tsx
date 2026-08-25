@@ -874,37 +874,53 @@ function GeneratorContent() {
 
   /* ── Voice preview — one at a time ── */
   const activePreviewId = useRef<string | null>(null);
-
+  const previewRequestId = useRef(0);
+  
+  function stopVoicePreview() {
+    previewRequestId.current += 1;
+    const audio = previewAudioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.onended = null;
+      audio.onerror = null;
+    }
+    previewAudioRef.current = null;
+    activePreviewId.current = null;
+    setPreviewId(null);
+  }
+  
   function toggleVoicePreview(e: React.MouseEvent, v: ApiVoice) {
     e.stopPropagation();
-
-    // Clicking the same voice again → stop
+  
     if (activePreviewId.current === v.voice_id) {
-      previewAudioRef.current?.pause();
-      previewAudioRef.current = null;
-      activePreviewId.current = null;
-      setPreviewId(null);
+      stopVoicePreview();
       return;
     }
-
-    // Stop whatever is already playing
-    previewAudioRef.current?.pause();
-    previewAudioRef.current = null;
-
+  
+    // Always stop the previous voice before starting a new preview.
+    stopVoicePreview();
     if (!v.play_audio_url) return;
-
+  
+    const requestId = previewRequestId.current;
+    const audio = new Audio();
+    audio.crossOrigin = 'anonymous';
+    audio.preload = 'auto';
+    audio.src = v.play_audio_url;
+    previewAudioRef.current = audio;
     activePreviewId.current = v.voice_id;
     setPreviewId(v.voice_id);
-
-    const audio = new Audio(v.play_audio_url);
-    previewAudioRef.current = audio;
-    audio.play().catch(() => {});
-    audio.onended = () => {
-      if (activePreviewId.current === v.voice_id) {
+  
+    const finish = () => {
+      if (previewRequestId.current === requestId && activePreviewId.current === v.voice_id) {
+        previewAudioRef.current = null;
         activePreviewId.current = null;
         setPreviewId(null);
       }
     };
+    audio.onended = finish;
+    audio.onerror = finish;
+    audio.play().catch(finish);
   }
 
 
