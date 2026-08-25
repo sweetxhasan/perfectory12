@@ -1367,21 +1367,23 @@ function GeneratorContent() {
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
-              <button
+              <CutButton
                 type="button"
+                variant="light"
                 onClick={toggleCurrentAudio}
-                className="inline-flex items-center gap-2 rounded-2xl bg-white/20 px-4 sm:px-5 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/30 active:scale-[0.98]"
+                className="inline-flex items-center gap-2 border-0 bg-white/20 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/30 sm:px-5"
               >
-                <Icon name={audioPlaying ? 'pause' : 'play'} size={16} />
+                <Icon name={audioPlaying ? 'pause' : 'play'} size={16} className="text-white" />
                 {audioPlaying ? 'Pause' : 'Play again'}
-              </button>
-              <button
+              </CutButton>
+              <CutButton
                 type="button"
+                variant="light"
                 onClick={() => download(currentGen.url, currentGen.text)}
-                className="inline-flex items-center gap-2 rounded-2xl bg-white/20 px-4 sm:px-5 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/30 active:scale-[0.98]"
+                className="inline-flex items-center gap-2 border-0 bg-white/20 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/30 sm:px-5"
               >
-                <Icon name="download" size={16} /> Download
-              </button>
+                <Icon name="download" size={16} className="text-white" /> Download
+              </CutButton>
             </div>
           </div>
         )}
