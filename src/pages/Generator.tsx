@@ -1185,11 +1185,11 @@ function GeneratorContent() {
                 ) : voices.filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).length === 0 ? (
                   <p className="voice-loading-text px-1 py-4 text-sm font-semibold">No voice found</p>
                 ) : voices.filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).slice(0, 20).map((voice) => <div role="button" tabIndex={0} key={voice.voice_id} onClick={() => setVoiceId(voice.voice_id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setVoiceId(voice.voice_id); }} className="w-[148px] shrink-0 snap-start text-left sm:w-[168px]">
-                <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName={`bg-white p-2 ${voiceId === voice.voice_id ? 'ring-2 ring-[#ec5252]/30' : ''}`}>
+                <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName={`p-2 ${voiceId === voice.voice_id ? 'bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] text-white' : 'bg-white text-slate-800'}`}>
                   <div className="flex items-center gap-1.5">
                     {voice.profile_photo_url ? <img src={voice.profile_photo_url} alt={voice.name} className="h-7 w-7 rounded-full object-cover" /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#ec5252] to-[#6e1a52] text-xs font-bold text-white">{voice.name.charAt(0)}</span>}
-                    <span className="min-w-0 flex-1 whitespace-nowrap text-xs font-semibold text-slate-800 sm:text-sm">{voice.name}</span>
-                    <CutButton type="button" variant="primary" onClick={(event) => onTogglePreview(event, voice)} className="size-7 shrink-0 px-0 py-0 text-white [&_svg]:!text-white [&_svg]:opacity-100"><Icon name={previewId === voice.voice_id ? 'pause' : 'play'} size={12} className="text-white" /></CutButton>
+                    <span className={`min-w-0 flex-1 whitespace-nowrap text-xs font-semibold sm:text-sm ${voiceId === voice.voice_id ? 'text-white' : 'text-slate-800'}`}>{voice.name}</span>
+                    <CutButton type="button" variant="light" onClick={(event) => onTogglePreview(event, voice)} className="size-7 shrink-0 bg-white px-0 py-0 text-slate-900 [&_svg]:!text-slate-900 [&_svg]:opacity-100"><Icon name={previewId === voice.voice_id ? 'pause' : 'play'} size={12} className="text-slate-900" /></CutButton>
                   </div>
                 </CutPanel>
               </div>)}
