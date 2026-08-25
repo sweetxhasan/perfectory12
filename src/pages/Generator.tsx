@@ -806,14 +806,24 @@ function GeneratorContent() {
   const [voicesLoading, setVoicesLoading] = useState(true);
 
   useEffect(() => {
-    fetchVoices()
+    let cancelled = false;
+    setVoicesLoading(true);
+    setPreviewId(null);
+    fetchVoices(lang)
       .then((list) => {
+        if (cancelled) return;
         setVoices(list);
-        if (list.length > 0) setVoiceId((prev) => prev || list[0].voice_id);
+        setVoiceId((current) => list.some((voice) => voice.voice_id === current) ? current : (list[0]?.voice_id ?? ''));
       })
-      .catch(() => { /* silently fall back to empty list */ })
-      .finally(() => setVoicesLoading(false));
-  }, []);
+      .catch(() => {
+        if (!cancelled) {
+          setVoices([]);
+          setVoiceId('');
+        }
+      })
+      .finally(() => { if (!cancelled) setVoicesLoading(false); });
+    return () => { cancelled = true; };
+  }, [lang]);
 
   const cost      = creditCost(text);
   const credits   = profile?.credits ?? 0;
@@ -1158,8 +1168,12 @@ function GeneratorContent() {
                   })}
                 </div>
               </div>
-              <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 snap-x snap-mandatory">
-                {(voices.length ? voices : Array.from({ length: 5 }, (_, index) => ({ voice_id: `simulated-${index}`, name: ['Ujjwal', 'Tiyasha', 'Arif', 'Maya', 'Rafi'][index], gender: index % 2 ? 'female' : 'male', plan: 'free', profile_photo_url: '', play_audio_url: '' } as ApiVoice))).filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).slice(0, 5).map((voice) => <div role="button" tabIndex={0} key={voice.voice_id} onClick={() => setVoiceId(voice.voice_id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setVoiceId(voice.voice_id); }} className="w-[148px] shrink-0 snap-start text-left sm:w-[168px]">
+              <div className="-mx-1 flex min-h-16 gap-3 overflow-x-auto px-1 pb-2 snap-x snap-mandatory">
+                {voicesLoading ? (
+                  <p className="voice-loading-text px-1 py-4 text-sm font-semibold">Voice Founding<span className="loading-dots" aria-hidden="true">...</span> please wait...</p>
+                ) : voices.filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).length === 0 ? (
+                  <p className="voice-loading-text px-1 py-4 text-sm font-semibold">No voice found</p>
+                ) : voices.filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).slice(0, 20).map((voice) => <div role="button" tabIndex={0} key={voice.voice_id} onClick={() => setVoiceId(voice.voice_id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setVoiceId(voice.voice_id); }} className="w-[148px] shrink-0 snap-start text-left sm:w-[168px]">
                 <CutPanel tone="card" stroke="url(#cut-brand-gradient)" className="w-full" contentClassName={`bg-white p-2 ${voiceId === voice.voice_id ? 'ring-2 ring-[#ec5252]/30' : ''}`}>
                   <div className="flex items-center gap-1.5">
                     {voice.profile_photo_url ? <img src={voice.profile_photo_url} alt={voice.name} className="h-7 w-7 rounded-full object-cover" /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#ec5252] to-[#6e1a52] text-xs font-bold text-white">{voice.name.charAt(0)}</span>}

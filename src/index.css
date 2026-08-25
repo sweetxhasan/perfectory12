@@ -2,6 +2,28 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+.voice-loading-text {
+  background: linear-gradient(-45deg, #ec5252, #6e1a52);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.loading-dots {
+  display: inline-block;
+  width: 1.2em;
+  overflow: hidden;
+  vertical-align: bottom;
+  animation: voice-loading-dots 1.2s steps(4, end) infinite;
+}
+
+@keyframes voice-loading-dots {
+  0% { width: 0; }
+  33% { width: 0.4em; }
+  66% { width: 0.8em; }
+  100% { width: 1.2em; }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

@@ -21,23 +21,33 @@ function mapVoiceType(type: string): VoicePlan {
   return 'yearly'; // pro_max, premium, etc.
 }
 
-export async function fetchVoices(): Promise<ApiVoice[]> {
-  const res = await fetch('https://gsvtcpiwxaslgusfmzok.supabase.co/functions/v1/voice-list');
+export async function fetchVoices(language: LanguageId = 'bn'): Promise<ApiVoice[]> {
+  const res = await fetch(`https://littlevoiceapi.littleblog.online/api/voices?language=${encodeURIComponent(language)}`, {
+    headers: { Accept: 'application/json' },
+  });
   if (!res.ok) throw new Error(`Voice list fetch failed: ${res.status}`);
   const json = await res.json();
   const data: Array<{
+    id: string;
     name: string;
-    voice_id: string;
-    character_type: 'male' | 'female';
+    gender: 'male' | 'female';
     voice_type: string;
-    profile_photo_url: string | null;
-    play_audio_url: string | null;
-  }> = json.data ?? [];
-  return data.map((v) => ({
-    ...v,
-    plan: mapVoiceType(v.voice_type),
-    gender: v.character_type,
-  }));
+    photo_url?: string | null;
+    sample_audio_url?: string | null;
+    languages?: string[];
+  }> = json.voices ?? [];
+  return data
+    .filter((voice) => !voice.languages?.length || voice.languages.includes(language))
+    .map((voice) => ({
+      voice_id: voice.id,
+      name: voice.name,
+      character_type: voice.gender,
+      voice_type: voice.voice_type,
+      profile_photo_url: voice.photo_url ?? null,
+      play_audio_url: voice.sample_audio_url ?? null,
+      plan: mapVoiceType(voice.voice_type),
+      gender: voice.gender,
+    }));
 }
 
 export interface Language {
