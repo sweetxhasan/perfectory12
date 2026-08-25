@@ -1170,7 +1170,7 @@ function GeneratorContent() {
               </div>
               <div className="-mx-1 flex min-h-16 gap-3 overflow-x-auto px-1 pb-2 snap-x snap-mandatory">
                 {voicesLoading ? (
-                  <p className="voice-loading-text px-1 py-4 text-sm font-semibold">Voice Founding<span className="loading-dots" aria-hidden="true">...</span> please wait...</p>
+                  <p className="voice-loading-text px-1 py-4 text-sm font-semibold">Voice founding please wait<span className="loading-dots" aria-hidden="true">...</span></p>
                 ) : voices.filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).length === 0 ? (
                   <p className="voice-loading-text px-1 py-4 text-sm font-semibold">No voice found</p>
                 ) : voices.filter((voice) => voiceFilter === 'all' || voice.gender === voiceFilter).slice(0, 20).map((voice) => <div role="button" tabIndex={0} key={voice.voice_id} onClick={() => setVoiceId(voice.voice_id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setVoiceId(voice.voice_id); }} className="w-[148px] shrink-0 snap-start text-left sm:w-[168px]">
