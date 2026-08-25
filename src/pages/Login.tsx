@@ -87,9 +87,8 @@ export default function LoginPage() {
       try {
         await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       } catch {
-        // Embedded previews can close IndexedDB while the document is hidden.
-        // Fall back to session persistence so login still works safely.
-        if (rememberMe) await setPersistence(auth, browserSessionPersistence);
+        // If persistent storage is unavailable, keep the current auth session
+        // instead of failing the login request.
       }
       // Redirect (dashboard vs. /verify/email) is decided by the effect
       // above once `user`/`profile` update — avoids racing this call

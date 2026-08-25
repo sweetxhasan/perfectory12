@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { initializeAuth, browserSessionPersistence, GoogleAuthProvider } from "firebase/auth";
+import { initializeAuth, browserLocalPersistence, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -13,8 +13,8 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
-// Session persistence avoids IndexedDB initialization failures in embedded previews
-// where the browser can close or hide the IndexedDB database between reloads.
-export const auth = initializeAuth(app, { persistence: browserSessionPersistence });
+// Keep the Firebase session across reloads and browser restarts, matching the
+// previous login behavior. Firebase manages this persistence securely.
+export const auth = initializeAuth(app, { persistence: browserLocalPersistence });
 export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
