@@ -140,20 +140,15 @@ function DashboardContent() {
 
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
         {/* Credits card */}
-        <CutPanel tone="card" contentClassName="flex items-center gap-4 p-5">
-          <CutPanel tone="soft" className="size-12 shrink-0" contentClassName="flex items-center justify-center text-brand">
-            <Icon name="bolt" size={24} />
-          </CutPanel>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm text-muted-foreground">Credits left</p>
-            <p className="text-2xl">{profile.credits}</p>
-          </div>
-          <Link href="/credits">
-            <CutButton variant="outline" className="shrink-0 px-3 py-2 text-xs text-brand">
-              <Icon name="chart" size={14} /> See Usage
-            </CutButton>
-          </Link>
-        </CutPanel>
+  <CutPanel tone="card" contentClassName="flex items-center gap-4 p-5">
+  <CutPanel tone="soft" className="size-12 shrink-0" contentClassName="flex items-center justify-center text-brand">
+  <Icon name="bolt" size={24} />
+  </CutPanel>
+  <div className="flex min-w-0 items-center gap-3">
+  <p className="whitespace-nowrap text-base text-muted-foreground">Credits left</p>
+  <p className="bg-[linear-gradient(-45deg,#ec5252,#6e1a52)] bg-clip-text text-3xl font-bold leading-none text-transparent">{profile.credits}</p>
+  </div>
+  </CutPanel>
 
         {/* Plan card */}
         <CutPanel tone="card" contentClassName="flex items-center gap-4 p-5">
